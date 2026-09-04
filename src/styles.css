@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-dark: #090312;
+    --bg-surface: #130924;
+    --bg-card: #1c0e36;
+    --accent-neon: #a855f7;
+    --accent-glow: #d946ef;
+    --lilac-soft: #e9d5ff;
+    --lilac-muted: #c084fc;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: #090312;
+    color: #f3e8ff;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: 'Syne', sans-serif;
+  }
+}
+
+/* Monochromatic Violet Theme Enhancements */
+.bg-violet-black {
+  background-color: #090312;
+}
+
+.bg-violet-surface {
+  background-color: #130924;
+}
+
+.bg-violet-card {
+  background-color: #1a0d33;
+}
+
+.bg-lilac-soft {
+  background-color: #f5f0fb;
+}
+
+.text-lilac-muted {
+  color: #d8b4fe;
+}
+
+/* Neon Violet Glow Effects */
+.btn-neon-violet {
+  background: linear-gradient(135deg, #a855f7 0%, #9333ea 50%, #7e22ce 100%);
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.45), 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-neon-violet:hover {
+  background: linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #9333ea 100%);
+  box-shadow: 0 0 30px rgba(192, 132, 252, 0.65), 0 0 45px rgba(217, 70, 239, 0.35);
+  transform: translateY(-2px);
+}
+
+.btn-neon-violet:active {
+  transform: translateY(0);
+}
+
+/* Glassmorphic Violet Panels */
+.glass-violet-nav {
+  background: rgba(15, 6, 28, 0.82);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(216, 180, 254, 0.12);
+}
+
+.glass-violet-card {
+  background: linear-gradient(145deg, rgba(28, 14, 54, 0.75) 0%, rgba(16, 7, 32, 0.85) 100%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(216, 180, 254, 0.12);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-violet-card:hover {
+  border-color: rgba(192, 132, 252, 0.4);
+  box-shadow: 0 12px 32px -8px rgba(168, 85, 247, 0.25), 0 0 20px rgba(168, 85, 247, 0.15);
+  transform: translateY(-4px);
+}
+
+/* Drag and drop lilac theme */
+.drag-drop-zone {
+  background: linear-gradient(180deg, rgba(233, 213, 255, 0.04) 0%, rgba(192, 132, 252, 0.08) 100%);
+  border: 2px dashed rgba(192, 132, 252, 0.4);
+  transition: all 0.3s ease;
+}
+
+.drag-drop-zone.active,
+.drag-drop-zone:hover {
+  border-color: #c084fc;
+  background: linear-gradient(180deg, rgba(233, 213, 255, 0.08) 0%, rgba(192, 132, 252, 0.14) 100%);
+  box-shadow: 0 0 25px rgba(168, 85, 247, 0.25);
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-float-slow {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #090312;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a134a;
+  border-radius: 9999px;
+  border: 2px solid #090312;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #7e22ce;
+}
