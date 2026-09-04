@@ -32,6 +32,17 @@ export interface ServiceItem {
   whatsappUrl: string;
 }
 
+export interface ProfileData {
+  name: string;
+  title: string;
+  location: string;
+  imageUrl: string;
+  bio: string;
+  whatsapp: string;
+  email: string;
+  instagram: string;
+}
+
 export interface CartItem {
   photo: Photo;
   quantity: number;
