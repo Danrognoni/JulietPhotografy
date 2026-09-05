@@ -30,6 +30,12 @@ export const routes: Routes = [
     data: { tab: 'photos' }
   },
   {
+    path: 'admin/albums',
+    component: HomeComponent,
+    canActivate: [authGuard],
+    data: { tab: 'albums' }
+  },
+  {
     path: 'admin/services',
     component: HomeComponent,
     canActivate: [authGuard],

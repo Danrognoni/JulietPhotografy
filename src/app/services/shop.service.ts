@@ -252,24 +252,71 @@ export class ShopService {
     tags: ['Casamientos', 'Cumpleaños de XV', 'Eventos Sociales & Corporativos', 'Retoque & Postproducción']
   };
 
+  // Default Albums / Categories
+  private readonly defaultAlbums: AlbumFolder[] = [
+    {
+      id: 'casamientos',
+      name: 'Casamientos',
+      category: 'Casamientos',
+      coverImage: '',
+      count: 0,
+      description: 'Historias de amor, ceremonias íntimas y momentos espontáneos de bodas.'
+    },
+    {
+      id: 'cumpleanos-xv',
+      name: 'Cumpleaños XV',
+      category: 'Cumpleaños XV',
+      coverImage: '',
+      count: 0,
+      description: 'Sesiones previas llenas de estilo, fiesta y vals de 15 años.'
+    },
+    {
+      id: 'eventos',
+      name: 'Eventos',
+      category: 'Eventos',
+      coverImage: '',
+      count: 0,
+      description: 'Celebraciones sociales, aniversarios y registros culturales.'
+    },
+    {
+      id: 'paisajismo',
+      name: 'Paisajismo',
+      category: 'Paisajismo',
+      coverImage: '',
+      count: 0,
+      description: 'Horizontes, dunas y la inmensidad del océano en Mar del Plata.'
+    },
+    {
+      id: 'foto-producto',
+      name: 'Foto Producto',
+      category: 'Foto Producto',
+      coverImage: '',
+      count: 0,
+      description: 'Composiciones gastronómicas y comerciales con iluminación de estudio.'
+    }
+  ];
+
   // State Signals
   readonly photos = signal<Photo[]>(this.loadStorage('jm_photos', this.defaultPhotos));
   readonly services = signal<ServiceItem[]>(this.loadStorage('jm_services', this.defaultServices));
   readonly profile = signal<ProfileData>(this.loadStorage('jm_profile', this.defaultProfile));
+  readonly albums = signal<AlbumFolder[]>(this.loadStorage('jm_custom_albums', this.defaultAlbums));
 
   readonly selectedCategory = signal<PhotoCategory | 'Todos'>('Todos');
   readonly searchQuery = signal<string>('');
+  readonly heroPhotoId = signal<string>(this.loadStorage<string>('jm_hero_photo_id', ''));
   
   readonly cart = signal<CartItem[]>([]);
   readonly isCartOpen = signal<boolean>(false);
   readonly selectedPhoto = signal<Photo | null>(null);
   readonly isAdminDashboardOpen = signal<boolean>(false);
-  readonly adminInitialTab = signal<'photos' | 'services' | 'profile'>('photos');
+  readonly adminInitialTab = signal<'photos' | 'albums' | 'services' | 'profile'>('photos');
 
   // Global Alert & Selection Signals
   readonly globalAlert = signal<AppAlert | null>(null);
   readonly editingPhoto = signal<Photo | null>(null);
   readonly editingService = signal<ServiceItem | null>(null);
+  readonly editingAlbum = signal<AlbumFolder | null>(null);
 
   constructor() {
     // Sincronizar automáticamente con el backend Spring Boot al iniciar en el cliente
@@ -337,48 +384,33 @@ export class ShopService {
   }
 
   // Computed state
-  // Computed Albums / Folders based on photos
+  // Computed Albums / Folders based on albums signal and photos
   readonly albumFolders = computed<AlbumFolder[]>(() => {
     const all = this.photos();
-    const standardFolders = [
-      { name: 'Casamientos', desc: 'Historias de amor, ceremonias íntimas y momentos espontáneos de bodas.' },
-      { name: 'Cumpleaños XV', desc: 'Sesiones previas llenas de estilo, fiesta y vals de 15 años.' },
-      { name: 'Eventos', desc: 'Celebraciones sociales, aniversarios y registros culturales.' },
-      { name: 'Paisajismo', desc: 'Horizontes, dunas y la inmensidad del océano en Mar del Plata.' },
-      { name: 'Foto Producto', desc: 'Composiciones gastronómicas y comerciales con iluminación de estudio.' }
-    ];
+    const currentAlbums = this.albums();
 
-    // Add any unique custom categories uploaded by the user
-    const existingNames = standardFolders.map(f => f.name.toLowerCase());
-    all.forEach(p => {
-      if (p.category && !existingNames.includes(p.category.toLowerCase()) && p.category !== 'Todos') {
-        standardFolders.push({
-          name: p.category,
-          desc: 'Colección fotográfica de autor y galería temática.'
-        });
-        existingNames.push(p.category.toLowerCase());
-      }
-    });
-
-    return standardFolders.map(folder => {
+    return currentAlbums.map(album => {
       const matching = all.filter(p => {
-        const catMatch = p.category?.trim().toLowerCase() === folder.name.trim().toLowerCase();
-        const badgeMatch = (folder.name === 'Casamientos' && p.badge?.toLowerCase().includes('casamiento')) ||
-                           (folder.name === 'Cumpleaños XV' && p.badge?.toLowerCase().includes('quince'));
+        const catMatch = p.category?.trim().toLowerCase() === album.name.trim().toLowerCase();
+        const badgeMatch = (album.name === 'Casamientos' && p.badge?.toLowerCase().includes('casamiento')) ||
+                           (album.name === 'Cumpleaños XV' && p.badge?.toLowerCase().includes('quince'));
         return Boolean(catMatch || badgeMatch);
       });
 
-      const cover = matching.length > 0 ? matching[0].imageUrl : '';
+      const cover = album.coverImage || (matching.length > 0 ? matching[0].imageUrl : '');
 
       return {
-        id: folder.name.toLowerCase().replace(/\s+/g, '-'),
-        name: folder.name,
-        category: folder.name,
+        ...album,
+        category: album.name,
         coverImage: cover,
-        count: matching.length,
-        description: folder.desc
+        count: matching.length
       };
     });
+  });
+
+  readonly albumCategories = computed<string[]>(() => {
+    const list = this.albums().map(a => a.name.trim());
+    return Array.from(new Set(list));
   });
 
   // Computed state
@@ -411,6 +443,28 @@ export class ShopService {
   readonly cartTotal = computed(() => {
     return this.cart().reduce((total, item) => total + (item.photo.price * item.quantity), 0);
   });
+
+  readonly heroPhoto = computed<Photo>(() => {
+    const list = this.photos();
+    const customId = this.heroPhotoId();
+    if (customId) {
+      const found = list.find(p => p.id === customId);
+      if (found) return found;
+    }
+    const featured = list.find(p => p.featured ||
+      p.badge?.toLowerCase().includes('hero') ||
+      p.badge?.toLowerCase().includes('portada') ||
+      p.badge?.toLowerCase().includes('destacada')
+    );
+    if (featured) return featured;
+    return list[0] || this.defaultPhotos[0];
+  });
+
+  setHeroCover(photoId: string): void {
+    this.heroPhotoId.set(photoId);
+    this.saveStorage('jm_hero_photo_id', photoId);
+    this.showAlert('success', 'Fotografía asignada como Portada Principal del Hero');
+  }
 
   private loadStorage<T>(key: string, fallback: T): T {
     if (typeof window === 'undefined') return fallback;
@@ -823,13 +877,73 @@ export class ShopService {
     this.updateBodyScrollLock();
   }
 
+  // --- ALBUM CRUD ACTIONS ---
+  addAlbum(data: { name: string; description: string; coverImage?: string }): AlbumFolder {
+    const slug = data.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || `album-${Date.now()}`;
+    const newAlbum: AlbumFolder = {
+      id: slug,
+      name: data.name.trim(),
+      category: data.name.trim(),
+      coverImage: data.coverImage || '',
+      count: 0,
+      description: data.description.trim()
+    };
+
+    this.albums.update(list => [...list, newAlbum]);
+    this.saveStorage('jm_custom_albums', this.albums());
+    this.showAlert('success', `Álbum "${newAlbum.name}" creado con éxito.`);
+    return newAlbum;
+  }
+
+  updateAlbum(id: string, updates: Partial<AlbumFolder>, previousName?: string): void {
+    const oldName = previousName || this.albums().find(a => a.id === id)?.name;
+    const newName = updates.name ? updates.name.trim() : undefined;
+
+    this.albums.update(list =>
+      list.map(album => {
+        if (album.id === id) {
+          return {
+            ...album,
+            ...updates,
+            name: newName || album.name,
+            category: newName || album.category
+          };
+        }
+        return album;
+      })
+    );
+
+    // If album name changed, also update the category of photos that had the old name
+    if (newName && oldName && oldName !== newName) {
+      this.photos.update(list =>
+        list.map(p => (p.category === oldName ? { ...p, category: newName } : p))
+      );
+      this.saveStorage('jm_photos', this.photos());
+    }
+
+    this.saveStorage('jm_custom_albums', this.albums());
+    this.showAlert('success', 'Álbum actualizado correctamente.');
+  }
+
+  deleteAlbum(id: string): void {
+    const albumToDelete = this.albums().find(a => a.id === id);
+    this.albums.update(list => list.filter(a => a.id !== id));
+    this.saveStorage('jm_custom_albums', this.albums());
+    this.showAlert('success', `Álbum "${albumToDelete?.name || ''}" eliminado.`);
+  }
+
+  startEditingAlbum(album: AlbumFolder): void {
+    this.editingAlbum.set(album);
+    this.openAdminDashboard('albums');
+  }
+
   // --- ADMIN DASHBOARD ACTIONS ---
-  toggleAdminDashboard(tab: 'photos' | 'services' | 'profile' = 'photos'): void {
+  toggleAdminDashboard(tab: 'photos' | 'albums' | 'services' | 'profile' = 'photos'): void {
     if (!this.isAdminDashboardOpen()) {
       this.openAdminDashboard(tab);
       return;
     }
-    // Si ya está abierto pero en OTRA pestaña (ej: estaba editando servicio y hace clic en Admin), cambia a la pestaña deseada sin cerrar
+    // Si ya está abierto pero en OTRA pestaña, cambia a la pestaña deseada sin cerrar
     if (this.adminInitialTab() !== tab) {
       this.openAdminDashboard(tab);
       return;
@@ -837,7 +951,7 @@ export class ShopService {
     this.closeAdminDashboard();
   }
 
-  openAdminDashboard(tab: 'photos' | 'services' | 'profile' = 'photos'): void {
+  openAdminDashboard(tab: 'photos' | 'albums' | 'services' | 'profile' = 'photos'): void {
     this.adminInitialTab.set(tab);
     this.isAdminDashboardOpen.set(true);
     this.scrollToTop(true);
@@ -851,6 +965,7 @@ export class ShopService {
   closeAdminDashboard(): void {
     this.isAdminDashboardOpen.set(false);
     this.editingPhoto.set(null);
+    this.editingAlbum.set(null);
     this.editingService.set(null);
     this.updateBodyScrollLock();
     if (typeof window !== 'undefined' && this.router.url.startsWith('/admin')) {

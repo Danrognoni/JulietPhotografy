@@ -10,6 +10,7 @@ import { AdminDashboardComponent } from '../../components/admin-dashboard/admin-
 import { CartDrawerComponent } from '../../components/cart-drawer/cart-drawer.component';
 import { PhotoModalComponent } from '../../components/photo-modal/photo-modal.component';
 import { FooterComponent } from '../../components/footer/footer.component';
+import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive';
 import { ShopService } from '../../services/shop.service';
 import { AuthService } from '../../services/auth.service';
 
@@ -27,7 +28,8 @@ import { AuthService } from '../../services/auth.service';
     AdminDashboardComponent,
     CartDrawerComponent,
     PhotoModalComponent,
-    FooterComponent
+    FooterComponent,
+    ScrollRevealDirective
   ],
   template: `
     <div class="min-h-screen bg-aura-mesh text-slate-100 flex flex-col relative selection:bg-emerald-400 selection:text-slate-950">
@@ -83,13 +85,13 @@ import { AuthService } from '../../services/auth.service';
           </div>
         }
 
-        <!-- 1. Hero Section (Revel Asymmetrical Editorial Grid) -->
+        <!-- 1. Hero Section (Pixpa Aspect Full Cover) -->
         <app-hero></app-hero>
 
         <!-- 2. Sección de Carpetas / Álbumes de Fotos & Portafolio -->
         <app-gallery></app-gallery>
 
-        <!-- 3. Sección de Servicios (Columnas Editoriales Revel 01, 02, 03) -->
+        <!-- 3. Sección de Servicios (Columnas Editoriales Aspect 01, 02, 03) -->
         <app-services></app-services>
 
         <!-- 4. Sección Sobre Mí (Bio Asimétrica, Retrato & Dynamic Tags) -->
@@ -97,10 +99,12 @@ import { AuthService } from '../../services/auth.service';
 
         <!-- Admin Quick Access Floating Banner (RENDERED ONLY IF LOGGED IN AS ADMIN) -->
         @if (auth.isAdmin()) {
-          <section class="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full animate-fadeIn">
-            <div class="card-editorial rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-[#170c35]/90 via-[#12082b]/85 to-[#0e0622]/90 border border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl">
+          <section 
+            appScrollReveal
+            class="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div class="rounded-2xl p-6 sm:p-8 bg-[#120826]/85 backdrop-blur-xl border border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl">
               <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-slate-950 flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-500/20">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-slate-950 flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-500/20">
                   <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <rect width="18" height="18" x="3" y="3" rx="2"/>
                     <path d="M7 7h10M7 12h10M7 17h10"/>
@@ -111,11 +115,11 @@ import { AuthService } from '../../services/auth.service';
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                     <span>Modo Administradora Activo</span>
                   </div>
-                  <h4 class="font-editorial text-2xl font-normal text-white">
+                  <h4 class="font-editorial text-2xl font-light text-white">
                     Panel de Control & Edición (CRUD)
                   </h4>
-                  <p class="text-xs sm:text-sm text-slate-300 mt-0.5 font-sans">
-                    Tienes permisos habilitados para crear o editar fotos, carpetas de álbumes, servicios y tu perfil.
+                  <p class="text-xs sm:text-sm text-slate-300/80 mt-0.5 font-sans font-light">
+                    Tienes permisos habilitados para crear o editar fotos, fijar foto de portada hero, álbumes, servicios y tu perfil.
                   </p>
                 </div>
               </div>

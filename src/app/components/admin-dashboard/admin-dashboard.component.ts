@@ -5,7 +5,7 @@ import { catchError, throwError } from 'rxjs';
 import { ShopService } from '../../services/shop.service';
 import { AuthService } from '../../services/auth.service';
 import { ViewportScrollService } from '../../services/viewport-scroll.service';
-import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/photo.model';
+import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../../models/photo.model';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -52,26 +52,37 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
             </button>
           </div>
 
-          <!-- Tab Bar Navigation: Fotos vs Servicios vs Editar Perfil (Sincronizado con URL) -->
+          <!-- Tab Bar Navigation: Fotos vs Álbumes vs Servicios vs Editar Perfil (Sincronizado con URL) -->
           <div class="px-6 pt-4 border-b border-violet-500/20 bg-[#13082b] flex items-center gap-4 overflow-x-auto">
             <button
               type="button"
               (click)="switchTab('photos')"
               class="pb-3 text-xs sm:text-sm font-semibold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap"
-              [ngClass]="activeTab() === 'photos' ? 'border-emerald-400 text-emerald-300' : 'border-transparent text-slate-400 hover:text-white'">
+              [ngClass]="activeTab() === 'photos' ? 'border-[#86DEB7] text-[#86DEB7]' : 'border-transparent text-slate-400 hover:text-white'">
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect width="18" height="18" x="3" y="3" rx="2"/>
                 <circle cx="9" cy="9" r="2"/>
                 <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
               </svg>
-              <span>Fotos & Álbumes ({{ shop.photos().length }})</span>
+              <span>Fotos ({{ shop.photos().length }})</span>
+            </button>
+
+            <button
+              type="button"
+              (click)="switchTab('albums')"
+              class="pb-3 text-xs sm:text-sm font-semibold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap"
+              [ngClass]="activeTab() === 'albums' ? 'border-[#86DEB7] text-[#86DEB7]' : 'border-transparent text-slate-400 hover:text-white'">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/>
+              </svg>
+              <span>Álbumes Temáticos ({{ shop.albumFolders().length }})</span>
             </button>
 
             <button
               type="button"
               (click)="switchTab('services')"
               class="pb-3 text-xs sm:text-sm font-semibold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap"
-              [ngClass]="activeTab() === 'services' ? 'border-sky-400 text-sky-300' : 'border-transparent text-slate-400 hover:text-white'">
+              [ngClass]="activeTab() === 'services' ? 'border-[#86DEB7] text-[#86DEB7]' : 'border-transparent text-slate-400 hover:text-white'">
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
                 <circle cx="9" cy="7" r="4"/>
@@ -190,16 +201,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                           [(ngModel)]="photoCategory"
                           name="photoCategory"
                           (ngModelChange)="onCategorySelectChange($event)"
-                          class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white focus:outline-none focus:border-emerald-400">
-                          <option value="Casamientos">Casamientos</option>
-                          <option value="Cumpleaños XV">Cumpleaños XV</option>
-                          <option value="Eventos">Eventos</option>
-                          <option value="Paisajismo">Paisajismo</option>
-                          <option value="Foto Producto">Foto Producto</option>
-                          @for (cat of customCategoryOptions(); track cat) {
+                          class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white focus:outline-none focus:border-[#86DEB7]">
+                          @for (cat of shop.albumCategories(); track cat) {
                             <option [value]="cat">{{ cat }}</option>
                           }
-                          <option value="__NEW_CATEGORY__">+ Crear o ingresar nueva carpeta...</option>
+                          <option value="__NEW_CATEGORY__">+ Crear o ingresar nuevo álbum...</option>
                         </select>
 
                         @if (isCreatingNewCategory()) {
@@ -344,6 +350,16 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                             <td class="p-3.5 text-right space-x-1.5 whitespace-nowrap">
                               <button
                                 type="button"
+                                (click)="shop.setHeroCover(photo.id)"
+                                [title]="shop.heroPhoto().id === photo.id ? 'Esta fotografía es la Portada Hero actual' : 'Establecer como Portada Hero'"
+                                class="px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors border"
+                                [ngClass]="shop.heroPhoto().id === photo.id 
+                                  ? 'bg-emerald-500/25 text-emerald-300 border-emerald-500/50 shadow-sm shadow-emerald-500/20' 
+                                  : 'bg-slate-800/60 text-slate-300 border-slate-700/60 hover:text-emerald-300 hover:border-emerald-500/40'">
+                                {{ shop.heroPhoto().id === photo.id ? '★ Portada Hero' : 'Fijar Portada' }}
+                              </button>
+                              <button
+                                type="button"
                                 (click)="startPhotoEdit(photo)"
                                 title="Editar foto"
                                 class="px-2.5 py-1 rounded-lg text-violet-300 bg-violet-900/60 hover:bg-violet-800 border border-violet-600/40 transition-colors">
@@ -363,6 +379,198 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                     </table>
                   </div>
                 </div>
+              </div>
+
+            } @else if (activeTab() === 'albums') {
+              
+              <!-- TAB 2: GESTIÓN DE ÁLBUMES TEMÁTICOS (CRUD COMPLETO) -->
+              <div class="space-y-6">
+                
+                <!-- Album Form (Create / Edit) if active -->
+                @if (isCreatingAlbum()) {
+                  <div class="p-6 rounded-2xl bg-[#160b33]/80 border border-[#86DEB7]/40 shadow-xl space-y-4 animate-fadeIn">
+                    <div class="flex items-center justify-between">
+                      <h4 class="font-display font-bold text-base text-white flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-[#86DEB7]"></span>
+                        <span>{{ editingAlbumId() ? 'Editar Álbum Temático' : 'Crear Nuevo Álbum Temático' }}</span>
+                      </h4>
+                      <button
+                        type="button"
+                        (click)="cancelAlbumEdit()"
+                        class="text-xs text-violet-300 hover:text-white underline">
+                        Cancelar
+                      </button>
+                    </div>
+
+                    <form (ngSubmit)="saveAlbum()" class="space-y-4">
+                      
+                      <!-- Album Name & Description -->
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                          <label class="block text-xs font-bold uppercase tracking-wider text-violet-300">
+                            Nombre del Álbum / Colección *
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            name="albumName"
+                            [(ngModel)]="albumName"
+                            placeholder="Ej. Sesiones en Estudio, Retratos de Pareja..."
+                            class="w-full px-3.5 py-2 rounded-xl bg-[#0c051a] border border-violet-500/30 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#86DEB7] focus:ring-1 focus:ring-[#86DEB7]/30"/>
+                        </div>
+
+                        <div class="space-y-1">
+                          <label class="block text-xs font-bold uppercase tracking-wider text-violet-300">
+                            Descripción Breve
+                          </label>
+                          <input
+                            type="text"
+                            name="albumDescription"
+                            [(ngModel)]="albumDescription"
+                            placeholder="Breve reseña sobre el estilo o locación de la serie..."
+                            class="w-full px-3.5 py-2 rounded-xl bg-[#0c051a] border border-violet-500/30 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#86DEB7] focus:ring-1 focus:ring-[#86DEB7]/30"/>
+                        </div>
+                      </div>
+
+                      <!-- Cover Image (Upload or URL or pick from Catalog) -->
+                      <div class="space-y-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-violet-300">
+                          Foto de Portada del Álbum
+                        </label>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
+                          <div class="sm:col-span-8 space-y-2">
+                            <input
+                              type="url"
+                              name="albumCoverUrl"
+                              [(ngModel)]="albumCoverUrl"
+                              placeholder="https://... o sube una imagen local desde tu PC"
+                              class="w-full px-3.5 py-2 rounded-xl bg-[#0c051a] border border-violet-500/30 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-[#86DEB7]"/>
+
+                            <div class="flex items-center gap-3">
+                              <label class="cursor-pointer px-3 py-1.5 rounded-xl bg-[#50723C]/30 border border-[#86DEB7]/30 text-[#86DEB7] text-xs font-semibold hover:bg-[#63B995]/40 transition-colors flex items-center gap-2">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                  <polyline points="17 8 12 3 7 8"/>
+                                  <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                <span>Subir Portada desde PC</span>
+                                <input type="file" accept="image/*" (change)="onAlbumFileSelected($event)" class="hidden"/>
+                              </label>
+
+                              @if (selectedAlbumFile) {
+                                <span class="text-xs text-[#86DEB7] truncate max-w-[200px]">
+                                  {{ selectedAlbumFile.name }}
+                                </span>
+                              }
+                            </div>
+                          </div>
+
+                          <!-- Preview Thumbnail -->
+                          <div class="sm:col-span-4 flex justify-center sm:justify-end">
+                            <div class="w-24 h-24 rounded-xl border border-violet-500/30 overflow-hidden bg-[#0c051a] flex items-center justify-center">
+                              @if (albumCoverUrl) {
+                                <img [src]="albumCoverUrl" alt="Portada Álbum" class="w-full h-full object-cover"/>
+                              } @else {
+                                <span class="text-[10px] text-slate-500 text-center p-2">Sin portada asignada</span>
+                              }
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="flex items-center justify-end gap-3 pt-2">
+                        <button
+                          type="button"
+                          (click)="cancelAlbumEdit()"
+                          class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white transition-colors">
+                          Cancelar
+                        </button>
+
+                        <button
+                          type="submit"
+                          [disabled]="!albumName.trim() || isSubmitting()"
+                          class="btn-editorial-mint px-6 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                          @if (isSubmitting()) {
+                            <span>Guardando...</span>
+                          } @else {
+                            <span>{{ editingAlbumId() ? 'Guardar Cambios' : 'Crear Álbum' }}</span>
+                          }
+                        </button>
+                      </div>
+
+                    </form>
+                  </div>
+                }
+
+                <!-- List of Albums Header & "+ Nuevo Álbum" button -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h4 class="font-display font-bold text-base text-white">
+                      Álbumes Temáticos en Catálogo ({{ shop.albumFolders().length }})
+                    </h4>
+                    <p class="text-xs text-slate-400 mt-0.5">
+                      Gestiona, renombra, agrega portadas y crea colecciones temáticas para la portada y filtros.
+                    </p>
+                  </div>
+
+                  @if (!isCreatingAlbum()) {
+                    <button
+                      type="button"
+                      (click)="startAlbumCreate()"
+                      class="btn-editorial-mint px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-md self-start sm:self-auto">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                      </svg>
+                      <span>+ Crear Nuevo Álbum</span>
+                    </button>
+                  }
+                </div>
+
+                <!-- Albums Grid Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  @for (folder of shop.albumFolders(); track folder.id) {
+                    <div class="p-4 rounded-2xl bg-[#160b33]/80 border border-violet-500/25 flex flex-col justify-between space-y-3 shadow-md">
+                      <div class="flex items-center gap-3">
+                        <div class="w-16 h-16 rounded-xl overflow-hidden bg-[#0c051a] flex-shrink-0 border border-violet-500/30">
+                          @if (folder.coverImage) {
+                            <img [src]="folder.coverImage" [alt]="folder.name" class="w-full h-full object-cover"/>
+                          } @else {
+                            <div class="w-full h-full flex items-center justify-center text-slate-500 text-[9px] text-center p-1">
+                              Sin portada
+                            </div>
+                          }
+                        </div>
+                        <div class="min-w-0 flex-grow">
+                          <div class="flex items-center justify-between gap-1">
+                            <h5 class="font-bold text-white text-sm truncate">{{ folder.name }}</h5>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#50723C]/30 text-[#86DEB7] border border-[#86DEB7]/20 flex-shrink-0">
+                              {{ folder.count }} {{ folder.count === 1 ? 'foto' : 'fotos' }}
+                            </span>
+                          </div>
+                          <p class="text-xs text-slate-300/80 line-clamp-2 mt-1">{{ folder.description }}</p>
+                        </div>
+                      </div>
+
+                      <div class="flex items-center justify-end gap-2 pt-2 border-t border-violet-900/30">
+                        <button
+                          type="button"
+                          (click)="startAlbumEdit(folder)"
+                          class="px-3 py-1 rounded-lg text-xs font-semibold text-[#86DEB7] bg-[#50723C]/30 hover:bg-[#63B995]/40 border border-[#86DEB7]/30 transition-colors">
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          (click)="deleteAlbum(folder)"
+                          class="px-3 py-1 rounded-lg text-xs font-semibold text-rose-400 bg-rose-950/60 hover:bg-rose-900 border border-rose-800/40 transition-colors">
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+
               </div>
 
             } @else if (activeTab() === 'services') {
@@ -829,8 +1037,17 @@ export class AdminDashboardComponent {
   @ViewChild('dashboardModalCard') dashboardModalCard?: ElementRef<HTMLDivElement>;
   @ViewChild('dashboardHeader') dashboardHeader?: ElementRef<HTMLDivElement>;
 
-  readonly activeTab = signal<'photos' | 'services' | 'profile'>('photos');
+  readonly activeTab = signal<'photos' | 'albums' | 'services' | 'profile'>('photos');
   readonly isSubmitting = signal<boolean>(false);
+
+  // Album form
+  editingAlbumId = signal<string | null>(null);
+  albumName = '';
+  albumDescription = '';
+  albumCoverUrl = '';
+  selectedAlbumFile: File | null = null;
+  previousAlbumName = '';
+  isCreatingAlbum = signal<boolean>(false);
 
   // Photo form
   editingPhotoId = signal<string | null>(null);
@@ -862,9 +1079,11 @@ export class AdminDashboardComponent {
   applyNewCategory(): void {
     const trimmed = this.newCategoryName.trim();
     if (trimmed) {
+      this.shop.addAlbum({ name: trimmed, description: 'Colección temática de autor.' });
       this.photoCategory = trimmed;
       this.isCreatingNewCategory.set(false);
-      this.shop.showAlert('info', `Carpeta "${trimmed}" asignada a la fotografía.`);
+      this.newCategoryName = '';
+      this.shop.showAlert('info', `Álbum "${trimmed}" creado y asignado a la fotografía.`);
     }
   }
 
@@ -929,6 +1148,15 @@ export class AdminDashboardComponent {
       }
     });
 
+    // Escuchar si se seleccionó un álbum para editar
+    effect(() => {
+      const ea = this.shop.editingAlbum();
+      if (ea) {
+        this.activeTab.set('albums');
+        this.startAlbumEdit(ea);
+      }
+    });
+
     // Escuchar si se seleccionó un servicio para editar desde la sección de servicios
     effect(() => {
       const es = this.shop.editingService();
@@ -952,10 +1180,93 @@ export class AdminDashboardComponent {
   }
 
   // --- NAVEGACIÓN ENTRE PESTAÑAS Y SINCRONIZACIÓN CON ROUTER ---
-  switchTab(tab: 'photos' | 'services' | 'profile'): void {
+  switchTab(tab: 'photos' | 'albums' | 'services' | 'profile'): void {
     this.activeTab.set(tab);
     this.shop.openAdminDashboard(tab);
     this.resetScroll();
+  }
+
+  // --- CRUD DE ÁLBUMES TEMÁTICOS ---
+  startAlbumCreate(): void {
+    this.editingAlbumId.set(null);
+    this.albumName = '';
+    this.albumDescription = '';
+    this.albumCoverUrl = '';
+    this.selectedAlbumFile = null;
+    this.previousAlbumName = '';
+    this.isCreatingAlbum.set(true);
+    this.resetScroll();
+  }
+
+  startAlbumEdit(album: AlbumFolder): void {
+    this.editingAlbumId.set(album.id);
+    this.albumName = album.name;
+    this.albumDescription = album.description || '';
+    this.albumCoverUrl = album.coverImage || '';
+    this.selectedAlbumFile = null;
+    this.previousAlbumName = album.name;
+    this.isCreatingAlbum.set(true);
+    this.resetScroll();
+  }
+
+  cancelAlbumEdit(): void {
+    this.editingAlbumId.set(null);
+    this.albumName = '';
+    this.albumDescription = '';
+    this.albumCoverUrl = '';
+    this.selectedAlbumFile = null;
+    this.previousAlbumName = '';
+    this.isCreatingAlbum.set(false);
+  }
+
+  onAlbumFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.processAlbumFile(input.files[0]);
+    }
+  }
+
+  processAlbumFile(file: File): void {
+    this.selectedAlbumFile = file;
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.albumCoverUrl = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  saveAlbum(): void {
+    const name = this.albumName.trim();
+    if (!name) {
+      this.shop.showAlert('error', 'El nombre del álbum es obligatorio.');
+      return;
+    }
+
+    if (this.editingAlbumId()) {
+      this.shop.updateAlbum(
+        this.editingAlbumId()!,
+        {
+          name,
+          description: this.albumDescription.trim(),
+          coverImage: this.albumCoverUrl
+        },
+        this.previousAlbumName
+      );
+    } else {
+      this.shop.addAlbum({
+        name,
+        description: this.albumDescription.trim(),
+        coverImage: this.albumCoverUrl
+      });
+    }
+    this.isSubmitting.set(false);
+    this.cancelAlbumEdit();
+  }
+
+  deleteAlbum(folder: AlbumFolder): void {
+    if (confirm(`¿Estás segura de que deseas eliminar el álbum "${folder.name}"? Las fotografías no se borrarán, pero dejarán de estar agrupadas bajo este álbum.`)) {
+      this.shop.deleteAlbum(folder.id);
+    }
   }
 
   // --- CERRAR MODAL CON TECLA ESCAPE O CLIC EN BACKDROP ---
