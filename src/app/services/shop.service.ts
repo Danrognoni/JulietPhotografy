@@ -1,11 +1,36 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
-import { Photo, PhotoCategory, ServiceItem, ProfileData, CartItem, AlbumFolder } from '../models/photo.model';
+import { Observable, tap, switchMap, map } from 'rxjs';
+import { 
+  Photo, 
+  PhotoCategory, 
+  ServiceItem, 
+  ProfileData, 
+  CartItem, 
+  AlbumFolder, 
+  CoverPhoto,
+  CheckoutPreferenceResponse,
+  OrderRequest,
+  OrderItemRequest,
+  OrderItemResult,
+  OrderResult,
+  Order,
+  OrderStatus
+} from '../models/photo.model';
 import { AuthService } from './auth.service';
 import { ViewportScrollService } from './viewport-scroll.service';
 import { environment } from '../../environments/environment';
+
+export type { 
+  CheckoutPreferenceResponse, 
+  OrderRequest, 
+  OrderItemRequest, 
+  OrderItemResult, 
+  OrderResult, 
+  Order, 
+  OrderStatus 
+};
 
 export interface AppAlert {
   type: 'error' | 'success' | 'warning' | 'info';
@@ -252,55 +277,12 @@ export class ShopService {
     tags: ['Casamientos', 'Cumpleaños de XV', 'Eventos Sociales & Corporativos', 'Retoque & Postproducción']
   };
 
-  // Default Albums / Categories
-  private readonly defaultAlbums: AlbumFolder[] = [
-    {
-      id: 'casamientos',
-      name: 'Casamientos',
-      category: 'Casamientos',
-      coverImage: '',
-      count: 0,
-      description: 'Historias de amor, ceremonias íntimas y momentos espontáneos de bodas.'
-    },
-    {
-      id: 'cumpleanos-xv',
-      name: 'Cumpleaños XV',
-      category: 'Cumpleaños XV',
-      coverImage: '',
-      count: 0,
-      description: 'Sesiones previas llenas de estilo, fiesta y vals de 15 años.'
-    },
-    {
-      id: 'eventos',
-      name: 'Eventos',
-      category: 'Eventos',
-      coverImage: '',
-      count: 0,
-      description: 'Celebraciones sociales, aniversarios y registros culturales.'
-    },
-    {
-      id: 'paisajismo',
-      name: 'Paisajismo',
-      category: 'Paisajismo',
-      coverImage: '',
-      count: 0,
-      description: 'Horizontes, dunas y la inmensidad del océano en Mar del Plata.'
-    },
-    {
-      id: 'foto-producto',
-      name: 'Foto Producto',
-      category: 'Foto Producto',
-      coverImage: '',
-      count: 0,
-      description: 'Composiciones gastronómicas y comerciales con iluminación de estudio.'
-    }
-  ];
-
-  // State Signals
+  // State Signals (Álbumes y Portada persistidos desde backend)
   readonly photos = signal<Photo[]>(this.loadStorage('jm_photos', this.defaultPhotos));
   readonly services = signal<ServiceItem[]>(this.loadStorage('jm_services', this.defaultServices));
   readonly profile = signal<ProfileData>(this.loadStorage('jm_profile', this.defaultProfile));
-  readonly albums = signal<AlbumFolder[]>(this.loadStorage('jm_custom_albums', this.defaultAlbums));
+  readonly albums = signal<AlbumFolder[]>(this.loadStorage('jm_custom_albums', []));
+  readonly coverPhoto = signal<CoverPhoto | null>(this.loadStorage('jm_cover_photo', null));
 
   readonly selectedCategory = signal<PhotoCategory | 'Todos'>('Todos');
   readonly searchQuery = signal<string>('');
@@ -372,6 +354,40 @@ export class ShopService {
         }
       },
       error: (err) => console.info('Backend /api/profile no conectado, operando con caché:', err?.status)
+    });
+
+    // 4. Álbumes Temáticos (Persistencia completa)
+    this.http.get<AlbumFolder[]>(`${environment.apiUrl}/albums`).subscribe({
+      next: (data) => {
+        if (data) {
+          const mapped = data.map(a => ({
+            ...a,
+            coverImage: this.normalizeImageUrl(a.coverImage)
+          }));
+          this.albums.set(mapped);
+          this.saveStorage('jm_custom_albums', mapped);
+        }
+      },
+      error: (err) => console.info('Backend /api/albums no conectado, operando con caché:', err?.status)
+    });
+
+    // 5. Foto de Portada Hero (Persistencia completa)
+    this.http.get<CoverPhoto>(`${environment.apiUrl}/cover-photo`).subscribe({
+      next: (data) => {
+        if (data) {
+          const mapped: CoverPhoto = {
+            ...data,
+            imageUrl: this.normalizeImageUrl(data.imageUrl)
+          };
+          this.coverPhoto.set(mapped);
+          if (mapped.photoId) {
+            this.heroPhotoId.set(mapped.photoId);
+            this.saveStorage('jm_hero_photo_id', mapped.photoId);
+          }
+          this.saveStorage('jm_cover_photo', mapped);
+        }
+      },
+      error: (err) => console.info('Backend /api/cover-photo no conectado, operando con caché:', err?.status)
     });
   }
 
@@ -446,11 +462,37 @@ export class ShopService {
 
   readonly heroPhoto = computed<Photo>(() => {
     const list = this.photos();
-    const customId = this.heroPhotoId();
+    const cover = this.coverPhoto();
+    const customId = this.heroPhotoId() || cover?.photoId;
+
     if (customId) {
       const found = list.find(p => p.id === customId);
-      if (found) return found;
+      if (found) {
+        if (cover?.imageUrl && cover.imageUrl !== found.imageUrl) {
+          return {
+            ...found,
+            imageUrl: this.normalizeImageUrl(cover.imageUrl),
+            title: cover.title || found.title
+          };
+        }
+        return found;
+      }
     }
+
+    if (cover && cover.imageUrl) {
+      return {
+        id: cover.photoId || 'cover-hero',
+        title: cover.title || 'Fotografía de Julieta Marateo',
+        category: (cover.category || 'Fotografía Profesional') as PhotoCategory,
+        price: 0,
+        imageUrl: this.normalizeImageUrl(cover.imageUrl),
+        description: cover.description || '',
+        dimensions: '',
+        technicalSheet: '',
+        inStock: true
+      };
+    }
+
     const featured = list.find(p => p.featured ||
       p.badge?.toLowerCase().includes('hero') ||
       p.badge?.toLowerCase().includes('portada') ||
@@ -460,10 +502,56 @@ export class ShopService {
     return list[0] || this.defaultPhotos[0];
   });
 
-  setHeroCover(photoId: string): void {
-    this.heroPhotoId.set(photoId);
-    this.saveStorage('jm_hero_photo_id', photoId);
-    this.showAlert('success', 'Fotografía asignada como Portada Principal del Hero');
+  setHeroCover(photoId: string, customUrl?: string, file?: File): Observable<CoverPhoto> {
+    const headers = this.getAuthHeaders();
+    const photo = this.photos().find(p => p.id === photoId);
+    const resolvedUrl = customUrl || photo?.imageUrl || '';
+
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      if (photoId) formData.append('photoId', photoId);
+      if (resolvedUrl) formData.append('imageUrl', resolvedUrl);
+      if (photo?.title) formData.append('title', photo.title);
+      if (photo?.category) formData.append('category', photo.category);
+      if (photo?.description) formData.append('description', photo.description);
+
+      return this.http.put<CoverPhoto>(`${environment.apiUrl}/cover-photo`, formData, { headers }).pipe(
+        tap((saved) => {
+          const mapped: CoverPhoto = {
+            ...saved,
+            imageUrl: this.normalizeImageUrl(saved.imageUrl)
+          };
+          this.coverPhoto.set(mapped);
+          this.heroPhotoId.set(mapped.photoId || photoId);
+          this.saveStorage('jm_cover_photo', mapped);
+          this.saveStorage('jm_hero_photo_id', mapped.photoId || photoId);
+          this.showAlert('success', 'Fotografía asignada como Portada Principal del Hero');
+        })
+      );
+    } else {
+      const payload: CoverPhoto = {
+        photoId: photoId || undefined,
+        imageUrl: resolvedUrl,
+        title: photo?.title || undefined,
+        category: photo?.category || undefined,
+        description: photo?.description || undefined
+      };
+
+      return this.http.put<CoverPhoto>(`${environment.apiUrl}/cover-photo`, payload, { headers }).pipe(
+        tap((saved) => {
+          const mapped: CoverPhoto = {
+            ...saved,
+            imageUrl: this.normalizeImageUrl(saved.imageUrl)
+          };
+          this.coverPhoto.set(mapped);
+          this.heroPhotoId.set(mapped.photoId || photoId);
+          this.saveStorage('jm_cover_photo', mapped);
+          this.saveStorage('jm_hero_photo_id', mapped.photoId || photoId);
+          this.showAlert('success', 'Fotografía asignada como Portada Principal del Hero');
+        })
+      );
+    }
   }
 
   private loadStorage<T>(key: string, fallback: T): T {
@@ -837,6 +925,56 @@ export class ShopService {
     this.cart.set([]);
   }
 
+  // --- MERCADO PAGO CHECKOUT PRO & ORDERS ---
+
+  /**
+   * Crea la orden de compra en Spring Boot (POST /api/orders) y genera inmediatamente
+   * la preferencia de pago de Checkout Pro (POST /api/orders/{id}/preference).
+   * Retorna la respuesta completa con preferenceId, initPoint, sandboxInitPoint y orderId.
+   */
+  initiateMercadoPagoCheckout(orderData: OrderRequest): Observable<CheckoutPreferenceResponse> {
+    return this.http.post<OrderResult>(`${environment.apiUrl}/orders`, orderData).pipe(
+      switchMap((order) => {
+        return this.http.post<{ preferenceId: string; initPoint: string; sandboxInitPoint: string }>(
+          `${environment.apiUrl}/orders/${order.id}/preference`, 
+          {}
+        ).pipe(
+          map((pref) => ({
+            preferenceId: pref.preferenceId,
+            initPoint: pref.initPoint,
+            sandboxInitPoint: pref.sandboxInitPoint,
+            orderId: order.id
+          }))
+        );
+      })
+    );
+  }
+
+  /**
+   * Genera o regenera la preferencia de pago de Mercado Pago para una orden ya existente.
+   */
+  createOrderPreference(orderId: string): Observable<CheckoutPreferenceResponse> {
+    return this.http.post<{ preferenceId: string; initPoint: string; sandboxInitPoint: string }>(
+      `${environment.apiUrl}/orders/${orderId}/preference`,
+      {}
+    ).pipe(
+      map((pref) => ({
+        preferenceId: pref.preferenceId,
+        initPoint: pref.initPoint,
+        sandboxInitPoint: pref.sandboxInitPoint,
+        orderId
+      }))
+    );
+  }
+
+  /**
+   * Consulta el estado de una orden en el backend (GET /api/orders/{id}).
+   * Se utiliza al retornar desde Mercado Pago para validar la orden confirmada.
+   */
+  verifyOrderStatus(orderId: string): Observable<OrderResult> {
+    return this.http.get<OrderResult>(`${environment.apiUrl}/orders/${orderId}`);
+  }
+
   scrollToTop(smooth: boolean = true): void {
     this.viewportScroll.scrollToTop(smooth);
   }
@@ -877,59 +1015,118 @@ export class ShopService {
     this.updateBodyScrollLock();
   }
 
-  // --- ALBUM CRUD ACTIONS ---
-  addAlbum(data: { name: string; description: string; coverImage?: string }): AlbumFolder {
-    const slug = data.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || `album-${Date.now()}`;
-    const newAlbum: AlbumFolder = {
-      id: slug,
-      name: data.name.trim(),
-      category: data.name.trim(),
-      coverImage: data.coverImage || '',
-      count: 0,
-      description: data.description.trim()
-    };
+  // --- ALBUM CRUD ACTIONS (CON PERSISTENCIA BACKEND) ---
+  addAlbum(data: { name: string; description: string; coverImage?: string; displayOrder?: number }, file?: File): Observable<AlbumFolder> {
+    const headers = this.getAuthHeaders();
 
-    this.albums.update(list => [...list, newAlbum]);
-    this.saveStorage('jm_custom_albums', this.albums());
-    this.showAlert('success', `Álbum "${newAlbum.name}" creado con éxito.`);
-    return newAlbum;
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('name', data.name.trim());
+      formData.append('description', (data.description || '').trim());
+      if (data.coverImage) formData.append('coverImage', data.coverImage.trim());
+      if (data.displayOrder !== undefined) formData.append('displayOrder', String(data.displayOrder));
+
+      return this.http.post<AlbumFolder>(`${environment.apiUrl}/albums`, formData, { headers }).pipe(
+        tap((saved) => {
+          const serverAlbum: AlbumFolder = {
+            ...saved,
+            coverImage: this.normalizeImageUrl(saved.coverImage)
+          };
+          this.albums.update(list => [...list, serverAlbum]);
+          this.saveStorage('jm_custom_albums', this.albums());
+          this.showAlert('success', `Álbum "${serverAlbum.name}" creado con éxito.`);
+        })
+      );
+    } else {
+      const payload = {
+        name: data.name.trim(),
+        description: (data.description || '').trim(),
+        coverImage: data.coverImage || '',
+        displayOrder: data.displayOrder || 0
+      };
+
+      return this.http.post<AlbumFolder>(`${environment.apiUrl}/albums`, payload, { headers }).pipe(
+        tap((saved) => {
+          const serverAlbum: AlbumFolder = {
+            ...saved,
+            coverImage: this.normalizeImageUrl(saved.coverImage)
+          };
+          this.albums.update(list => [...list, serverAlbum]);
+          this.saveStorage('jm_custom_albums', this.albums());
+          this.showAlert('success', `Álbum "${serverAlbum.name}" creado con éxito.`);
+        })
+      );
+    }
   }
 
-  updateAlbum(id: string, updates: Partial<AlbumFolder>, previousName?: string): void {
+  updateAlbum(id: string, updates: Partial<AlbumFolder>, previousName?: string, file?: File): Observable<AlbumFolder> {
+    const headers = this.getAuthHeaders();
     const oldName = previousName || this.albums().find(a => a.id === id)?.name;
     const newName = updates.name ? updates.name.trim() : undefined;
 
-    this.albums.update(list =>
-      list.map(album => {
-        if (album.id === id) {
-          return {
-            ...album,
-            ...updates,
-            name: newName || album.name,
-            category: newName || album.category
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      if (updates.name) formData.append('name', updates.name.trim());
+      if (updates.description !== undefined) formData.append('description', (updates.description || '').trim());
+      if (updates.coverImage) formData.append('coverImage', updates.coverImage.trim());
+      if (updates.displayOrder !== undefined) formData.append('displayOrder', String(updates.displayOrder));
+
+      return this.http.put<AlbumFolder>(`${environment.apiUrl}/albums/${id}`, formData, { headers }).pipe(
+        tap((saved) => {
+          const serverAlbum: AlbumFolder = {
+            ...saved,
+            coverImage: this.normalizeImageUrl(saved.coverImage)
           };
-        }
-        return album;
-      })
-    );
+          this.albums.update(list => list.map(a => (a.id === id ? serverAlbum : a)));
 
-    // If album name changed, also update the category of photos that had the old name
-    if (newName && oldName && oldName !== newName) {
-      this.photos.update(list =>
-        list.map(p => (p.category === oldName ? { ...p, category: newName } : p))
+          // Si cambió el nombre del álbum, sincronizar fotos en memoria
+          if (newName && oldName && oldName !== newName) {
+            this.photos.update(list =>
+              list.map(p => (p.category === oldName ? { ...p, category: newName } : p))
+            );
+            this.saveStorage('jm_photos', this.photos());
+          }
+
+          this.saveStorage('jm_custom_albums', this.albums());
+          this.showAlert('success', `Álbum "${serverAlbum.name}" actualizado correctamente.`);
+        })
       );
-      this.saveStorage('jm_photos', this.photos());
-    }
+    } else {
+      return this.http.put<AlbumFolder>(`${environment.apiUrl}/albums/${id}`, updates, { headers }).pipe(
+        tap((saved) => {
+          const serverAlbum: AlbumFolder = {
+            ...saved,
+            coverImage: this.normalizeImageUrl(saved.coverImage)
+          };
+          this.albums.update(list => list.map(a => (a.id === id ? serverAlbum : a)));
 
-    this.saveStorage('jm_custom_albums', this.albums());
-    this.showAlert('success', 'Álbum actualizado correctamente.');
+          if (newName && oldName && oldName !== newName) {
+            this.photos.update(list =>
+              list.map(p => (p.category === oldName ? { ...p, category: newName } : p))
+            );
+            this.saveStorage('jm_photos', this.photos());
+          }
+
+          this.saveStorage('jm_custom_albums', this.albums());
+          this.showAlert('success', `Álbum "${serverAlbum.name}" actualizado correctamente.`);
+        })
+      );
+    }
   }
 
-  deleteAlbum(id: string): void {
+  deleteAlbum(id: string): Observable<void> {
+    const headers = this.getAuthHeaders();
     const albumToDelete = this.albums().find(a => a.id === id);
-    this.albums.update(list => list.filter(a => a.id !== id));
-    this.saveStorage('jm_custom_albums', this.albums());
-    this.showAlert('success', `Álbum "${albumToDelete?.name || ''}" eliminado.`);
+
+    return this.http.delete<void>(`${environment.apiUrl}/albums/${id}`, { headers }).pipe(
+      tap(() => {
+        this.albums.update(list => list.filter(a => a.id !== id));
+        this.saveStorage('jm_custom_albums', this.albums());
+        this.showAlert('success', `Álbum "${albumToDelete?.name || ''}" eliminado.`);
+      })
+    );
   }
 
   startEditingAlbum(album: AlbumFolder): void {

@@ -31,16 +31,17 @@ describe('AdminDashboardComponent - Manejo de Errores y Cierre de Modal', () => 
             editingAlbum: vi.fn().mockReturnValue(null),
             editingService: vi.fn().mockReturnValue(null),
             heroPhoto: vi.fn().mockReturnValue({ id: 'photo-1', title: 'Foto' }),
-            updatePhoto: vi.fn(),
-            addPhoto: vi.fn(),
-            deletePhoto: vi.fn(),
-            addAlbum: vi.fn(),
-            updateAlbum: vi.fn(),
-            deleteAlbum: vi.fn(),
-            updateService: vi.fn(),
-            addService: vi.fn(),
-            deleteService: vi.fn(),
-            updateProfile: vi.fn(),
+            updatePhoto: vi.fn().mockReturnValue(of({})),
+            addPhoto: vi.fn().mockReturnValue(of({})),
+            deletePhoto: vi.fn().mockReturnValue(of(undefined)),
+            addAlbum: vi.fn().mockReturnValue(of({ id: 'album-1', name: 'Test' })),
+            updateAlbum: vi.fn().mockReturnValue(of({ id: 'album-1', name: 'Test' })),
+            deleteAlbum: vi.fn().mockReturnValue(of(undefined)),
+            setHeroCover: vi.fn().mockReturnValue(of({ photoId: 'photo-1', imageUrl: 'test.jpg' })),
+            updateService: vi.fn().mockReturnValue(of({})),
+            addService: vi.fn().mockReturnValue(of({})),
+            deleteService: vi.fn().mockReturnValue(of(undefined)),
+            updateProfile: vi.fn().mockReturnValue(of({})),
             uploadImage: vi.fn().mockReturnValue(of({ url: 'https://example.com/uploaded.jpg' })),
             showAlert: vi.fn(),
             getCleanErrorMessage: vi.fn().mockImplementation((err: any, action: string) => `Error limpio al ${action}`)
@@ -110,5 +111,26 @@ describe('AdminDashboardComponent - Manejo de Errores y Cierre de Modal', () => 
     component.onBackdropClick(mockEvent);
 
     expect(shopService.closeAdminDashboard).toHaveBeenCalled();
+  });
+
+  it('debe invocar addAlbum y reiniciar el formulario al guardar un nuevo álbum', () => {
+    component.albumName = 'Nuevo Álbum';
+    component.albumDescription = 'Descripción';
+    component.editingAlbumId.set(null);
+
+    component.saveAlbum();
+
+    expect(shopService.addAlbum).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'Nuevo Álbum', description: 'Descripción' }),
+      undefined
+    );
+    expect(component.isSubmitting()).toBe(false);
+  });
+
+  it('debe invocar setHeroCover y actualizar la foto de portada', () => {
+    const photo = { id: 'photo-1', title: 'Foto', category: 'Paisajismo' as any, price: 100, imageUrl: 'img.jpg', description: '', dimensions: '', technicalSheet: '', inStock: true };
+    component.setHeroCover(photo);
+
+    expect(shopService.setHeroCover).toHaveBeenCalledWith('photo-1', 'img.jpg');
   });
 });

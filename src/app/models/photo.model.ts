@@ -56,4 +56,69 @@ export interface AlbumFolder {
   coverImage: string;
   count: number;
   description: string;
+  displayOrder?: number;
+  photoUrls?: string[];
+  createdAt?: string;
+  updatedAt?: string;
 }
+
+export interface CoverPhoto {
+  photoId?: string;
+  imageUrl: string;
+  title?: string;
+  category?: string;
+  description?: string;
+  updatedAt?: string;
+}
+
+// Mercado Pago & Order Interfaces
+export interface CheckoutPreferenceResponse {
+  preferenceId: string;
+  initPoint: string;
+  sandboxInitPoint: string;
+  orderId: string;
+}
+
+export interface OrderItemRequest {
+  photoId: string;
+  quantity: number;
+}
+
+export interface OrderRequest {
+  customerName: string;
+  customerContact: string;
+  notes?: string;
+  items: OrderItemRequest[];
+}
+
+export interface OrderItemResult {
+  id?: number;
+  photoId: string;
+  photoTitle: string;
+  photoCategory?: string;
+  photoImageUrl?: string;
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+}
+
+export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
+
+export interface OrderResult {
+  id: string;
+  customerName: string;
+  customerContact: string;
+  notes?: string;
+  status: OrderStatus;
+  subtotal: number;
+  total: number;
+  totalItems: number;
+  items: OrderItemResult[];
+  createdAt: string;
+  preferenceId?: string;
+  initPoint?: string;
+  sandboxInitPoint?: string;
+}
+
+export type Order = OrderResult;
+

@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
+import { PaymentStatusComponent } from './pages/payment-status/payment-status.component';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -11,6 +12,14 @@ export const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent
+  },
+  {
+    path: 'payment/status',
+    component: PaymentStatusComponent
+  },
+  {
+    path: 'cart/status',
+    redirectTo: 'payment/status'
   },
   {
     path: 'admin',

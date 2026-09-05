@@ -350,7 +350,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                             <td class="p-3.5 text-right space-x-1.5 whitespace-nowrap">
                               <button
                                 type="button"
-                                (click)="shop.setHeroCover(photo.id)"
+                                (click)="setHeroCover(photo)"
                                 [title]="shop.heroPhoto().id === photo.id ? 'Esta fotografía es la Portada Hero actual' : 'Establecer como Portada Hero'"
                                 class="px-2.5 py-1 rounded-lg text-xs font-bold transition-colors border"
                                 [ngClass]="shop.heroPhoto().id === photo.id 
@@ -1242,31 +1242,99 @@ export class AdminDashboardComponent {
       return;
     }
 
+    if (this.isSubmitting()) return;
+    this.isSubmitting.set(true);
+
+    const coverUrl = this.albumCoverUrl && !this.albumCoverUrl.startsWith('data:') ? this.albumCoverUrl.trim() : '';
+
     if (this.editingAlbumId()) {
+      const albumId = this.editingAlbumId()!;
       this.shop.updateAlbum(
-        this.editingAlbumId()!,
+        albumId,
         {
           name,
           description: this.albumDescription.trim(),
-          coverImage: this.albumCoverUrl
+          coverImage: coverUrl
         },
-        this.previousAlbumName
-      );
+        this.previousAlbumName,
+        this.selectedAlbumFile || undefined
+      )
+      .pipe(
+        catchError((err) => {
+          const cleanMsg = this.shop.getCleanErrorMessage(err, 'actualizar el álbum');
+          this.handleRequestError(cleanMsg, err);
+          return throwError(() => err);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.isSubmitting.set(false);
+          this.cancelAlbumEdit();
+        },
+        error: () => {
+          this.isSubmitting.set(false);
+        }
+      });
     } else {
-      this.shop.addAlbum({
-        name,
-        description: this.albumDescription.trim(),
-        coverImage: this.albumCoverUrl
+      this.shop.addAlbum(
+        {
+          name,
+          description: this.albumDescription.trim(),
+          coverImage: coverUrl
+        },
+        this.selectedAlbumFile || undefined
+      )
+      .pipe(
+        catchError((err) => {
+          const cleanMsg = this.shop.getCleanErrorMessage(err, 'crear el nuevo álbum');
+          this.handleRequestError(cleanMsg, err);
+          return throwError(() => err);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.isSubmitting.set(false);
+          this.cancelAlbumEdit();
+        },
+        error: () => {
+          this.isSubmitting.set(false);
+        }
       });
     }
-    this.isSubmitting.set(false);
-    this.cancelAlbumEdit();
   }
 
   deleteAlbum(folder: AlbumFolder): void {
     if (confirm(`¿Estás segura de que deseas eliminar el álbum "${folder.name}"? Las fotografías no se borrarán, pero dejarán de estar agrupadas bajo este álbum.`)) {
-      this.shop.deleteAlbum(folder.id);
+      this.isSubmitting.set(true);
+      this.shop.deleteAlbum(folder.id)
+        .pipe(
+          catchError((err) => {
+            const cleanMsg = this.shop.getCleanErrorMessage(err, 'eliminar el álbum');
+            this.handleRequestError(cleanMsg, err);
+            return throwError(() => err);
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.isSubmitting.set(false);
+          },
+          error: () => {
+            this.isSubmitting.set(false);
+          }
+        });
     }
+  }
+
+  setHeroCover(photo: Photo): void {
+    this.shop.setHeroCover(photo.id, photo.imageUrl)
+      .pipe(
+        catchError((err) => {
+          const cleanMsg = this.shop.getCleanErrorMessage(err, 'actualizar la foto de portada');
+          this.handleRequestError(cleanMsg, err);
+          return throwError(() => err);
+        })
+      )
+      .subscribe();
   }
 
   // --- CERRAR MODAL CON TECLA ESCAPE O CLIC EN BACKDROP ---
