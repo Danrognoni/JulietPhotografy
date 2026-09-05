@@ -10,14 +10,14 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
   standalone: true,
   imports: [CommonModule, RouterModule, ScrollRevealDirective],
   template: `
-    <section id="inicio" class="relative pt-20 sm:pt-24 w-full overflow-hidden bg-[#142417]">
+    <section id="inicio" class="relative pt-20 sm:pt-24 w-full overflow-hidden bg-transparent">
       
       <!-- Pixpa Aspect Signature: Full-Width Cinematic Hero Cover -->
       <div 
         appScrollReveal
-        class="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+        class="w-full max-w-[1680px] mx-auto px-5 sm:px-8 lg:px-12 py-4 sm:py-6">
         
-        <div class="relative w-full h-[75vh] sm:h-[82vh] lg:h-[86vh] min-h-[540px] max-h-[950px] rounded-2xl sm:rounded-3xl overflow-hidden group shadow-2xl bg-[#142417] border border-[#86DEB7]/40">
+        <div class="relative w-full h-[75vh] sm:h-[82vh] lg:h-[86vh] min-h-[540px] max-h-[950px] rounded-2xl sm:rounded-3xl overflow-hidden group shadow-[0_16px_50px_rgba(0,0,0,0.5)] bg-[#142417]/40 backdrop-blur-sm border border-[var(--aura-border)] group-hover:border-[var(--aura-border-hover)] transition-all duration-500">
           
           <!-- Grand Editorial Cover Image -->
           <img
@@ -51,7 +51,7 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
             <div class="flex items-center gap-3 flex-shrink-0">
               <a
                 href="/#albumes"
-                class="btn-editorial-mint px-6 py-2.5 rounded-full text-xs font-sans font-bold uppercase tracking-[0.2em] transition-all shadow-xl">
+                class="btn-editorial-mint px-6 py-2.5 rounded-full text-xs font-sans font-bold uppercase tracking-[0.2em] transition-all shadow-xl hover:shadow-[0_0_24px_var(--aura-glow-bright)]">
                 Explorar Obras
               </a>
 

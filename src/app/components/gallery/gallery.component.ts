@@ -13,173 +13,172 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
   imports: [CommonModule, FormsModule, ScrollRevealDirective],
   template: `
     <!-- SECTION 1: ÁLBUMES & COLECCIONES (MOSAICO EDITORIAL ASIMÉTRICO FULL-WIDTH) -->
-    <section id="albumes" class="py-16 md:py-24 w-full px-3 sm:px-4 md:px-6 relative bg-[#142417]">
-      
-      <!-- Section Header -->
-      <div 
-        appScrollReveal 
-        [revealDelay]="0"
-        class="max-w-7xl mx-auto px-2 sm:px-4 flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
-        <div>
-          <div class="inline-flex items-center gap-2 text-[#86DEB7] text-xs font-bold uppercase tracking-[0.25em] mb-2.5">
-            <span class="w-6 h-[1.5px] bg-[#86DEB7]"></span>
-            <span>Series & Colecciones</span>
+    <section id="albumes" class="py-16 md:py-24 w-full relative bg-transparent">
+      <div class="max-w-[1680px] mx-auto px-5 sm:px-8 lg:px-12">
+        
+        <!-- Section Header -->
+        <div 
+          appScrollReveal 
+          [revealDelay]="0"
+          class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+          <div>
+            <div class="inline-flex items-center gap-2 text-[#86efac] text-xs font-bold uppercase tracking-[0.25em] mb-2.5">
+              <span class="w-6 h-[1.5px] bg-[#86efac]"></span>
+              <span>Series & Colecciones</span>
+            </div>
+            <h2 class="font-editorial text-4xl sm:text-5xl lg:text-6xl text-[#86DEB7] font-bold tracking-tight">
+              Álbumes Temáticos
+            </h2>
+            <p class="text-[#86DEB7]/90 text-sm sm:text-base mt-2.5 max-w-xl font-sans font-medium leading-relaxed">
+              Explora los diferentes cuerpos de trabajo en una composición editorial continua. Haz clic en cualquier serie para explorar sus obras.
+            </p>
           </div>
-          <h2 class="font-editorial text-4xl sm:text-5xl lg:text-6xl text-[#86DEB7] font-bold tracking-tight">
-            Álbumes Temáticos
-          </h2>
-          <p class="text-[#86DEB7]/90 text-sm sm:text-base mt-2.5 max-w-xl font-sans font-medium leading-relaxed">
-            Explora los diferentes cuerpos de trabajo en una composición editorial continua. Haz clic en cualquier serie para explorar sus obras.
-          </p>
+
+          <!-- Quick Reset to All -->
+          @if (shop.selectedCategory() !== 'Todos') {
+            <button
+              type="button"
+              (click)="selectAlbum('Todos')"
+              class="px-4 py-2 rounded-full bg-[#142417]/80 backdrop-blur-md border border-[var(--aura-border)] text-[#86DEB7] text-xs font-bold hover:bg-[#63B995] hover:text-[#142417] hover:border-[#86efac] transition-all flex items-center gap-2 self-start md:self-auto shadow-md">
+              <span>Ver Todas las Carpetas</span>
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          }
         </div>
 
-        <!-- Quick Reset to All -->
-        @if (shop.selectedCategory() !== 'Todos') {
-          <button
-            type="button"
-            (click)="selectAlbum('Todos')"
-            class="px-4 py-2 rounded-full bg-[#142417] border border-[#86DEB7] text-[#86DEB7] text-xs font-bold hover:bg-[#63B995] hover:text-[#142417] transition-all flex items-center gap-2 self-start md:self-auto shadow-md">
-            <span>Ver Todas las Carpetas</span>
-            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          </button>
-        }
-      </div>
-
-      <!-- Albums Full-Width Asymmetrical Dense Mosaic Grid -->
-      <div class="album-mosaic-grid w-full">
-        @for (folder of shop.albumFolders(); track folder.id; let idx = $index) {
-          <article 
-            appScrollReveal
-            [revealDelay]="(idx % 5) * 80"
-            (click)="selectAlbum(folder.category)"
-            class="relative w-full h-full overflow-hidden rounded-2xl bg-[#63B995] group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500 border border-[#86DEB7]/40"
-            [ngClass]="[
-              getAlbumSpanClass(idx),
-              shop.selectedCategory() === folder.category ? 'ring-2 ring-[#86DEB7] ring-offset-2 ring-offset-[#142417]' : ''
-            ]">
-            
-            @if (folder.count > 0 && folder.coverImage) {
-              <!-- Cover Photo with Subtle Zoom -->
-              <img
-                [src]="folder.coverImage"
-                [alt]="folder.name"
-                loading="lazy"
-                decoding="async"
-                class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"/>
-            } @else {
-              <!-- Elegant Sober Empty State -->
-              <div class="w-full h-full bg-[#142417] flex flex-col items-center justify-center p-6 text-center border border-[#63B995]">
-                <div class="w-12 h-12 rounded-xl border border-[#86DEB7] bg-[#63B995] flex items-center justify-center text-[#142417] mb-2">
-                  <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
-                    <circle cx="9" cy="9" r="2"/>
-                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
-                  </svg>
+        <!-- Albums Cards Grid (Balanced Layout for wide screens) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 w-full">
+          @for (folder of shop.albumFolders(); track folder.id; let idx = $index) {
+            <article 
+              appScrollReveal
+              [revealDelay]="(idx % 3) * 100"
+              (click)="selectAlbum(folder.category)"
+              class="relative w-full h-[380px] sm:h-[440px] lg:h-[480px] overflow-hidden rounded-2xl sm:rounded-3xl bg-[#142417]/50 backdrop-blur-md group cursor-pointer shadow-[0_12px_36px_rgba(0,0,0,0.4)] hover:shadow-[0_16px_44px_var(--aura-glow-bright)] transition-all duration-500 border border-[var(--aura-border)] hover:border-[var(--aura-border-hover)]"
+              [ngClass]="shop.selectedCategory() === folder.category ? 'ring-2 ring-[#86efac] ring-offset-2 ring-offset-[#142417]' : ''">
+              
+              @if (folder.count > 0 && folder.coverImage) {
+                <!-- Cover Photo with Subtle Zoom -->
+                <img
+                  [src]="folder.coverImage"
+                  [alt]="folder.name"
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"/>
+              } @else {
+                <!-- Elegant Sober Empty State -->
+                <div class="w-full h-full bg-[#142417]/60 flex flex-col items-center justify-center p-6 text-center border border-[var(--aura-border)]">
+                  <div class="w-12 h-12 rounded-xl border border-[var(--aura-border)] bg-[#63B995]/30 flex items-center justify-center text-[#86efac] mb-2">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect width="18" height="18" x="3" y="3" rx="2"/>
+                      <circle cx="9" cy="9" r="2"/>
+                      <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                    </svg>
+                  </div>
+                  <span class="text-[10px] font-mono tracking-widest text-[#86efac] uppercase font-bold">Serie en Preparación</span>
                 </div>
-                <span class="text-[10px] font-mono tracking-widest text-[#86DEB7] uppercase font-bold">Serie en Preparación</span>
-              </div>
-            }
+              }
 
-            <!-- Static Bottom Caption (Always visible gently before hover) -->
-            <div class="absolute inset-0 bg-gradient-to-t from-[#142417]/95 via-[#142417]/35 to-transparent pointer-events-none transition-opacity duration-300 group-hover:opacity-0"></div>
-            <div class="absolute bottom-4 left-4 right-4 z-10 text-left transition-opacity duration-300 group-hover:opacity-0">
-              <span class="text-[9px] font-mono tracking-[0.2em] uppercase text-[#86DEB7] block mb-0.5 font-bold">
-                Colección
-              </span>
-              <h3 class="font-editorial text-xl sm:text-2xl font-bold text-[#86DEB7] leading-tight drop-shadow-sm">
-                {{ folder.name }}
-              </h3>
-              <span class="text-[11px] font-mono text-[#86DEB7]/90 font-semibold">
-                {{ folder.count }} {{ folder.count === 1 ? 'fotografía' : 'fotografías' }}
-              </span>
-            </div>
-
-            <!-- Hover Overlay with #142417 and Subtle Central (+) Icon -->
-            <div class="absolute inset-0 bg-[#142417]/35 backdrop-blur-[3px] opacity-0 group-hover:opacity-100 transition-all duration-400 flex flex-col items-center justify-center p-6 text-center z-20">
-              <div class="w-12 h-12 rounded-full border border-[#86DEB7] bg-[#142417] text-[#86DEB7] flex items-center justify-center shadow-xl transform scale-90 group-hover:scale-100 transition-transform duration-300 mb-2.5">
-                <svg class="w-6 h-6 stroke-[2]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <line x1="12" y1="5" x2="12" y2="19"/>
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                </svg>
-              </div>
-              <h3 class="font-editorial text-2xl sm:text-3xl font-bold text-[#86DEB7] drop-shadow-md">
-                {{ folder.name }}
-              </h3>
-              <span class="text-xs font-mono text-[#86DEB7] tracking-widest uppercase my-1 font-bold">
-                {{ folder.count }} {{ folder.count === 1 ? 'fotografía' : 'fotografías' }}
-              </span>
-              <p class="text-xs text-[#86DEB7]/95 font-sans font-medium line-clamp-2 max-w-xs mt-1">
-                {{ folder.description }}
-              </p>
-              <span class="mt-2.5 inline-flex items-center gap-1.5 text-[11px] font-bold text-[#142417] bg-[#86DEB7] px-3 py-1 rounded-full border border-[#142417]">
-                <span>Explorar serie</span>
-                <span>→</span>
-              </span>
-            </div>
-
-            <!-- Top Indicator Pill if Active -->
-            @if (shop.selectedCategory() === folder.category) {
-              <div class="absolute top-3 left-3 z-30">
-                <span class="px-2.5 py-0.5 rounded-full bg-[#86DEB7] text-[#142417] text-[10px] font-extrabold uppercase tracking-widest shadow-md border border-[#142417]">
-                  Activo
+              <!-- Static Bottom Caption (Always visible gently before hover) -->
+              <div class="absolute inset-0 bg-gradient-to-t from-[#142417]/95 via-[#142417]/30 to-transparent pointer-events-none transition-opacity duration-300 group-hover:opacity-0"></div>
+              <div class="absolute bottom-5 left-5 right-5 z-10 text-left transition-opacity duration-300 group-hover:opacity-0">
+                <span class="text-[9px] font-mono tracking-[0.2em] uppercase text-[#86efac] block mb-1 font-bold">
+                  Colección
+                </span>
+                <h3 class="font-editorial text-2xl sm:text-3xl font-bold text-[#86DEB7] leading-tight drop-shadow-sm">
+                  {{ folder.name }}
+                </h3>
+                <span class="text-xs font-mono text-[#86DEB7]/90 font-semibold">
+                  {{ folder.count }} {{ folder.count === 1 ? 'fotografía' : 'fotografías' }}
                 </span>
               </div>
-            }
 
-          </article>
-        }
+              <!-- Hover Overlay with #142417 and Subtle Central (+) Icon -->
+              <div class="absolute inset-0 bg-[#142417]/60 backdrop-blur-[5px] opacity-0 group-hover:opacity-100 transition-all duration-400 flex flex-col items-center justify-center p-6 sm:p-8 text-center z-20">
+                <div class="w-13 h-13 rounded-full border border-[#86efac] bg-[#142417]/90 text-[#86efac] flex items-center justify-center shadow-[0_0_24px_var(--aura-glow-bright)] transform scale-90 group-hover:scale-100 transition-transform duration-300 mb-3">
+                  <svg class="w-6 h-6 stroke-[2]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                </div>
+                <h3 class="font-editorial text-2xl sm:text-3xl font-bold text-[#86DEB7] drop-shadow-md">
+                  {{ folder.name }}
+                </h3>
+                <span class="text-xs font-mono text-[#86efac] tracking-widest uppercase my-1.5 font-bold">
+                  {{ folder.count }} {{ folder.count === 1 ? 'fotografía' : 'fotografías' }}
+                </span>
+                <p class="text-xs text-[#86DEB7]/95 font-sans font-medium line-clamp-2 max-w-xs mt-1">
+                  {{ folder.description }}
+                </p>
+                <span class="mt-3.5 inline-flex items-center gap-2 text-xs font-bold text-[#142417] bg-[#86efac] px-4 py-1.5 rounded-full border border-[#142417] shadow-[0_0_20px_var(--aura-glow-bright)]">
+                  <span>Explorar serie</span>
+                  <span>→</span>
+                </span>
+              </div>
+
+              <!-- Top Indicator Pill if Active -->
+              @if (shop.selectedCategory() === folder.category) {
+                <div class="absolute top-4 left-4 z-30">
+                  <span class="px-3 py-1 rounded-full bg-[#86efac] text-[#142417] text-[10px] font-extrabold uppercase tracking-widest shadow-md border border-[#142417]">
+                    Activo
+                  </span>
+                </div>
+              }
+
+            </article>
+          }
+        </div>
+
       </div>
-
     </section>
 
-    <!-- Seamless Subtle Divider -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="h-[1.5px] bg-gradient-to-r from-transparent via-[#86DEB7]/40 to-transparent"></div>
+    <!-- Seamless Subtle Floral Divider with Center Glow -->
+    <div class="max-w-[1680px] mx-auto px-5 sm:px-8 lg:px-12">
+      <div class="h-[1.5px] bg-gradient-to-r from-transparent via-[#86efac]/40 to-transparent"></div>
     </div>
 
     <!-- SECTION 2: PORTAFOLIO DETALLADO (FILTROS MINIMALISTAS & OBRAS) -->
-    <section id="galeria" class="py-20 md:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative bg-[#142417]">
+    <section id="galeria" class="py-20 md:py-28 max-w-[1680px] mx-auto px-5 sm:px-8 lg:px-12 relative bg-transparent">
       
       <!-- Filter Bar & Search Header -->
       <div 
         appScrollReveal
         [revealDelay]="50"
-        class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-14 pb-6 border-b border-[#63B995]/30">
+        class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-8 mb-14 pb-6 border-b border-[var(--aura-border)]">
         <div>
-          <span class="text-[11px] font-bold uppercase tracking-[0.25em] text-[#86DEB7] block mb-2">
+          <span class="text-[11px] font-bold uppercase tracking-[0.25em] text-[#86efac] block mb-2">
             Catálogo de Fotografías
           </span>
           <h3 class="font-editorial text-3xl sm:text-4xl lg:text-5xl text-[#86DEB7] font-bold">
             {{ shop.selectedCategory() === 'Todos' ? 'Venta De Fotografías' : 'Colección: ' + shop.selectedCategory() }}
-            <span class="text-xs sm:text-sm font-sans text-[#63B995] ml-2 font-bold">
+            <span class="text-xs sm:text-sm font-sans text-[#86efac] ml-2 font-bold">
               ({{ shop.filteredPhotos().length }} obras)
             </span>
           </h3>
         </div>
 
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
           
-          <!-- Category Filter Tabs (Minimalist Pixpa Text Tabs with Active Underline #86DEB7) -->
-          <nav aria-label="Filtro de categorías" class="flex flex-wrap items-center gap-4 sm:gap-6 border-b border-[#63B995]/20 pb-2 sm:pb-0 sm:border-b-0">
+          <!-- Category Filter Tabs (Minimalist Pixpa Text Tabs with Active Underline #86efac) -->
+          <nav aria-label="Filtro de categorías" class="flex flex-wrap items-center gap-3 sm:gap-6 border-b border-[var(--aura-border)] pb-2 sm:pb-0 sm:border-b-0">
             @for (cat of categories(); track cat) {
               <button
                 type="button"
                 (click)="setFilter(cat)"
                 class="text-xs tracking-[0.2em] uppercase font-bold py-1.5 relative transition-colors"
                 [ngClass]="shop.selectedCategory() === cat 
-                  ? 'text-[#86DEB7] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-[#86DEB7]' 
-                  : 'text-[#63B995] hover:text-[#86DEB7]'">
+                  ? 'text-[#86efac] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-[#86efac] after:shadow-[0_0_12px_#86efac]' 
+                  : 'text-[#63B995] hover:text-[#86efac]'">
                 {{ cat }}
               </button>
             }
           </nav>
 
-          <!-- Search Input -->
-          <div class="relative min-w-[200px] w-full sm:w-auto">
-            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#86DEB7]">
+          <!-- Search Input with Floral Glassmorphism -->
+          <div class="relative min-w-[220px] w-full sm:w-auto">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#86efac]/80">
               <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="8"/>
                 <path d="m21 21-4.3-4.3"/>
@@ -190,24 +189,24 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
               placeholder="Buscar obra, cámara..."
               [ngModel]="shop.searchQuery()"
               (ngModelChange)="onSearchChange($event)"
-              class="w-full pl-8 pr-3 py-1.5 text-xs rounded-full bg-[#142417] border border-[#63B995] text-[#86DEB7] placeholder-[#86DEB7]/60 focus:outline-none focus:border-[#86DEB7] focus:ring-1 focus:ring-[#86DEB7] transition-all font-medium"/>
+              class="w-full pl-8 pr-3 py-2 text-xs rounded-full bg-[#142417]/80 backdrop-blur-md border border-[var(--aura-border)] text-[#86DEB7] placeholder-[#86DEB7]/60 focus:outline-none focus:border-[#86efac] focus:ring-1 focus:ring-[#86efac]/40 transition-all font-medium shadow-inner"/>
           </div>
 
         </div>
       </div>
 
-      <!-- Photos Open Grid (Responsive Editorial Grid without Boxes) -->
+      <!-- Photos Open Grid (Responsive 4-column Editorial Grid on wide screens) -->
       @if (shop.filteredPhotos().length > 0) {
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 sm:gap-8 lg:gap-10">
           @for (photo of shop.filteredPhotos(); track photo.id; let idx = $index) {
             <article 
               appScrollReveal
-              [revealDelay]="(idx % 6) * 90"
+              [revealDelay]="(idx % 4) * 80"
               class="group flex flex-col justify-start relative">
               
               <!-- ADMIN ON-CARD ACTION BADGES (RENDERED ONLY IF LOGGED IN) -->
               @if (auth.isAdmin()) {
-                <div class="absolute top-3 right-3 z-30 flex items-center gap-1.5 bg-[#142417] p-1 rounded-xl shadow-lg border border-[#86DEB7]">
+                <div class="absolute top-3 right-3 z-30 flex items-center gap-1.5 bg-[#142417]/90 backdrop-blur-md p-1 rounded-xl shadow-lg border border-[var(--aura-border)]">
                   <button
                     type="button"
                     (click)="editPhotoAdmin(photo)"
@@ -235,7 +234,7 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
               <!-- Image Frame with Lightbox Click -->
               <div 
                 (click)="shop.openPreview(photo)"
-                class="relative aspect-[3/4] sm:aspect-[4/5] overflow-hidden rounded-2xl bg-[#63B995] cursor-pointer shadow-xl group-hover:shadow-2xl transition-all duration-500 border border-[#86DEB7]/40">
+                class="relative aspect-[3/4] sm:aspect-[4/5] overflow-hidden rounded-2xl bg-[#142417]/60 backdrop-blur-md cursor-pointer shadow-[0_10px_32px_rgba(0,0,0,0.4)] group-hover:shadow-[0_16px_40px_var(--aura-glow)] transition-all duration-500 border border-[var(--aura-border)] group-hover:border-[var(--aura-border-hover)]">
                 
                 <img
                   [src]="photo.imageUrl"
@@ -245,20 +244,20 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
                   class="w-full h-full object-cover object-center transform transition-transform duration-700 ease-out group-hover:scale-105"/>
                 
                 <!-- Category Badge -->
-                <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-mono tracking-widest uppercase border shadow-md backdrop-blur-md bg-[#142417] border-[#86DEB7] text-[#86DEB7] font-bold">
+                <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-mono tracking-widest uppercase border shadow-md backdrop-blur-md bg-[#142417]/85 border-[var(--aura-border)] text-[#86efac] font-bold">
                   {{ photo.category }}
                 </span>
 
                 @if (photo.badge) {
-                  <span class="absolute bottom-3 left-3 px-2.5 py-0.5 rounded-md text-[10px] font-mono uppercase tracking-wider bg-[#63B995] border border-[#86DEB7] text-[#142417] font-extrabold">
+                  <span class="absolute bottom-3 left-3 px-2.5 py-0.5 rounded-md text-[10px] font-mono uppercase tracking-wider bg-[#63B995] border border-[var(--aura-border-hover)] text-[#142417] font-extrabold shadow-sm">
                     {{ photo.badge }}
                   </span>
                 }
 
                 <!-- Hover Overlay with Lens Icon -->
-                <div class="absolute inset-0 bg-[#142417]/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <span class="px-4 py-2 rounded-full bg-[#142417] text-[#86DEB7] text-xs font-bold flex items-center gap-2 border border-[#86DEB7] shadow-xl">
-                    <svg class="w-4 h-4 text-[#86DEB7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <div class="absolute inset-0 bg-[#142417]/45 backdrop-blur-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <span class="px-4 py-2 rounded-full bg-[#142417]/90 text-[#86efac] text-xs font-bold flex items-center gap-2 border border-[#86efac] shadow-[0_0_24px_var(--aura-glow)] transform scale-95 group-hover:scale-100 transition-transform duration-300">
+                    <svg class="w-4 h-4 text-[#86efac]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <circle cx="11" cy="11" r="8"/>
                       <line x1="21" y1="21" x2="16.65" y2="16.65"/>
                     </svg>
@@ -270,10 +269,10 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
               <!-- Information Beneath Image -->
               <div class="pt-4 space-y-2">
                 <div class="flex items-baseline justify-between gap-2">
-                  <h4 class="font-editorial text-2xl font-bold text-[#86DEB7] transition-colors leading-snug">
+                  <h4 class="font-editorial text-2xl font-bold text-[#86DEB7] group-hover:text-[#86efac] transition-colors leading-snug">
                     {{ photo.title }}
                   </h4>
-                  <span class="font-mono text-base font-bold text-[#86DEB7] flex-shrink-0">
+                  <span class="font-mono text-base font-bold text-[#86efac] flex-shrink-0">
                     \${{ photo.price }}
                   </span>
                 </div>
@@ -284,7 +283,7 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
 
                 <!-- Technical Camera Sheet Badge -->
                 <div class="pt-1 flex items-center gap-2 text-[11px] font-mono text-[#63B995] truncate font-semibold">
-                  <svg class="w-3.5 h-3.5 text-[#86DEB7] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg class="w-3.5 h-3.5 text-[#86efac] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"/>
                     <circle cx="12" cy="12" r="3"/>
                   </svg>
@@ -292,7 +291,7 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
                 </div>
 
                 <!-- Footer: Dimensions & Cart CTA -->
-                <div class="pt-3 border-t border-[#63B995]/30 flex items-center justify-between gap-3">
+                <div class="pt-3 border-t border-[var(--aura-border)] flex items-center justify-between gap-3">
                   <span class="text-[11px] font-mono text-[#63B995] truncate font-semibold">
                     {{ photo.dimensions }}
                   </span>
@@ -302,7 +301,7 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
                     (click)="handleAddToCart(photo)"
                     class="px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-md"
                     [ngClass]="addedPhotoId() === photo.id 
-                      ? 'bg-[#86DEB7] text-[#142417]' 
+                      ? 'bg-[#86efac] text-[#142417] shadow-[0_0_20px_var(--aura-glow-bright)]' 
                       : 'btn-editorial-mint'">
                     @if (addedPhotoId() === photo.id) {
                       <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">

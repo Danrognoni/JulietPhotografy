@@ -4,7 +4,6 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { HeroComponent } from '../../components/hero/hero.component';
 import { GalleryComponent } from '../../components/gallery/gallery.component';
-import { ServicesComponent } from '../../components/services/services.component';
 import { AboutComponent } from '../../components/about/about.component';
 import { AdminDashboardComponent } from '../../components/admin-dashboard/admin-dashboard.component';
 import { CartDrawerComponent } from '../../components/cart-drawer/cart-drawer.component';
@@ -23,7 +22,6 @@ import { AuthService } from '../../services/auth.service';
     NavbarComponent,
     HeroComponent,
     GalleryComponent,
-    ServicesComponent,
     AboutComponent,
     AdminDashboardComponent,
     CartDrawerComponent,
@@ -32,8 +30,26 @@ import { AuthService } from '../../services/auth.service';
     ScrollRevealDirective
   ],
   template: `
-    <div class="min-h-screen bg-aura-mesh text-[#86DEB7] flex flex-col relative selection:bg-[#86DEB7] selection:text-[#142417]">
+    <div class="min-h-screen bg-aura-mesh text-[#86DEB7] flex flex-col relative selection:bg-[#86DEB7] selection:text-[#142417] overflow-x-hidden">
       
+      <!-- Dynamic Ambient Floral Aura Floating Background (Ethereal Mint, Pistachio & Sage Orbs) -->
+      <div class="fixed inset-0 overflow-hidden pointer-events-none z-0" aria-hidden="true">
+        <!-- Mint Glow Sphere (Top Left) -->
+        <div class="absolute -top-36 -left-36 w-[580px] h-[580px] rounded-full bg-[#86efac]/22 blur-[115px] ambient-glow-blob-1"></div>
+
+        <!-- Pistachio / Pastel Lime Sphere (Top Right) -->
+        <div class="absolute top-1/4 -right-44 w-[640px] h-[640px] rounded-full bg-[#bbf7d0]/20 blur-[125px] ambient-glow-blob-2"></div>
+
+        <!-- Bright Sage Sphere (Center Left) -->
+        <div class="absolute top-1/2 -left-48 w-[600px] h-[600px] rounded-full bg-[#6ee7b7]/22 blur-[130px] ambient-glow-blob-3"></div>
+
+        <!-- Fresh Emerald Accent Sphere (Lower Right) -->
+        <div class="absolute bottom-16 -right-28 w-[560px] h-[560px] rounded-full bg-[#4ade80]/18 blur-[110px] ambient-glow-blob-4"></div>
+
+        <!-- Central Soft Ethereal Floral Sparkle Glow -->
+        <div class="absolute top-2/3 left-1/3 w-[450px] h-[450px] rounded-full bg-[#86efac]/15 blur-[100px] ambient-sparkle-pulse"></div>
+      </div>
+
       <!-- Main Content Structure -->
       <div class="relative z-10 flex flex-col flex-grow">
         
@@ -93,17 +109,14 @@ import { AuthService } from '../../services/auth.service';
         <!-- 2. Sección de Carpetas / Álbumes de Fotos & Portafolio -->
         <app-gallery></app-gallery>
 
-        <!-- 3. Sección de Servicios (Columnas Editoriales Aspect 01, 02, 03) -->
-        <app-services></app-services>
-
-        <!-- 4. Sección Sobre Mí (Bio Asimétrica, Retrato & Dynamic Tags) -->
+        <!-- 3. Sección Sobre Mí (Bio Asimétrica, Retrato & Dynamic Tags) -->
         <app-about></app-about>
 
         <!-- Admin Quick Access Floating Banner (RENDERED ONLY IF LOGGED IN AS ADMIN) -->
         @if (auth.isAdmin()) {
           <section 
             appScrollReveal
-            class="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            class="py-12 max-w-[1680px] mx-auto px-5 sm:px-8 lg:px-12 w-full">
             <div class="rounded-2xl p-6 sm:p-8 bg-[#63B995] border border-[#86DEB7] flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl text-[#142417]">
               <div class="flex items-center gap-4">
                 <div class="w-12 h-12 rounded-xl bg-[#142417] text-[#86DEB7] border border-[#86DEB7] flex items-center justify-center flex-shrink-0 shadow-md">
@@ -147,7 +160,7 @@ import { AuthService } from '../../services/auth.service';
           </section>
         }
 
-        <!-- 5. Footer & Contact Details -->
+        <!-- 4. Footer & Contact Details -->
         <app-footer></app-footer>
 
       </div>

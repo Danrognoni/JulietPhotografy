@@ -39,11 +39,6 @@ import { AuthService } from '../../services/auth.service';
             <span>Portafolio</span>
             <span class="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#86DEB7] transition-all duration-300 group-hover:w-full"></span>
           </a>
-          <a href="/#servicios"
-             class="text-[#86DEB7] hover:text-[#63B995] transition-colors py-1 relative group">
-            <span>Servicios</span>
-            <span class="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#86DEB7] transition-all duration-300 group-hover:w-full"></span>
-          </a>
           <a href="/#sobre-mi"
              class="text-[#86DEB7] hover:text-[#63B995] transition-colors py-1 relative group">
             <span>Sobre Mí</span>
@@ -156,11 +151,6 @@ import { AuthService } from '../../services/auth.service';
              (click)="closeMobileMenu()"
              class="block py-2 text-sm font-semibold tracking-wider uppercase text-[#86DEB7] hover:text-[#63B995] border-b border-[#63B995]/40">
             Portafolio
-          </a>
-          <a href="/#servicios"
-             (click)="closeMobileMenu()"
-             class="block py-2 text-sm font-semibold tracking-wider uppercase text-[#86DEB7] hover:text-[#63B995] border-b border-[#63B995]/40">
-            Servicios
           </a>
           <a href="/#sobre-mi"
              (click)="closeMobileMenu()"

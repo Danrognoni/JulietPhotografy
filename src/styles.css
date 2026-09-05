@@ -3,13 +3,27 @@
 @layer base {
   :root {
     /* Strict 3-Color Palette Hierarchy */
-    --color-light: #86DEB7;   /* Color 1: Claro / Acento principal, títulos destacados, bordes luminosos */
-    --color-medium: #63B995;  /* Color 2: Medio / Secundario, botones, tarjetas, contenedores */
-    --color-dark: #142417;    /* Color 3: Oscuro / Base, fondo general body/html, contraste */
+    --color-light: #86DEB7;   /* Color 1: Claro / Acento principal, títulos destacados */
+    --color-medium: #63B995;  /* Color 2: Medio / Secundario, botones, contenedores */
+    --color-dark: #142417;    /* Color 3: Oscuro / Base estructural */
+
+    /* Ethereal Floral Aura Tokens (Luminous Light Greens) */
+    --aura-green-light: #86efac;     /* Menta luminosa */
+    --aura-lime-pastel: #bbf7d0;     /* Pistacho y lima pastel suave */
+    --aura-salvia-bright: #6ee7b7;   /* Salvia brillante */
+    --aura-emerald-fresh: #4ade80;   /* Acento energético fresco */
+
+    /* Ethereal Glows and Border Tokens */
+    --aura-glow: rgba(134, 239, 172, 0.22);
+    --aura-glow-bright: rgba(187, 247, 208, 0.38);
+    --aura-glow-soft: rgba(110, 231, 183, 0.16);
+    --aura-border: rgba(134, 239, 172, 0.22);
+    --aura-border-hover: rgba(134, 239, 172, 0.65);
+    --aura-sparkle: rgba(187, 247, 208, 0.5);
 
     --bg-base: #142417;
     --bg-surface: #63B995;
-    --bg-card: #142417;
+    --bg-card: rgba(20, 36, 23, 0.75);
   }
 
   html {
@@ -27,7 +41,7 @@
   }
 
   ::selection {
-    background-color: #86DEB7;
+    background-color: #86efac;
     color: #142417;
   }
 
@@ -42,34 +56,127 @@
   }
 }
 
-/* Organic Ambient Background with Exclusive 3-Color Gradients */
+/* Organic Ambient Background: Floral Mesh Gradient with Light Green Auras */
 .bg-aura-mesh {
   background-color: #142417;
   background-image: 
-    radial-gradient(at 15% 10%, rgba(99, 185, 149, 0.12) 0px, transparent 60%),
-    radial-gradient(at 85% 15%, rgba(134, 222, 183, 0.08) 0px, transparent 55%),
-    radial-gradient(at 50% 50%, rgba(20, 36, 23, 0.60) 0px, transparent 60%),
-    radial-gradient(at 80% 80%, rgba(134, 222, 183, 0.06) 0px, transparent 55%),
-    radial-gradient(at 20% 85%, rgba(99, 185, 149, 0.10) 0px, transparent 55%);
+    radial-gradient(at 10% 12%, rgba(134, 239, 172, 0.16) 0px, transparent 55%),
+    radial-gradient(at 88% 18%, rgba(187, 247, 208, 0.14) 0px, transparent 50%),
+    radial-gradient(at 50% 48%, rgba(110, 231, 183, 0.10) 0px, transparent 60%),
+    radial-gradient(at 82% 82%, rgba(74, 222, 128, 0.12) 0px, transparent 55%),
+    radial-gradient(at 15% 85%, rgba(134, 239, 172, 0.15) 0px, transparent 55%),
+    radial-gradient(at 50% 95%, rgba(99, 185, 149, 0.18) 0px, transparent 50%);
   background-attachment: fixed;
 }
 
-/* Primary Editorial Action Buttons (#63B995 -> #86DEB7 hover) */
+/* Dynamic Ambient Aura Floating Keyframes (Mint, Lime & Salvia Glow) */
+@keyframes auraFloat1 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  33% {
+    transform: translate3d(55px, 40px, 0) scale(1.12) rotate(120deg);
+  }
+  66% {
+    transform: translate3d(-30px, 75px, 0) scale(0.96) rotate(240deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(360deg);
+  }
+}
+
+@keyframes auraFloat2 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  33% {
+    transform: translate3d(-45px, -55px, 0) scale(1.15) rotate(-120deg);
+  }
+  66% {
+    transform: translate3d(35px, -25px, 0) scale(0.93) rotate(-240deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(-360deg);
+  }
+}
+
+@keyframes auraFloat3 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.96);
+  }
+  50% {
+    transform: translate3d(45px, -40px, 0) scale(1.16);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(0.96);
+  }
+}
+
+@keyframes auraFloat4 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-50px, 35px, 0) scale(1.13);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes floralSparkle {
+  0%, 100% {
+    opacity: 0.18;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 0.32;
+    transform: scale(1.06);
+  }
+}
+
+.ambient-glow-blob-1 {
+  animation: auraFloat1 18s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  will-change: transform;
+}
+
+.ambient-glow-blob-2 {
+  animation: auraFloat2 22s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  will-change: transform;
+}
+
+.ambient-glow-blob-3 {
+  animation: auraFloat3 16s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  will-change: transform;
+}
+
+.ambient-glow-blob-4 {
+  animation: auraFloat4 20s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  will-change: transform;
+}
+
+.ambient-sparkle-pulse {
+  animation: floralSparkle 9s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Primary Editorial Action Buttons (#63B995 -> #86DEB7 / #86efac hover with mint glow) */
 .btn-fresh-gradient, .btn-aura-primary, .btn-editorial-mint {
   background-color: #63B995;
   color: #142417;
   font-weight: 700;
-  box-shadow: 0 4px 14px rgba(80, 114, 60, 0.4);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  border: 1px solid #86DEB7;
+  box-shadow: 0 4px 18px var(--aura-glow);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid var(--aura-border);
+  backdrop-filter: blur(8px);
 }
 
 .btn-fresh-gradient:hover, .btn-aura-primary:hover, .btn-editorial-mint:hover {
   background-color: #86DEB7;
   color: #142417;
-  box-shadow: 0 6px 20px rgba(134, 222, 183, 0.5);
+  box-shadow: 0 8px 28px var(--aura-glow-bright);
   transform: translateY(-2px);
-  border-color: #86DEB7;
+  border-color: #86efac;
 }
 
 .btn-fresh-gradient:active, .btn-aura-primary:active, .btn-editorial-mint:active {
@@ -78,17 +185,20 @@
 
 /* Secondary Outline Button */
 .btn-aura-outline {
-  background-color: #142417;
+  background-color: rgba(20, 36, 23, 0.75);
+  backdrop-filter: blur(12px);
   color: #86DEB7;
-  border: 1px solid #86DEB7;
+  border: 1px solid var(--aura-border);
   font-weight: 600;
-  transition: all 0.25s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-aura-outline:hover {
   background-color: #63B995;
   color: #142417;
-  border-color: #86DEB7;
+  border-color: #86efac;
+  box-shadow: 0 6px 20px var(--aura-glow);
+  transform: translateY(-1.5px);
 }
 
 /* WhatsApp Brand / Contact Button */
@@ -96,16 +206,17 @@
   background-color: #63B995;
   color: #142417;
   font-weight: 700;
-  box-shadow: 0 4px 14px rgba(80, 114, 60, 0.4);
-  transition: all 0.25s ease;
-  border: 1px solid #86DEB7;
+  box-shadow: 0 4px 16px var(--aura-glow);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid var(--aura-border);
 }
 
 .btn-whatsapp:hover {
-  background-color: #86DEB7;
+  background-color: #86efac;
   color: #142417;
-  box-shadow: 0 6px 20px rgba(134, 222, 183, 0.5);
+  box-shadow: 0 8px 28px var(--aura-glow-bright);
   transform: translateY(-2px);
+  border-color: #bbf7d0;
 }
 
 .btn-whatsapp:active {
@@ -114,18 +225,18 @@
 
 /* Header Glassmorphism Navigation */
 .glass-header-light, .glass-header-aura {
-  background: rgba(80, 114, 60, 0.94);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(134, 222, 183, 0.35);
-  box-shadow: 0 4px 20px rgba(80, 114, 60, 0.35);
+  background: rgba(20, 36, 23, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--aura-border);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4), 0 1px 16px var(--aura-glow-soft);
 }
 
-/* Scroll Reveal Animations (translateY(45px) scale(0.96) -> translateY(0) scale(1)) */
+/* Scroll Reveal Animations (translateY(30px) scale(0.98) -> translateY(0) scale(1)) */
 .scroll-reveal-item {
   opacity: 0;
-  transform: translateY(45px) scale(0.96);
-  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(30px) scale(0.98);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
@@ -142,43 +253,54 @@
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Glassmorphism Refined Containers with Aura Glow */
+.glass-card-editorial {
+  background: rgba(20, 36, 23, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--aura-border);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-editorial:hover {
+  border-color: var(--aura-border-hover);
+  box-shadow: 0 12px 38px var(--aura-glow);
+}
+
 /* Aspect Editorial Album Image Container */
 .album-card-editorial {
   position: relative;
   overflow: hidden;
-  background: #63B995;
-  border: 1px solid #86DEB7;
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  background: #142417;
+  border: 1px solid var(--aura-border);
+  backdrop-filter: blur(8px);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .album-card-editorial:hover {
   transform: translateY(-4px);
-  border-color: #86DEB7;
-  box-shadow: 0 8px 24px rgba(80, 114, 60, 0.45);
+  border-color: var(--aura-border-hover);
+  box-shadow: 0 14px 40px var(--aura-glow-bright);
 }
 
 /* Full-Width Album Mosaic Grid */
 .album-mosaic-grid {
   display: grid;
   grid-template-columns: repeat(1, minmax(0, 1fr));
-  grid-auto-rows: 220px;
-  grid-auto-flow: dense;
-  gap: 12px;
+  gap: 16px;
 }
 
 @media (min-width: 640px) {
   .album-mosaic-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: 250px;
-    gap: 14px;
+    gap: 20px;
   }
 }
 
 @media (min-width: 1024px) {
   .album-mosaic-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    grid-auto-rows: 270px;
-    gap: 16px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
   }
 }
 
@@ -190,39 +312,27 @@
   border: 1px solid #86DEB7;
 }
 
-/* Drag and Drop Zone */
-.drag-drop-zone-fresh {
-  background: rgba(80, 114, 60, 0.6);
-  border: 2px dashed #86DEB7;
+/* Dynamic Tag Pills */
+.aura-pill-tag, .pill-editorial {
+  background: rgba(20, 36, 23, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--aura-border);
+  color: #86DEB7;
+  font-weight: 600;
   transition: all 0.25s ease;
 }
 
-.drag-drop-zone-fresh.active,
-.drag-drop-zone-fresh:hover {
-  border-color: #86DEB7;
-  background: rgba(99, 185, 149, 0.45);
-  box-shadow: 0 0 16px rgba(134, 222, 183, 0.4);
-}
-
-/* Dynamic Tag Pills */
-.aura-pill-tag, .pill-editorial {
-  background: #142417;
-  border: 1px solid #86DEB7;
-  color: #86DEB7;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
 .aura-pill-tag:hover, .pill-editorial:hover {
-  border-color: #86DEB7;
+  border-color: #86efac;
   background: #63B995;
   color: #142417;
+  box-shadow: 0 0 18px var(--aura-glow);
 }
 
 /* Soft Accent Pills */
 .pill-mint {
   background: #63B995;
-  border: 1px solid #86DEB7;
+  border: 1px solid var(--aura-border);
   color: #142417;
   font-weight: 600;
 }
@@ -240,7 +350,7 @@
   border: 2px solid #142417;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #86DEB7;
+  background: #86efac;
 }
 
 /* Global Viewport & Modal Scroll Locks */
