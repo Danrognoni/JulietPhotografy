@@ -37,11 +37,11 @@ import { ServiceItem } from '../../models/photo.model';
         <!-- Revel Editorial Services Grid (Numbered Columns) -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
           @for (service of shop.services(); track service.id; let idx = $index) {
-            <article class="card-editorial rounded-3xl overflow-hidden flex flex-col justify-between group border border-violet-500/20 bg-[#140b2e]/70 backdrop-blur-xl shadow-xl hover:shadow-2xl transition-all duration-300 relative">
+            <article class="card-editorial rounded-3xl overflow-hidden flex flex-col justify-between group border border-violet-500/15 bg-[#130b24] shadow-lg hover:shadow-xl transition-all duration-300 relative">
               
               <!-- ADMIN ACTION BADGES (RENDERED ONLY IF LOGGED IN) -->
               @if (auth.isAdmin()) {
-                <div class="absolute top-3 right-3 z-30 flex items-center gap-1.5 bg-[#120728]/95 backdrop-blur-md p-1 rounded-xl shadow-lg border border-emerald-500/40">
+                <div class="absolute top-3 right-3 z-30 flex items-center gap-1.5 bg-[#120728]/95 p-1 rounded-xl shadow-lg border border-emerald-500/40">
                   <button
                     type="button"
                     (click)="editServiceAdmin(service)"
@@ -72,6 +72,7 @@ import { ServiceItem } from '../../models/photo.model';
                   [src]="service.imageUrl"
                   [alt]="service.title"
                   loading="lazy"
+                  decoding="async"
                   class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"/>
                 <div class="absolute inset-0 bg-gradient-to-t from-[#0e0722] via-[#0e0722]/30 to-transparent"></div>
                 

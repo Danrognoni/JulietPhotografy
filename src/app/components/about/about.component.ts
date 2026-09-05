@@ -17,7 +17,7 @@ import { AuthService } from '../../services/auth.service';
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         <!-- Asymmetrical Editorial Container: Portrait + Narrative -->
-        <div class="card-editorial rounded-3xl p-6 sm:p-10 lg:p-14 border border-violet-500/25 bg-[#12082b]/80 backdrop-blur-2xl shadow-2xl relative">
+        <div class="card-editorial rounded-3xl p-6 sm:p-10 lg:p-14 border border-violet-500/15 bg-[#130b24] shadow-xl relative">
           
           <!-- Admin Quick Edit Profile Badge (VISIBLE ONLY IF LOGGED IN) -->
           @if (auth.isAdmin()) {
@@ -39,11 +39,13 @@ import { AuthService } from '../../services/auth.service';
             <!-- Asymmetrical Portrait Frame with Aura Halo -->
             <div class="lg:col-span-5 flex justify-center">
               <div class="relative group/img">
-                <div class="w-64 h-64 sm:w-80 sm:h-80 rounded-3xl p-[2.5px] bg-gradient-to-tr from-emerald-400/50 via-sky-400/40 to-violet-500/50 shadow-2xl shadow-violet-950/60">
+                <div class="w-64 h-64 sm:w-80 sm:h-80 rounded-3xl p-[2.5px] bg-gradient-to-tr from-emerald-400/30 via-sky-400/20 to-violet-500/30 shadow-2xl shadow-violet-950/60">
                   <div class="w-full h-full rounded-[22px] overflow-hidden bg-[#0d071e] relative">
                     <img
                       [src]="shop.profile().imageUrl"
                       [alt]="shop.profile().name + ' - ' + shop.profile().title"
+                      loading="lazy"
+                      decoding="async"
                       class="w-full h-full object-cover object-center group-hover/img:scale-105 transition-transform duration-700 ease-out"/>
                   </div>
                 </div>
@@ -90,7 +92,6 @@ import { AuthService } from '../../services/auth.service';
                       [ngClass]="idx % 3 === 0 
                         ? 'pill-mint hover:border-emerald-400' 
                         : (idx % 3 === 1 ? 'pill-sky hover:border-sky-400' : 'pill-lavender hover:border-violet-400')">
-                      <span class="text-[10px] opacity-75">✦</span>
                       <span>{{ tag }}</span>
                     </span>
                   }

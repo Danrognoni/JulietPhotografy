@@ -20,18 +20,13 @@ import { AuthService } from '../../services/auth.service';
         
         <!-- Revel Editorial Masthead & Headline -->
         <div class="text-center max-w-4xl mx-auto mb-12 lg:mb-16 space-y-4">
-          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 text-xs font-semibold uppercase tracking-[0.25em]">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-            <span>Portafolio Editorial & Servicios de Autor</span>
-          </div>
+          
 
           <h1 class="font-editorial text-4xl sm:text-6xl lg:text-7xl font-light text-white leading-[1.08] tracking-tight">
-            Historias contadas a través de la <span class="italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-sky-200 to-violet-300">luz & la emoción</span>
+            Fotografa de moda, paisajismo, producto. <span class="italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-sky-200 to-violet-300">luz & la emoción</span>
           </h1>
 
-          <p class="text-slate-300 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto font-sans font-normal leading-relaxed">
-            Fotografía sensible y postproducción profesional en Mar del Plata. Coberturas integrales para casamientos, cumpleaños de XV, paisajes y sesiones de autor.
-          </p>
+         
 
           <!-- Primary Actions -->
           <div class="pt-3 flex flex-wrap items-center justify-center gap-3.5">
@@ -73,6 +68,8 @@ import { AuthService } from '../../services/auth.service';
               <img
                 [src]="featuredPhoto1()?.imageUrl || defaultCover1"
                 [alt]="featuredPhoto1()?.title || 'Fotografía de Autor'"
+                loading="lazy"
+                decoding="async"
                 class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"/>
               <div class="absolute inset-0 bg-gradient-to-t from-[#090514]/90 via-[#090514]/20 to-transparent"></div>
               
@@ -90,13 +87,14 @@ import { AuthService } from '../../services/auth.service';
             </div>
           </div>
 
-          <!-- Column 2: Centerpiece Landscape + Floating Editorial Quote Card -->
-          <div class="lg:col-span-5 space-y-5">
-            <!-- Centerpiece Landscape -->
-            <div class="album-card-editorial overflow-hidden shadow-2xl h-[280px] sm:h-[300px] relative group">
+          <!-- Column 2: Centerpiece Landscape -->
+          <div class="lg:col-span-5 relative group">
+            <div class="album-card-editorial overflow-hidden shadow-2xl h-[420px] sm:h-[480px]">
               <img
                 [src]="featuredPhoto2()?.imageUrl || defaultCover2"
                 [alt]="featuredPhoto2()?.title || 'Paisajes de Mar del Plata'"
+                loading="lazy"
+                decoding="async"
                 class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"/>
               <div class="absolute inset-0 bg-gradient-to-t from-[#090514]/90 via-[#090514]/15 to-transparent"></div>
               
@@ -104,32 +102,24 @@ import { AuthService } from '../../services/auth.service';
                 <span class="inline-block px-2.5 py-0.5 rounded-full bg-sky-950/80 border border-sky-400/40 text-sky-300 text-[10px] font-bold uppercase tracking-widest">
                   {{ featuredPhoto2()?.category || 'Paisajismo' }}
                 </span>
-                <h3 class="font-editorial text-2xl text-white font-normal leading-snug drop-shadow-md">
+                <h3 class="font-editorial text-2xl sm:text-3xl text-white font-normal leading-snug drop-shadow-md">
                   {{ featuredPhoto2()?.title || 'Amanecer en los Acantilados' }}
                 </h3>
-              </div>
-            </div>
-
-            <!-- Floating Editorial Inspiration Pill / Quote -->
-            <div class="card-editorial rounded-2xl p-5 border border-violet-500/20 bg-[#140b2e]/70 backdrop-blur-xl flex items-center justify-between gap-4">
-              <div class="space-y-1">
-                <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">Filosofía de Trabajo</span>
-                <p class="font-editorial text-lg italic text-slate-100">
-                  "Capturar la autenticidad sin poses forzadas, con el respeto que merece cada historia."
+                <p class="text-xs text-slate-300/80 line-clamp-1 font-sans">
+                  {{ featuredPhoto2()?.dimensions || 'Impresión Fine Art' }}
                 </p>
-              </div>
-              <div class="w-10 h-10 rounded-full bg-violet-950/70 border border-violet-500/30 flex items-center justify-center flex-shrink-0 text-violet-300 font-editorial text-xl italic">
-                ✦
               </div>
             </div>
           </div>
 
-          <!-- Column 3: Offset Companion Image (XV / Foto Producto) -->
-          <div class="lg:col-span-3 space-y-5">
-            <div class="album-card-editorial overflow-hidden shadow-2xl h-[360px] sm:h-[420px] relative group">
+          <!-- Column 3: Offset Companion Image (XV / Eventos) -->
+          <div class="lg:col-span-3 relative group">
+            <div class="album-card-editorial overflow-hidden shadow-2xl h-[420px] sm:h-[480px]">
               <img
                 [src]="featuredPhoto3()?.imageUrl || defaultCover3"
                 [alt]="featuredPhoto3()?.title || 'Quinceañeras & Eventos'"
+                loading="lazy"
+                decoding="async"
                 class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"/>
               <div class="absolute inset-0 bg-gradient-to-t from-[#090514]/90 via-[#090514]/15 to-transparent"></div>
               
@@ -140,6 +130,9 @@ import { AuthService } from '../../services/auth.service';
                 <h3 class="font-editorial text-xl text-white font-normal leading-snug drop-shadow-md">
                   {{ featuredPhoto3()?.title || 'Brillo de Quinceañera' }}
                 </h3>
+                <p class="text-xs text-slate-300/80 line-clamp-1 font-sans">
+                  {{ featuredPhoto3()?.dimensions || 'Papel Lustre' }}
+                </p>
               </div>
             </div>
           </div>

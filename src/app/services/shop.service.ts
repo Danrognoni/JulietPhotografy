@@ -362,13 +362,13 @@ export class ShopService {
 
     return standardFolders.map(folder => {
       const matching = all.filter(p => {
-        const catMatch = p.category?.toLowerCase() === folder.name.toLowerCase();
+        const catMatch = p.category?.trim().toLowerCase() === folder.name.trim().toLowerCase();
         const badgeMatch = (folder.name === 'Casamientos' && p.badge?.toLowerCase().includes('casamiento')) ||
                            (folder.name === 'Cumpleaños XV' && p.badge?.toLowerCase().includes('quince'));
-        return catMatch || badgeMatch;
+        return Boolean(catMatch || badgeMatch);
       });
 
-      const cover = matching.length > 0 ? matching[0].imageUrl : (all[0]?.imageUrl || 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80');
+      const cover = matching.length > 0 ? matching[0].imageUrl : '';
 
       return {
         id: folder.name.toLowerCase().replace(/\s+/g, '-'),

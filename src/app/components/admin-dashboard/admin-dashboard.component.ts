@@ -140,7 +140,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
 
                       @if (photoImageUrl) {
                         <div class="flex items-center justify-center gap-3">
-                          <img [src]="photoImageUrl" alt="Vista previa" class="h-20 w-28 object-cover rounded-lg border border-violet-500/40 shadow-xs"/>
+                          <img [src]="photoImageUrl" alt="Vista previa" loading="lazy" decoding="async" class="h-20 w-28 object-cover rounded-lg border border-violet-500/40 shadow-xs"/>
                           <div class="text-left text-xs">
                             <span class="font-semibold text-white block">Imagen lista</span>
                             <span class="text-fuchsia-400 hover:underline">Haz clic o arrastra para cambiar</span>
@@ -325,7 +325,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                         @for (photo of shop.photos(); track photo.id) {
                           <tr class="hover:bg-violet-900/20 transition-colors">
                             <td class="p-3.5">
-                              <img [src]="photo.imageUrl" [alt]="photo.title" class="w-12 h-12 rounded-lg object-cover border border-violet-500/40"/>
+                              <img [src]="photo.imageUrl" [alt]="photo.title" loading="lazy" decoding="async" class="w-12 h-12 rounded-lg object-cover border border-violet-500/40"/>
                             </td>
                             <td class="p-3.5 font-semibold text-white max-w-[150px] truncate">
                               {{ photo.title }}
@@ -474,7 +474,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                   @for (service of shop.services(); track service.id) {
                     <div class="p-4 rounded-2xl bg-[#160b33]/80 border border-violet-500/25 flex flex-col justify-between space-y-3 shadow-md">
                       <div class="flex items-center gap-3">
-                        <img [src]="service.imageUrl" [alt]="service.title" class="w-14 h-14 rounded-xl object-cover border border-violet-500/30"/>
+                        <img [src]="service.imageUrl" [alt]="service.title" loading="lazy" decoding="async" class="w-14 h-14 rounded-xl object-cover border border-violet-500/30"/>
                         <div class="min-w-0">
                           <h5 class="font-bold text-white text-sm truncate">{{ service.title }}</h5>
                           <p class="text-xs text-slate-300 line-clamp-2 mt-0.5">{{ service.description }}</p>
@@ -530,7 +530,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                     <div class="flex flex-col sm:flex-row items-center gap-5">
                       <!-- Image Preview Avatar -->
                       <div class="w-28 h-28 rounded-2xl overflow-hidden border-2 border-violet-400/50 shadow-lg shadow-violet-950/50 flex-shrink-0 bg-[#0e0620]">
-                        <img [src]="profileImageUrl" alt="Vista previa de perfil" class="w-full h-full object-cover"/>
+                        <img [src]="profileImageUrl" alt="Vista previa de perfil" loading="lazy" decoding="async" class="w-full h-full object-cover"/>
                       </div>
 
                       <div class="flex-grow space-y-2 w-full">
@@ -554,8 +554,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                             <span>{{ selectedProfileFile ? 'Cambiar archivo seleccionado' : 'Subir imagen desde equipo' }}</span>
                           </button>
                           @if (selectedProfileFile) {
-                            <span class="text-xs text-fuchsia-300 font-medium truncate max-w-[200px]">
-                              ✓ {{ selectedProfileFile.name }}
+                            <span class="text-xs text-emerald-300 font-medium truncate max-w-[200px] inline-flex items-center gap-1">
+                              <svg class="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <polyline points="20 6 9 17 4 12"/>
+                              </svg>
+                              <span class="truncate">{{ selectedProfileFile.name }}</span>
                             </span>
                           }
                         </div>
@@ -680,20 +683,24 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                               type="button"
                               (click)="saveEditedTag($index)"
                               title="Guardar cambio"
-                              class="text-emerald-400 hover:text-emerald-300 font-bold">
-                              ✓
+                              class="text-emerald-400 hover:text-emerald-300 p-0.5">
+                              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <polyline points="20 6 9 17 4 12"/>
+                              </svg>
                             </button>
                             <button
                               type="button"
                               (click)="cancelEditTag()"
                               title="Cancelar edición"
-                              class="text-slate-400 hover:text-white">
-                              ✕
+                              class="text-slate-400 hover:text-white p-0.5">
+                              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"/>
+                                <line x1="6" y1="6" x2="18" y2="18"/>
+                              </svg>
                             </button>
                           } @else {
-                            <span class="font-medium text-white flex items-center gap-1">
-                              <span class="text-fuchsia-400">✦</span>
-                              <span>{{ tag }}</span>
+                            <span class="font-medium text-white">
+                              {{ tag }}
                             </span>
                             
                             <button

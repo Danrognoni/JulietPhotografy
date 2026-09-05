@@ -36,6 +36,8 @@ import { Photo } from '../../models/photo.model';
             <img
               [src]="photo.imageUrl"
               [alt]="photo.title"
+              loading="lazy"
+              decoding="async"
               class="w-full h-full max-h-[50vh] lg:max-h-[85vh] object-contain"/>
             
             <span class="absolute bottom-4 left-4 text-[11px] text-emerald-300 bg-[#14082c]/90 px-3.5 py-1 rounded-full border border-emerald-500/30 backdrop-blur-md shadow-md">

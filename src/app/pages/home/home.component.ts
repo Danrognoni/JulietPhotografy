@@ -32,11 +32,6 @@ import { AuthService } from '../../services/auth.service';
   template: `
     <div class="min-h-screen bg-aura-mesh text-slate-100 flex flex-col relative selection:bg-emerald-400 selection:text-slate-950">
       
-      <!-- Subtle Ambient Soft Aura Floating Orbs (Violet, Mint & Sky Blue) -->
-      <div class="fixed top-24 left-1/4 w-[600px] h-[600px] rounded-full aura-orb-violet blur-[150px] pointer-events-none z-0"></div>
-      <div class="fixed top-1/2 right-12 w-[500px] h-[500px] rounded-full aura-orb-magenta blur-[140px] pointer-events-none z-0"></div>
-      <div class="fixed bottom-24 left-1/3 w-[550px] h-[550px] rounded-full aura-orb-indigo blur-[140px] pointer-events-none z-0"></div>
-
       <!-- Main Content Structure -->
       <div class="relative z-10 flex flex-col flex-grow">
         

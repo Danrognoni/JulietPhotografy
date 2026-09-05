@@ -72,6 +72,8 @@ import { ShopService } from '../../services/shop.service';
                 <img
                   [src]="item.photo.imageUrl"
                   [alt]="item.photo.title"
+                  loading="lazy"
+                  decoding="async"
                   class="w-16 h-16 object-cover rounded-xl border border-violet-500/30 flex-shrink-0"/>
 
                 <div class="flex-grow min-w-0">
