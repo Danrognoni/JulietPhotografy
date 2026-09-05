@@ -1,6 +1,7 @@
-import { Component, inject, signal, effect } from '@angular/core';
+import { Component, inject, signal, effect, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { catchError, throwError } from 'rxjs';
 import { ShopService } from '../../services/shop.service';
 import { AuthService } from '../../services/auth.service';
 import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/photo.model';
@@ -11,11 +12,15 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
   imports: [CommonModule, FormsModule],
   template: `
     @if (shop.isAdminDashboardOpen()) {
-      <!-- Backdrop -->
-      <div class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 backdrop-blur-md bg-slate-900/60 animate-fadeIn">
+      <!-- Backdrop con cierre por clic exterior para evitar pantallas trabadas -->
+      <div 
+        (click)="onBackdropClick($event)"
+        class="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-6 backdrop-blur-md bg-slate-900/60 animate-fadeIn">
         
-        <!-- Modal Card Dashboard -->
-        <div class="relative w-full max-w-5xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+        <!-- Modal Card Dashboard (detiene propagación de clic) -->
+        <div 
+          (click)="$event.stopPropagation()"
+          class="relative w-full max-w-5xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
           
           <!-- Header Bar -->
           <div class="px-6 py-5 border-b border-slate-200 bg-slate-50/90 flex items-center justify-between">
@@ -254,14 +259,22 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                   <div class="flex items-center justify-end gap-3 pt-2">
                     <button
                       type="submit"
-                      [disabled]="!isPhotoFormValid()"
+                      [disabled]="!isPhotoFormValid() || isSubmitting()"
                       class="btn-fresh-gradient px-6 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                        <polyline points="17 21 17 13 7 13 7 21"/>
-                        <polyline points="7 3 7 8 15 8"/>
-                      </svg>
-                      <span>{{ editingPhotoId() ? 'Guardar Cambios' : 'Publicar Fotografía' }}</span>
+                      @if (isSubmitting()) {
+                        <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25"></circle>
+                          <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor"></path>
+                        </svg>
+                        <span>Guardando...</span>
+                      } @else {
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                          <polyline points="17 21 17 13 7 13 7 21"/>
+                          <polyline points="7 3 7 8 15 8"/>
+                        </svg>
+                        <span>{{ editingPhotoId() ? 'Guardar Cambios' : 'Publicar Fotografía' }}</span>
+                      }
                     </button>
                   </div>
 
@@ -405,14 +418,22 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                   <div class="flex items-center justify-end gap-3 pt-2">
                     <button
                       type="submit"
-                      [disabled]="!isServiceFormValid()"
+                      [disabled]="!isServiceFormValid() || isSubmitting()"
                       class="btn-fresh-gradient px-6 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                        <polyline points="17 21 17 13 7 13 7 21"/>
-                        <polyline points="7 3 7 8 15 8"/>
-                      </svg>
-                      <span>{{ editingServiceId() ? 'Guardar Cambios' : 'Crear Servicio' }}</span>
+                      @if (isSubmitting()) {
+                        <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25"></circle>
+                          <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor"></path>
+                        </svg>
+                        <span>Guardando...</span>
+                      } @else {
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                          <polyline points="17 21 17 13 7 13 7 21"/>
+                          <polyline points="7 3 7 8 15 8"/>
+                        </svg>
+                        <span>{{ editingServiceId() ? 'Guardar Cambios' : 'Crear Servicio' }}</span>
+                      }
                     </button>
                   </div>
 
@@ -490,15 +511,40 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                       </div>
 
                       <div class="flex-grow space-y-2 w-full">
+                        <!-- File Upload Button & Status -->
+                        <div class="flex items-center gap-3">
+                          <input
+                            #profileFileInput
+                            type="file"
+                            accept="image/*"
+                            (change)="onProfileFileSelected($event)"
+                            class="hidden"/>
+                          <button
+                            type="button"
+                            (click)="profileFileInput.click()"
+                            class="px-4 py-2 text-xs font-semibold rounded-xl bg-teal-50 border border-teal-200 text-teal-800 hover:bg-teal-100 transition-colors flex items-center gap-2">
+                            <svg class="w-4 h-4 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                              <polyline points="17 8 12 3 7 8"/>
+                              <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <span>{{ selectedProfileFile ? 'Cambiar archivo seleccionado' : 'Subir imagen desde equipo' }}</span>
+                          </button>
+                          @if (selectedProfileFile) {
+                            <span class="text-xs text-teal-700 font-medium truncate max-w-[200px]">
+                              ✓ {{ selectedProfileFile.name }}
+                            </span>
+                          }
+                        </div>
+
                         <input
                           type="url"
-                          required
                           [(ngModel)]="profileImageUrl"
                           name="profileImageUrl"
-                          placeholder="https://images.unsplash.com/..."
+                          placeholder="O ingresa una URL: https://images.unsplash.com/..."
                           class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 text-slate-800 focus:outline-none focus:border-teal-500"/>
                         <p class="text-[11px] text-slate-500">
-                          Ingresa una URL directa de tu fotografía o retrato profesional.
+                          Sube un archivo de imagen o ingresa una URL directa para actualizar tu retrato profesional.
                         </p>
                       </div>
                     </div>
@@ -600,13 +646,22 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                   <div class="pt-3 flex justify-end">
                     <button
                       type="submit"
-                      class="btn-fresh-gradient px-7 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 shadow-sm">
-                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                        <polyline points="17 21 17 13 7 13 7 21"/>
-                        <polyline points="7 3 7 8 15 8"/>
-                      </svg>
-                      <span>Guardar Perfil Permanentemente</span>
+                      [disabled]="isSubmitting()"
+                      class="btn-fresh-gradient px-7 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 shadow-sm disabled:opacity-50">
+                      @if (isSubmitting()) {
+                        <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25"></circle>
+                          <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor"></path>
+                        </svg>
+                        <span>Guardando perfil...</span>
+                      } @else {
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                          <polyline points="17 21 17 13 7 13 7 21"/>
+                          <polyline points="7 3 7 8 15 8"/>
+                        </svg>
+                        <span>Guardar Perfil Permanentemente</span>
+                      }
                     </button>
                   </div>
 
@@ -637,6 +692,7 @@ export class AdminDashboardComponent {
   readonly auth = inject(AuthService);
 
   readonly activeTab = signal<'photos' | 'services' | 'profile'>('photos');
+  readonly isSubmitting = signal<boolean>(false);
 
   // Photo form
   editingPhotoId = signal<string | null>(null);
@@ -647,6 +703,7 @@ export class AdminDashboardComponent {
   photoDimensions = '60 x 40 cm · Fine Art';
   photoTechnicalSheet = '';
   photoDescription = '';
+  selectedPhotoFile: File | null = null;
 
   // Service form
   editingServiceId = signal<string | null>(null);
@@ -664,13 +721,14 @@ export class AdminDashboardComponent {
   profileInstagram = '';
   profileWhatsapp = '';
   profileEmail = '';
+  selectedProfileFile: File | null = null;
   profileSavedMessage = signal<boolean>(false);
 
   constructor() {
     // Sync initial tab when triggered
     effect(() => {
       this.activeTab.set(this.shop.adminInitialTab());
-    });
+    }, { allowSignalWrites: true });
 
     // Populate profile form fields from shop.profile()
     effect(() => {
@@ -684,6 +742,60 @@ export class AdminDashboardComponent {
       this.profileWhatsapp = p.whatsapp;
       this.profileEmail = p.email;
     });
+
+    // Escuchar si se seleccionó una foto para editar desde la galería
+    effect(() => {
+      const ep = this.shop.editingPhoto();
+      if (ep) {
+        this.startPhotoEdit(ep);
+      }
+    }, { allowSignalWrites: true });
+
+    // Escuchar si se seleccionó un servicio para editar desde la sección de servicios
+    effect(() => {
+      const es = this.shop.editingService();
+      if (es) {
+        this.startServiceEdit(es);
+      }
+    }, { allowSignalWrites: true });
+  }
+
+  // --- CERRAR MODAL CON TECLA ESCAPE O CLIC EN BACKDROP ---
+  @HostListener('window:keydown.escape')
+  onEscapePress(): void {
+    if (this.shop.isAdminDashboardOpen() && !this.isSubmitting()) {
+      this.shop.closeAdminDashboard();
+    }
+  }
+
+  onBackdropClick(event: MouseEvent): void {
+    if (!this.isSubmitting()) {
+      this.shop.closeAdminDashboard();
+    }
+  }
+
+  /**
+   * Manejador centralizado de errores:
+   * 1. Quita el estado borroso y cierra el modal inmediatamente.
+   * 2. Registra el error limpio en consola.
+   * 3. Muestra una alerta limpia tanto en la UI como en el navegador.
+   */
+  private handleRequestError(cleanMsg: string, rawError?: any): void {
+    this.isSubmitting.set(false);
+    
+    // Quitar estado borroso y cerrar modal para evitar pantalla trabada
+    this.shop.closeAdminDashboard();
+
+    // Notificación limpia en consola
+    console.error('[AdminDashboard] Petición fallida:', cleanMsg, rawError);
+
+    // Alerta visual reactiva en la interfaz
+    this.shop.showAlert('error', cleanMsg, 8000);
+
+    // Alerta nativa en navegador
+    if (typeof window !== 'undefined') {
+      alert(cleanMsg);
+    }
   }
 
   // --- DRAG & DROP PHOTO ---
@@ -703,6 +815,7 @@ export class AdminDashboardComponent {
     if (event.dataTransfer && event.dataTransfer.files.length > 0) {
       const file = event.dataTransfer.files[0];
       if (file.type.startsWith('image/')) {
+        this.selectedPhotoFile = file;
         const reader = new FileReader();
         reader.onload = () => {
           this.photoImageUrl = reader.result as string;
@@ -717,9 +830,25 @@ export class AdminDashboardComponent {
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
       if (file.type.startsWith('image/')) {
+        this.selectedPhotoFile = file;
         const reader = new FileReader();
         reader.onload = () => {
           this.photoImageUrl = reader.result as string;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+  }
+
+  onProfileFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      if (file.type.startsWith('image/')) {
+        this.selectedProfileFile = file;
+        const reader = new FileReader();
+        reader.onload = () => {
+          this.profileImageUrl = reader.result as string;
         };
         reader.readAsDataURL(file);
       }
@@ -735,10 +864,13 @@ export class AdminDashboardComponent {
   }
 
   savePhoto(): void {
-    if (!this.isPhotoFormValid()) return;
+    if (!this.isPhotoFormValid() || this.isSubmitting()) return;
+
+    this.isSubmitting.set(true);
 
     if (this.editingPhotoId()) {
-      this.shop.updatePhoto(this.editingPhotoId()!, {
+      const photoId = this.editingPhotoId()!;
+      this.shop.updatePhoto(photoId, {
         title: this.photoTitle.trim(),
         category: this.photoCategory,
         price: Number(this.photoPrice),
@@ -746,8 +878,25 @@ export class AdminDashboardComponent {
         dimensions: this.photoDimensions.trim() || '60 x 40 cm · Fine Art',
         technicalSheet: this.photoTechnicalSheet.trim(),
         description: this.photoDescription.trim() || 'Fotografía profesional en alta resolución.'
+      }, this.selectedPhotoFile || undefined)
+      .pipe(
+        catchError((err) => {
+          const cleanMsg = this.shop.getCleanErrorMessage(err, 'actualizar la fotografía');
+          this.handleRequestError(cleanMsg, err);
+          return throwError(() => err);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.isSubmitting.set(false);
+          this.cancelPhotoEdit();
+          this.shop.showAlert('success', '¡Fotografía actualizada con éxito!');
+        },
+        error: () => {
+          this.isSubmitting.set(false);
+          this.shop.closeAdminDashboard();
+        }
       });
-      this.cancelPhotoEdit();
     } else {
       this.shop.addPhoto({
         title: this.photoTitle.trim(),
@@ -759,8 +908,26 @@ export class AdminDashboardComponent {
         description: this.photoDescription.trim() || 'Fotografía profesional en alta resolución.',
         inStock: true,
         badge: 'Nuevo'
+      }, this.selectedPhotoFile || undefined)
+      .pipe(
+        catchError((err) => {
+          const cleanMsg = this.shop.getCleanErrorMessage(err, 'publicar la nueva fotografía');
+          this.handleRequestError(cleanMsg, err);
+          return throwError(() => err);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.isSubmitting.set(false);
+          this.resetPhotoForm();
+          this.shop.editingPhoto.set(null);
+          this.shop.showAlert('success', '¡Fotografía publicada con éxito en el catálogo!');
+        },
+        error: () => {
+          this.isSubmitting.set(false);
+          this.shop.closeAdminDashboard();
+        }
       });
-      this.resetPhotoForm();
     }
   }
 
@@ -773,19 +940,39 @@ export class AdminDashboardComponent {
     this.photoDimensions = photo.dimensions;
     this.photoTechnicalSheet = photo.technicalSheet;
     this.photoDescription = photo.description;
+    this.selectedPhotoFile = null;
   }
 
   cancelPhotoEdit(): void {
     this.editingPhotoId.set(null);
     this.resetPhotoForm();
+    this.shop.editingPhoto.set(null);
   }
 
   deletePhoto(id: string): void {
     if (confirm('¿Estás seguro de que deseas eliminar esta fotografía del catálogo?')) {
-      this.shop.deletePhoto(id);
-      if (this.editingPhotoId() === id) {
-        this.cancelPhotoEdit();
-      }
+      this.isSubmitting.set(true);
+      this.shop.deletePhoto(id)
+        .pipe(
+          catchError((err) => {
+            const cleanMsg = this.shop.getCleanErrorMessage(err, 'eliminar la fotografía del catálogo');
+            this.handleRequestError(cleanMsg, err);
+            return throwError(() => err);
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.isSubmitting.set(false);
+            if (this.editingPhotoId() === id) {
+              this.cancelPhotoEdit();
+            }
+            this.shop.showAlert('success', 'Fotografía eliminada correctamente.');
+          },
+          error: () => {
+            this.isSubmitting.set(false);
+            this.shop.closeAdminDashboard();
+          }
+        });
     }
   }
 
@@ -797,6 +984,7 @@ export class AdminDashboardComponent {
     this.photoDimensions = '60 x 40 cm · Fine Art';
     this.photoTechnicalSheet = '';
     this.photoDescription = '';
+    this.selectedPhotoFile = null;
   }
 
   // --- SERVICE CRUD ---
@@ -807,20 +995,39 @@ export class AdminDashboardComponent {
   }
 
   saveService(): void {
-    if (!this.isServiceFormValid()) return;
+    if (!this.isServiceFormValid() || this.isSubmitting()) return;
 
+    this.isSubmitting.set(true);
     const featuresArray = this.serviceFeaturesString
       ? this.serviceFeaturesString.split(',').map(f => f.trim()).filter(f => f.length > 0)
       : ['Cobertura integral', 'Edición profesional'];
 
     if (this.editingServiceId()) {
-      this.shop.updateService(this.editingServiceId()!, {
+      const serviceId = this.editingServiceId()!;
+      this.shop.updateService(serviceId, {
         title: this.serviceTitle.trim(),
         description: this.serviceDescription.trim(),
         imageUrl: this.serviceImageUrl.trim(),
         features: featuresArray
+      })
+      .pipe(
+        catchError((err) => {
+          const cleanMsg = this.shop.getCleanErrorMessage(err, 'actualizar el servicio');
+          this.handleRequestError(cleanMsg, err);
+          return throwError(() => err);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.isSubmitting.set(false);
+          this.cancelServiceEdit();
+          this.shop.showAlert('success', 'Servicio actualizado correctamente.');
+        },
+        error: () => {
+          this.isSubmitting.set(false);
+          this.shop.closeAdminDashboard();
+        }
       });
-      this.cancelServiceEdit();
     } else {
       this.shop.addService({
         title: this.serviceTitle.trim(),
@@ -828,8 +1035,26 @@ export class AdminDashboardComponent {
         imageUrl: this.serviceImageUrl.trim(),
         features: featuresArray,
         whatsappUrl: this.shop.defaultWhatsAppUrl
+      })
+      .pipe(
+        catchError((err) => {
+          const cleanMsg = this.shop.getCleanErrorMessage(err, 'crear el nuevo servicio');
+          this.handleRequestError(cleanMsg, err);
+          return throwError(() => err);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.isSubmitting.set(false);
+          this.resetServiceForm();
+          this.shop.editingService.set(null);
+          this.shop.showAlert('success', '¡Servicio creado y publicado correctamente!');
+        },
+        error: () => {
+          this.isSubmitting.set(false);
+          this.shop.closeAdminDashboard();
+        }
       });
-      this.resetServiceForm();
     }
   }
 
@@ -844,14 +1069,33 @@ export class AdminDashboardComponent {
   cancelServiceEdit(): void {
     this.editingServiceId.set(null);
     this.resetServiceForm();
+    this.shop.editingService.set(null);
   }
 
   deleteService(id: string): void {
     if (confirm('¿Estás seguro de que deseas eliminar este servicio?')) {
-      this.shop.deleteService(id);
-      if (this.editingServiceId() === id) {
-        this.cancelServiceEdit();
-      }
+      this.isSubmitting.set(true);
+      this.shop.deleteService(id)
+        .pipe(
+          catchError((err) => {
+            const cleanMsg = this.shop.getCleanErrorMessage(err, 'eliminar el servicio');
+            this.handleRequestError(cleanMsg, err);
+            return throwError(() => err);
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.isSubmitting.set(false);
+            if (this.editingServiceId() === id) {
+              this.cancelServiceEdit();
+            }
+            this.shop.showAlert('success', 'Servicio eliminado correctamente.');
+          },
+          error: () => {
+            this.isSubmitting.set(false);
+            this.shop.closeAdminDashboard();
+          }
+        });
     }
   }
 
@@ -864,6 +1108,9 @@ export class AdminDashboardComponent {
 
   // --- PROFILE EDIT ---
   saveProfile(): void {
+    if (this.isSubmitting()) return;
+    this.isSubmitting.set(true);
+
     this.shop.updateProfile({
       name: this.profileName.trim(),
       title: this.profileTitle.trim(),
@@ -873,11 +1120,28 @@ export class AdminDashboardComponent {
       instagram: this.profileInstagram.trim(),
       whatsapp: this.profileWhatsapp.trim(),
       email: this.profileEmail.trim()
+    }, this.selectedProfileFile || undefined)
+    .pipe(
+      catchError((err) => {
+        const cleanMsg = this.shop.getCleanErrorMessage(err, 'actualizar el perfil');
+        this.handleRequestError(cleanMsg, err);
+        return throwError(() => err);
+      })
+    )
+    .subscribe({
+      next: () => {
+        this.isSubmitting.set(false);
+        this.selectedProfileFile = null;
+        this.profileSavedMessage.set(true);
+        this.shop.showAlert('success', '¡Perfil actualizado permanentemente!');
+        setTimeout(() => {
+          this.profileSavedMessage.set(false);
+        }, 2500);
+      },
+      error: () => {
+        this.isSubmitting.set(false);
+        this.shop.closeAdminDashboard();
+      }
     });
-
-    this.profileSavedMessage.set(true);
-    setTimeout(() => {
-      this.profileSavedMessage.set(false);
-    }, 2500);
   }
 }

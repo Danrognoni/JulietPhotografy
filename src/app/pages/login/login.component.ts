@@ -180,8 +180,8 @@ export class LoginComponent {
     this.password = '12345678';
   }
 
-  handleLogin(): void {
-    const result = this.auth.login(this.email, this.password);
+  async handleLogin(): Promise<void> {
+    const result = await this.auth.login(this.email, this.password);
     if (result.success) {
       this.errorMessage.set('');
       this.shop.openAdminDashboard('photos');

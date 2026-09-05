@@ -1,18 +1,27 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
 import { Photo, PhotoCategory, ServiceItem, ProfileData, CartItem } from '../models/photo.model';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
+
+export interface AppAlert {
+  type: 'error' | 'success' | 'warning' | 'info';
+  message: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ShopService {
+  private readonly http = inject(HttpClient);
   readonly auth = inject(AuthService);
 
   readonly defaultWhatsAppUrl = 'https://wa.me/5492281311917?text=Hola%20Julieta,%20vengo%20de%20tu%20sitio%20web%20y%20me%20gustar%C3%ADa%20agendar%20una%20cita.';
   readonly defaultInstagramUrl = 'https://www.instagram.com/julietamph_/';
   readonly defaultInstagramHandle = '@julietamph_';
 
-  // Initial curated photography catalog
+  // Initial curated photography catalog (fallback si el backend no está disponible)
   private readonly defaultPhotos: Photo[] = [
     {
       id: 'photo-1',
@@ -238,7 +247,7 @@ export class ShopService {
     instagram: '@julietamph_'
   };
 
-  // State Signals with localStorage initializers
+  // State Signals
   readonly photos = signal<Photo[]>(this.loadStorage('jm_photos', this.defaultPhotos));
   readonly services = signal<ServiceItem[]>(this.loadStorage('jm_services', this.defaultServices));
   readonly profile = signal<ProfileData>(this.loadStorage('jm_profile', this.defaultProfile));
@@ -251,6 +260,76 @@ export class ShopService {
   readonly selectedPhoto = signal<Photo | null>(null);
   readonly isAdminDashboardOpen = signal<boolean>(false);
   readonly adminInitialTab = signal<'photos' | 'services' | 'profile'>('photos');
+
+  // Global Alert & Selection Signals
+  readonly globalAlert = signal<AppAlert | null>(null);
+  readonly editingPhoto = signal<Photo | null>(null);
+  readonly editingService = signal<ServiceItem | null>(null);
+
+  constructor() {
+    // Sincronizar automáticamente con el backend Spring Boot al iniciar en el cliente
+    if (typeof window !== 'undefined') {
+      this.syncWithBackend();
+    }
+  }
+
+  /**
+   * Carga los datos reales desde la API de Spring Boot y actualiza los Signals reactivos.
+   */
+  syncWithBackend(): void {
+    // 1. Fotos
+    this.http.get<Photo[]>(`${environment.apiUrl}/photos`).subscribe({
+      next: (data) => {
+        if (data && data.length > 0) {
+          const mapped = data.map(p => ({
+            ...p,
+            imageUrl: this.normalizeImageUrl(p.imageUrl)
+          }));
+          this.photos.set(mapped);
+          this.saveStorage('jm_photos', mapped);
+        }
+      },
+      error: (err) => console.info('Backend /api/photos no conectado, operando con catálogo en caché:', err?.status)
+    });
+
+    // 2. Servicios
+    this.http.get<ServiceItem[]>(`${environment.apiUrl}/services`).subscribe({
+      next: (data) => {
+        if (data && data.length > 0) {
+          const mapped = data.map(s => ({
+            ...s,
+            imageUrl: this.normalizeImageUrl(s.imageUrl)
+          }));
+          this.services.set(mapped);
+          this.saveStorage('jm_services', mapped);
+        }
+      },
+      error: (err) => console.info('Backend /api/services no conectado, operando con caché:', err?.status)
+    });
+
+    // 3. Perfil
+    this.http.get<ProfileData>(`${environment.apiUrl}/profile`).subscribe({
+      next: (data) => {
+        if (data) {
+          const mapped: ProfileData = {
+            ...data,
+            imageUrl: this.normalizeImageUrl(data.imageUrl)
+          };
+          this.profile.set(mapped);
+          this.saveStorage('jm_profile', mapped);
+        }
+      },
+      error: (err) => console.info('Backend /api/profile no conectado, operando con caché:', err?.status)
+    });
+  }
+
+  private normalizeImageUrl(url: string | undefined): string {
+    if (!url) return '';
+    if (url.startsWith('/uploads/')) {
+      return `${environment.uploadsUrl}${url}`;
+    }
+    return url;
+  }
 
   // Computed state
   readonly filteredPhotos = computed(() => {
@@ -305,59 +384,281 @@ export class ShopService {
     this.searchQuery.set(query);
   }
 
-  // --- CRUD FOTOS (ID ÚNICO & PERSISTENCIA) ---
-  addPhoto(newPhotoData: Omit<Photo, 'id'>): void {
-    const newPhoto: Photo = {
-      ...newPhotoData,
-      id: 'photo-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5)
-    };
-    const updated = [newPhoto, ...this.photos()];
-    this.photos.set(updated);
-    this.saveStorage('jm_photos', updated);
+  // --- ALERTAS GLOBALES & HELPER DE ERRORES ---
+  showAlert(type: 'error' | 'success' | 'warning' | 'info', message: string, durationMs: number = 6500): void {
+    this.globalAlert.set({ type, message });
+    if (durationMs > 0) {
+      setTimeout(() => {
+        if (this.globalAlert()?.message === message) {
+          this.globalAlert.set(null);
+        }
+      }, durationMs);
+    }
   }
 
-  updatePhoto(id: string, updatedData: Partial<Photo>): void {
-    const updated = this.photos().map(p => (p.id === id ? { ...p, ...updatedData } : p));
-    this.photos.set(updated);
-    this.saveStorage('jm_photos', updated);
+  clearAlert(): void {
+    this.globalAlert.set(null);
   }
 
-  deletePhoto(id: string): void {
-    const updated = this.photos().filter(p => p.id !== id);
-    this.photos.set(updated);
-    this.saveStorage('jm_photos', updated);
-    this.removeFromCart(id);
+  startEditingPhoto(photo: Photo): void {
+    this.editingPhoto.set(photo);
+    this.openAdminDashboard('photos');
   }
 
-  // --- CRUD SERVICIOS (ID ÚNICO & PERSISTENCIA) ---
-  addService(newServiceData: Omit<ServiceItem, 'id'>): void {
-    const newService: ServiceItem = {
+  startEditingService(service: ServiceItem): void {
+    this.editingService.set(service);
+    this.openAdminDashboard('services');
+  }
+
+  /**
+   * Genera un mensaje de error limpio, amigable y explicativo según el código de respuesta HTTP.
+   */
+  getCleanErrorMessage(error: any, actionName: string): string {
+    if (!error) {
+      return `Ocurrió un error inesperado al ${actionName}.`;
+    }
+
+    // CORS o servidor inaccesible (código 0)
+    if (error.status === 0) {
+      return `Error de conexión o CORS (código 0): No se pudo comunicar con el backend Spring Boot (http://localhost:8080). ` +
+             `Verifica que el servidor esté encendido y que la configuración de CORS admita este origen.`;
+    }
+
+    // 403 Forbidden
+    if (error.status === 403) {
+      return `Acceso denegado (403 Forbidden): Tu sesión ha expirado o no cuentas con los permisos de Administrador requeridos para ${actionName}. ` +
+             `Por favor, inicia sesión nuevamente.`;
+    }
+
+    // 401 Unauthorized
+    if (error.status === 401) {
+      return `No autorizado (401 Unauthorized): Se requiere un token JWT válido para ${actionName}. Por favor inicia sesión como Administradora.`;
+    }
+
+    // 404 Not Found
+    if (error.status === 404) {
+      return `Recurso no encontrado (404): El registro para ${actionName} no existe en el backend.`;
+    }
+
+    // 500 Internal Server Error
+    if (error.status === 500) {
+      const detail = error.error?.message || error.error?.error || '';
+      return `Error interno del servidor (500) al ${actionName}.${detail ? ' Detalle: ' + detail : ''}`;
+    }
+
+    // Mensaje personalizado enviado por el backend
+    if (error.error && typeof error.error === 'object') {
+      if (error.error.message) return `Error al ${actionName}: ${error.error.message}`;
+      if (error.error.error) return `Error al ${actionName}: ${error.error.error}`;
+    }
+
+    if (typeof error.error === 'string' && error.error.trim().length > 0) {
+      return `Error al ${actionName}: ${error.error}`;
+    }
+
+    return `Error HTTP (${error.status || 'desconocido'}) al ${actionName}: ${error.message || 'Error al procesar la petición en el backend.'}`;
+  }
+
+  // --- HELPER DE AUTORIZACIÓN JWT ---
+  getAuthHeaders(): { [header: string]: string } {
+    const token = this.auth.getToken();
+    return token ? { Authorization: `Bearer ${token.trim()}` } : {};
+  }
+
+  // --- CRUD FOTOS (CON PERSISTENCIA BACKEND + MULTIPART) ---
+  addPhoto(newPhotoData: Omit<Photo, 'id'>, file?: File): Observable<Photo> {
+    const headers = this.getAuthHeaders();
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('title', newPhotoData.title.trim());
+      formData.append('category', newPhotoData.category);
+      formData.append('price', String(newPhotoData.price));
+      formData.append('dimensions', (newPhotoData.dimensions || '60 x 40 cm · Fine Art').trim());
+      formData.append('technicalSheet', (newPhotoData.technicalSheet || '').trim());
+      formData.append('description', (newPhotoData.description || '').trim());
+      formData.append('badge', (newPhotoData.badge || 'Nuevo').trim());
+      formData.append('inStock', String(newPhotoData.inStock !== false));
+
+      if (newPhotoData.cameraDetails) {
+        if (newPhotoData.cameraDetails.camera) formData.append('cameraDetails.camera', newPhotoData.cameraDetails.camera.trim());
+        if (newPhotoData.cameraDetails.lens) formData.append('cameraDetails.lens', newPhotoData.cameraDetails.lens.trim());
+        if (newPhotoData.cameraDetails.aperture) formData.append('cameraDetails.aperture', newPhotoData.cameraDetails.aperture.trim());
+        if (newPhotoData.cameraDetails.shutter) formData.append('cameraDetails.shutter', newPhotoData.cameraDetails.shutter.trim());
+        if (newPhotoData.cameraDetails.iso) formData.append('cameraDetails.iso', newPhotoData.cameraDetails.iso.trim());
+      }
+
+      return this.http.post<Photo>(`${environment.apiUrl}/photos`, formData, { headers }).pipe(
+        tap((saved) => {
+          const serverPhoto: Photo = {
+            ...saved,
+            imageUrl: this.normalizeImageUrl(saved.imageUrl)
+          };
+          const updated = [serverPhoto, ...this.photos().filter(p => p.id !== serverPhoto.id)];
+          this.photos.set(updated);
+          this.saveStorage('jm_photos', updated);
+        })
+      );
+    } else {
+      return this.http.post<Photo>(`${environment.apiUrl}/photos`, newPhotoData, { headers }).pipe(
+        tap((saved) => {
+          const serverPhoto: Photo = {
+            ...saved,
+            imageUrl: this.normalizeImageUrl(saved.imageUrl)
+          };
+          const updated = [serverPhoto, ...this.photos().filter(p => p.id !== serverPhoto.id)];
+          this.photos.set(updated);
+          this.saveStorage('jm_photos', updated);
+        })
+      );
+    }
+  }
+
+  updatePhoto(id: string, updatedData: Partial<Photo>, file?: File): Observable<Photo> {
+    const headers = this.getAuthHeaders();
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      if (updatedData.title) formData.append('title', updatedData.title.trim());
+      if (updatedData.category) formData.append('category', updatedData.category);
+      if (updatedData.price !== undefined) formData.append('price', String(updatedData.price));
+      if (updatedData.dimensions) formData.append('dimensions', updatedData.dimensions.trim());
+      if (updatedData.technicalSheet) formData.append('technicalSheet', updatedData.technicalSheet.trim());
+      if (updatedData.description) formData.append('description', updatedData.description.trim());
+      if (updatedData.badge) formData.append('badge', updatedData.badge.trim());
+      if (updatedData.inStock !== undefined) formData.append('inStock', String(updatedData.inStock));
+
+      if (updatedData.cameraDetails) {
+        if (updatedData.cameraDetails.camera) formData.append('cameraDetails.camera', updatedData.cameraDetails.camera.trim());
+        if (updatedData.cameraDetails.lens) formData.append('cameraDetails.lens', updatedData.cameraDetails.lens.trim());
+        if (updatedData.cameraDetails.aperture) formData.append('cameraDetails.aperture', updatedData.cameraDetails.aperture.trim());
+        if (updatedData.cameraDetails.shutter) formData.append('cameraDetails.shutter', updatedData.cameraDetails.shutter.trim());
+        if (updatedData.cameraDetails.iso) formData.append('cameraDetails.iso', updatedData.cameraDetails.iso.trim());
+      }
+
+      return this.http.put<Photo>(`${environment.apiUrl}/photos/${id}`, formData, { headers }).pipe(
+        tap((saved) => {
+          const serverPhoto: Photo = {
+            ...saved,
+            imageUrl: this.normalizeImageUrl(saved.imageUrl)
+          };
+          const updated = this.photos().map(p => (p.id === id ? serverPhoto : p));
+          this.photos.set(updated);
+          this.saveStorage('jm_photos', updated);
+        })
+      );
+    } else {
+      return this.http.put<Photo>(`${environment.apiUrl}/photos/${id}`, updatedData, { headers }).pipe(
+        tap((saved) => {
+          const serverPhoto: Photo = {
+            ...saved,
+            imageUrl: this.normalizeImageUrl(saved.imageUrl)
+          };
+          const updated = this.photos().map(p => (p.id === id ? serverPhoto : p));
+          this.photos.set(updated);
+          this.saveStorage('jm_photos', updated);
+        })
+      );
+    }
+  }
+
+  deletePhoto(id: string): Observable<void> {
+    const headers = this.getAuthHeaders();
+    return this.http.delete<void>(`${environment.apiUrl}/photos/${id}`, { headers }).pipe(
+      tap(() => {
+        const updated = this.photos().filter(p => p.id !== id);
+        this.photos.set(updated);
+        this.saveStorage('jm_photos', updated);
+        this.removeFromCart(id);
+      })
+    );
+  }
+
+  // --- CRUD SERVICIOS (CON PERSISTENCIA BACKEND) ---
+  addService(newServiceData: Omit<ServiceItem, 'id'>, file?: File): Observable<ServiceItem> {
+    const headers = this.getAuthHeaders();
+    const payload = {
       ...newServiceData,
-      id: 'serv-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
       whatsappUrl: newServiceData.whatsappUrl || this.defaultWhatsAppUrl
     };
-    const updated = [...this.services(), newService];
-    this.services.set(updated);
-    this.saveStorage('jm_services', updated);
+
+    return this.http.post<ServiceItem>(`${environment.apiUrl}/services`, payload, { headers }).pipe(
+      tap((saved) => {
+        const serverService: ServiceItem = {
+          ...saved,
+          imageUrl: this.normalizeImageUrl(saved.imageUrl)
+        };
+        const updated = [...this.services().filter(s => s.id !== serverService.id), serverService];
+        this.services.set(updated);
+        this.saveStorage('jm_services', updated);
+      })
+    );
   }
 
-  updateService(id: string, updatedData: Partial<ServiceItem>): void {
-    const updated = this.services().map(s => (s.id === id ? { ...s, ...updatedData } : s));
-    this.services.set(updated);
-    this.saveStorage('jm_services', updated);
+  updateService(id: string, updatedData: Partial<ServiceItem>): Observable<ServiceItem> {
+    const headers = this.getAuthHeaders();
+    return this.http.put<ServiceItem>(`${environment.apiUrl}/services/${id}`, updatedData, { headers }).pipe(
+      tap((saved) => {
+        const serverService: ServiceItem = {
+          ...saved,
+          imageUrl: this.normalizeImageUrl(saved.imageUrl)
+        };
+        const updated = this.services().map(s => (s.id === id ? serverService : s));
+        this.services.set(updated);
+        this.saveStorage('jm_services', updated);
+      })
+    );
   }
 
-  deleteService(id: string): void {
-    const updated = this.services().filter(s => s.id !== id);
-    this.services.set(updated);
-    this.saveStorage('jm_services', updated);
+  deleteService(id: string): Observable<void> {
+    const headers = this.getAuthHeaders();
+    return this.http.delete<void>(`${environment.apiUrl}/services/${id}`, { headers }).pipe(
+      tap(() => {
+        const updated = this.services().filter(s => s.id !== id);
+        this.services.set(updated);
+        this.saveStorage('jm_services', updated);
+      })
+    );
   }
 
-  // --- EDITAR PERFIL (PERSISTENCIA) ---
-  updateProfile(changes: Partial<ProfileData>): void {
-    const updated = { ...this.profile(), ...changes };
-    this.profile.set(updated);
-    this.saveStorage('jm_profile', updated);
+  // --- EDITAR PERFIL (CON PERSISTENCIA BACKEND Y MULTIPART) ---
+  updateProfile(changes: Partial<ProfileData>, file?: File): Observable<ProfileData> {
+    const headers = this.getAuthHeaders();
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      if (changes.name) formData.append('name', changes.name.trim());
+      if (changes.title) formData.append('title', changes.title.trim());
+      if (changes.location) formData.append('location', changes.location.trim());
+      if (changes.bio) formData.append('bio', changes.bio.trim());
+      if (changes.instagram) formData.append('instagram', changes.instagram.trim());
+      if (changes.whatsapp) formData.append('whatsapp', changes.whatsapp.trim());
+      if (changes.email) formData.append('email', changes.email.trim());
+      if (changes.imageUrl) formData.append('imageUrl', changes.imageUrl.trim());
+
+      return this.http.put<ProfileData>(`${environment.apiUrl}/profile`, formData, { headers }).pipe(
+        tap((saved) => {
+          const updated: ProfileData = {
+            ...saved,
+            imageUrl: this.normalizeImageUrl(saved.imageUrl)
+          };
+          this.profile.set(updated);
+          this.saveStorage('jm_profile', updated);
+        })
+      );
+    } else {
+      const payload = { ...this.profile(), ...changes };
+      return this.http.put<ProfileData>(`${environment.apiUrl}/profile`, payload, { headers }).pipe(
+        tap((saved) => {
+          const updated: ProfileData = {
+            ...saved,
+            imageUrl: this.normalizeImageUrl(saved.imageUrl)
+          };
+          this.profile.set(updated);
+          this.saveStorage('jm_profile', updated);
+        })
+      );
+    }
   }
 
   // --- CART ACTIONS ---
@@ -437,5 +738,7 @@ export class ShopService {
 
   closeAdminDashboard(): void {
     this.isAdminDashboardOpen.set(false);
+    this.editingPhoto.set(null);
+    this.editingService.set(null);
   }
 }

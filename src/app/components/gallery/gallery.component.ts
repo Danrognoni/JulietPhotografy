@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { catchError, throwError } from 'rxjs';
 import { ShopService } from '../../services/shop.service';
 import { AuthService } from '../../services/auth.service';
 import { Photo, PhotoCategory } from '../../models/photo.model';
@@ -277,12 +278,28 @@ export class GalleryComponent {
   }
 
   editPhotoAdmin(photo: Photo): void {
-    this.shop.openAdminDashboard('photos');
+    this.shop.startEditingPhoto(photo);
   }
 
   deletePhotoAdmin(id: string): void {
     if (confirm('¿Eliminar esta fotografía permanentemente del catálogo?')) {
-      this.shop.deletePhoto(id);
+      this.shop.deletePhoto(id)
+        .pipe(
+          catchError((err) => {
+            const cleanMsg = this.shop.getCleanErrorMessage(err, 'eliminar la fotografía del catálogo');
+            console.error('[GalleryComponent] Error al eliminar fotografía:', cleanMsg, err);
+            this.shop.showAlert('error', cleanMsg);
+            if (typeof window !== 'undefined') {
+              alert(cleanMsg);
+            }
+            return throwError(() => err);
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.shop.showAlert('success', 'Fotografía eliminada correctamente.');
+          }
+        });
     }
   }
 }

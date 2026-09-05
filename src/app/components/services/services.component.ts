@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { catchError, throwError } from 'rxjs';
 import { ShopService } from '../../services/shop.service';
 import { AuthService } from '../../services/auth.service';
 import { ServiceItem } from '../../models/photo.model';
@@ -163,12 +164,28 @@ export class ServicesComponent {
   readonly auth = inject(AuthService);
 
   editServiceAdmin(service: ServiceItem): void {
-    this.shop.openAdminDashboard('services');
+    this.shop.startEditingService(service);
   }
 
   deleteServiceAdmin(id: string): void {
     if (confirm('¿Eliminar este servicio permanentemente?')) {
-      this.shop.deleteService(id);
+      this.shop.deleteService(id)
+        .pipe(
+          catchError((err) => {
+            const cleanMsg = this.shop.getCleanErrorMessage(err, 'eliminar el servicio');
+            console.error('[ServicesComponent] Error al eliminar servicio:', cleanMsg, err);
+            this.shop.showAlert('error', cleanMsg);
+            if (typeof window !== 'undefined') {
+              alert(cleanMsg);
+            }
+            return throwError(() => err);
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.shop.showAlert('success', 'Servicio eliminado correctamente.');
+          }
+        });
     }
   }
 }

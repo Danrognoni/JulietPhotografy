@@ -39,6 +39,50 @@ import { AuthService } from '../../services/auth.service';
         <!-- Fixed Header Navbar -->
         <app-navbar></app-navbar>
 
+        <!-- Global Feedback Alert Banner (Errores CORS, 403 o Éxitos) -->
+        @if (shop.globalAlert(); as alert) {
+          <div 
+            class="fixed top-24 right-4 sm:right-6 z-50 max-w-md w-[calc(100%-2rem)] shadow-2xl rounded-2xl p-4 border animate-slideLeft flex items-start gap-3 backdrop-blur-xl transition-all"
+            [ngClass]="alert.type === 'error' 
+              ? 'bg-red-50/95 border-red-200 text-red-900 shadow-red-500/10' 
+              : 'bg-emerald-50/95 border-emerald-200 text-emerald-900 shadow-emerald-500/10'">
+            
+            <div class="p-2 rounded-xl flex-shrink-0"
+                 [ngClass]="alert.type === 'error' ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'">
+              @if (alert.type === 'error') {
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+              } @else {
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 6 9 17l-5-5"/>
+                </svg>
+              }
+            </div>
+
+            <div class="flex-grow min-w-0 pr-2">
+              <h5 class="text-xs font-bold uppercase tracking-wider mb-0.5">
+                {{ alert.type === 'error' ? 'Notificación de Error' : 'Operación Exitosa' }}
+              </h5>
+              <p class="text-xs leading-relaxed font-medium break-words">
+                {{ alert.message }}
+              </p>
+            </div>
+
+            <button 
+              (click)="shop.clearAlert()" 
+              aria-label="Cerrar notificación"
+              class="text-slate-400 hover:text-slate-700 p-1 rounded-lg transition-colors">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        }
+
         <!-- Hero / Sobre Mí Presentation Section -->
         <app-hero></app-hero>
 
