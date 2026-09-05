@@ -103,6 +103,28 @@ export class AuthService {
     };
   }
 
+  /**
+   * Si el usuario es administrador y posee un token provisional (offline_dev_token),
+   * intenta obtener silenciosamente el token JWT real desde el backend.
+   */
+  async ensureRealToken(): Promise<string | null> {
+    const token = this.getToken();
+    if (token && token !== 'offline_dev_token') {
+      return token;
+    }
+    if (this.isAdmin()) {
+      try {
+        const res = await this.login(this.ADMIN_EMAIL, this.ADMIN_PASS);
+        if (res.success) {
+          return this.getToken();
+        }
+      } catch {
+        // En modo offline se mantiene el fallback
+      }
+    }
+    return token;
+  }
+
   logout(): void {
     this.currentUser.set(null);
     if (typeof window !== 'undefined') {

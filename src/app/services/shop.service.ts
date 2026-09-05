@@ -347,6 +347,7 @@ export class ShopService {
         if (data) {
           const mapped: ProfileData = {
             ...data,
+            tags: data.tags && data.tags.length > 0 ? data.tags : (this.profile().tags || []),
             imageUrl: this.normalizeImageUrl(data.imageUrl)
           };
           this.profile.set(mapped);
@@ -834,7 +835,7 @@ export class ShopService {
     const updatedLocal: ProfileData = {
       ...this.profile(),
       ...changes,
-      tags: changes.tags || this.profile().tags || []
+      tags: changes.tags !== undefined ? changes.tags : (this.profile().tags || [])
     };
     this.profile.set(updatedLocal);
     this.saveStorage('jm_profile', updatedLocal);
@@ -850,14 +851,16 @@ export class ShopService {
       if (changes.whatsapp) formData.append('whatsapp', changes.whatsapp.trim());
       if (changes.email) formData.append('email', changes.email.trim());
       if (changes.imageUrl) formData.append('imageUrl', changes.imageUrl.trim());
-      if (changes.tags) formData.append('tags', JSON.stringify(changes.tags));
+      if (changes.tags !== undefined) {
+        formData.append('tags', JSON.stringify(changes.tags));
+      }
 
       return this.http.put<ProfileData>(`${environment.apiUrl}/profile`, formData, { headers }).pipe(
         tap((saved) => {
           const updated: ProfileData = {
             ...updatedLocal,
             ...saved,
-            tags: changes.tags || saved.tags || updatedLocal.tags,
+            tags: saved.tags !== undefined ? saved.tags : (changes.tags !== undefined ? changes.tags : updatedLocal.tags),
             imageUrl: this.normalizeImageUrl(saved.imageUrl)
           };
           this.profile.set(updated);
@@ -865,13 +868,16 @@ export class ShopService {
         })
       );
     } else {
-      const payload = { ...updatedLocal };
+      const payload: Partial<ProfileData> = {
+        ...updatedLocal,
+        tags: changes.tags !== undefined ? changes.tags : updatedLocal.tags
+      };
       return this.http.put<ProfileData>(`${environment.apiUrl}/profile`, payload, { headers }).pipe(
         tap((saved) => {
           const updated: ProfileData = {
             ...updatedLocal,
             ...saved,
-            tags: changes.tags || saved.tags || updatedLocal.tags,
+            tags: saved.tags !== undefined ? saved.tags : (changes.tags !== undefined ? changes.tags : updatedLocal.tags),
             imageUrl: this.normalizeImageUrl(saved.imageUrl)
           };
           this.profile.set(updated);

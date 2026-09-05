@@ -30,30 +30,21 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
           <!-- Cinematic Gradient Scrim (Dark green at bottom, transparent above) -->
           <div class="absolute inset-0 bg-gradient-to-t from-[#142417]/95 via-[#142417]/35 to-transparent"></div>
           
-          <!-- Top Badge: Category & Location -->
-          <div class="absolute top-6 left-6 sm:top-8 sm:left-8 z-10">
-            <span class="px-3.5 py-1 rounded-full bg-[#142417]/70 backdrop-blur-md border border-[#86DEB7] text-[#86DEB7] text-[10px] sm:text-xs font-sans uppercase tracking-[0.25em] font-bold">
-              {{ shop.heroPhoto().category }} · Mar del Plata
-            </span>
-          </div>
-
+        
           <!-- Bottom Caption / Title / Claim (Aspect Style) -->
           <div class="absolute bottom-8 left-6 right-6 sm:bottom-12 sm:left-12 sm:right-12 z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div class="space-y-2 max-w-3xl text-left">
               
               <h1 class="font-editorial text-3xl sm:text-5xl lg:text-6xl text-[#86DEB7] font-bold leading-tight drop-shadow-lg tracking-tight">
-                {{ shop.heroPhoto().title }}
+               Fotografía
               </h1>
 
               <p class="font-editorial text-lg sm:text-2xl italic text-[#86DEB7]/90 font-normal drop-shadow-md">
-                Fotógrafa de moda, paisajismo, producto · la luz & la emoción
+               de moda, paisajismo, producto · la luz & la emoción
               </p>
 
-              @if (shop.heroPhoto().technicalSheet) {
-                <p class="text-[11px] font-mono text-[#63B995] tracking-wider font-semibold">
-                  {{ shop.heroPhoto().technicalSheet }}
-                </p>
-              }
+           
+              
             </div>
 
             <!-- Action Controls -->
