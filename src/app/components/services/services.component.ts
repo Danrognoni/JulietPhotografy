@@ -11,11 +11,11 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
   standalone: true,
   imports: [CommonModule, ScrollRevealDirective],
   template: `
-    <section id="servicios" class="py-20 md:py-28 relative overflow-hidden">
+    <section id="servicios" class="py-20 md:py-28 relative overflow-hidden bg-[#142417]">
       
       <!-- Subtle Ambient Soft Aura Glows -->
-      <div class="absolute top-1/4 right-5 w-80 h-80 rounded-full bg-emerald-500/10 blur-[140px] pointer-events-none"></div>
-      <div class="absolute bottom-10 left-5 w-80 h-80 rounded-full bg-sky-500/10 blur-[140px] pointer-events-none"></div>
+      <div class="absolute top-1/4 right-5 w-80 h-80 rounded-full bg-[#63B995]/20 blur-[140px] pointer-events-none"></div>
+      <div class="absolute bottom-10 left-5 w-80 h-80 rounded-full bg-[#86DEB7]/15 blur-[140px] pointer-events-none"></div>
 
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
@@ -24,16 +24,16 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
           appScrollReveal
           [revealDelay]="0"
           class="text-center max-w-3xl mx-auto mb-16 sm:mb-20 space-y-3">
-          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 text-xs font-semibold uppercase tracking-[0.25em]">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#142417] border border-[#86DEB7] text-[#86DEB7] text-xs font-bold uppercase tracking-[0.25em]">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#86DEB7]"></span>
             <span>Propuestas de Cobertura</span>
           </div>
           
-          <h2 class="font-editorial text-4xl sm:text-5xl lg:text-6xl text-white font-light tracking-tight">
+          <h2 class="font-editorial text-4xl sm:text-5xl lg:text-6xl text-[#86DEB7] font-bold tracking-tight">
             Servicios Fotográficos
           </h2>
 
-          <p class="text-slate-300/90 text-sm sm:text-base font-light font-sans max-w-2xl mx-auto leading-relaxed">
+          <p class="text-[#86DEB7]/90 text-sm sm:text-base font-medium font-sans max-w-2xl mx-auto leading-relaxed">
             Coberturas sensibles y personalizadas para registrar la magia de cada celebración. Acompañamiento cercano desde la planificación hasta la entrega final en Mar del Plata y alrededores.
           </p>
         </div>
@@ -49,25 +49,25 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
               <div>
                 <!-- Editorial Service Number (01, 02, 03) -->
                 <div class="flex items-center justify-between mb-3">
-                  <span class="font-editorial text-4xl sm:text-5xl font-light text-emerald-400/60 tracking-wider">
+                  <span class="font-editorial text-4xl sm:text-5xl font-bold text-[#86DEB7] tracking-wider">
                     0{{ idx + 1 }}
                   </span>
-                  <span class="text-[11px] font-mono tracking-widest text-slate-400 uppercase">
+                  <span class="text-[11px] font-mono tracking-widest text-[#63B995] uppercase font-bold">
                     Cobertura Integral
                   </span>
                 </div>
 
                 <!-- Image Frame with Soft Corners -->
-                <div class="relative aspect-[16/10] sm:aspect-[4/3] rounded-2xl overflow-hidden bg-[#0f0920] shadow-xl group-hover:shadow-2xl transition-all duration-500 mb-6">
+                <div class="relative aspect-[16/10] sm:aspect-[4/3] rounded-2xl overflow-hidden bg-[#63B995] shadow-xl group-hover:shadow-2xl transition-all duration-500 mb-6 border border-[#86DEB7]/40">
                   
                   <!-- ADMIN ACTION BADGES (RENDERED ONLY IF LOGGED IN) -->
                   @if (auth.isAdmin()) {
-                    <div class="absolute top-3 right-3 z-30 flex items-center gap-1.5 bg-[#0c0817]/90 backdrop-blur-md p-1 rounded-xl shadow-lg border border-emerald-500/40">
+                    <div class="absolute top-3 right-3 z-30 flex items-center gap-1.5 bg-[#142417] p-1 rounded-xl shadow-lg border border-[#86DEB7]">
                       <button
                         type="button"
                         (click)="editServiceAdmin(service)"
                         title="Editar servicio"
-                        class="p-1.5 rounded-lg text-emerald-300 hover:bg-emerald-950/60 hover:text-white transition-colors">
+                        class="p-1.5 rounded-lg text-[#86DEB7] hover:bg-[#63B995] hover:text-[#142417] transition-colors">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                           <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -78,7 +78,7 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
                         type="button"
                         (click)="deleteServiceAdmin(service.id)"
                         title="Eliminar servicio"
-                        class="p-1.5 rounded-lg text-rose-400 hover:bg-rose-950/60 transition-colors">
+                        class="p-1.5 rounded-lg text-[#86DEB7] hover:bg-[#63B995] hover:text-[#142417] transition-colors">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <polyline points="3 6 5 6 21 6"/>
                           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -93,24 +93,24 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
                     loading="lazy"
                     decoding="async"
                     class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"/>
-                  <div class="absolute inset-0 bg-gradient-to-t from-[#090514]/60 via-transparent to-transparent opacity-60"></div>
+                  <div class="absolute inset-0 bg-gradient-to-t from-[#142417]/60 via-transparent to-transparent opacity-60"></div>
                 </div>
 
                 <!-- Service Title & Description -->
-                <h3 class="text-2xl sm:text-3xl font-editorial font-light text-white mb-2.5 group-hover:text-emerald-300 transition-colors">
+                <h3 class="text-2xl sm:text-3xl font-editorial font-bold text-[#86DEB7] mb-2.5 group-hover:text-[#63B995] transition-colors">
                   {{ service.title }}
                 </h3>
 
-                <p class="text-slate-300/85 text-sm leading-relaxed font-light font-sans mb-5">
+                <p class="text-[#86DEB7]/90 text-sm leading-relaxed font-medium font-sans mb-5">
                   {{ service.description }}
                 </p>
 
                 <!-- Features List -->
                 @if (service.features && service.features.length > 0) {
-                  <ul class="space-y-2.5 pt-4 border-t border-violet-500/15 mb-6">
+                  <ul class="space-y-2.5 pt-4 border-t border-[#63B995]/30 mb-6">
                     @for (feat of service.features; track feat) {
-                      <li class="flex items-start gap-2.5 text-xs text-slate-300 font-light">
-                        <svg class="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <li class="flex items-start gap-2.5 text-xs text-[#86DEB7] font-medium">
+                        <svg class="w-4 h-4 text-[#86DEB7] flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                           <polyline points="20 6 9 17 4 12"/>
                         </svg>
                         <span>{{ feat }}</span>
@@ -126,7 +126,7 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
                   [href]="service.whatsappUrl || shop.defaultWhatsAppUrl"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="btn-editorial-mint w-full py-3 px-4 rounded-xl text-xs font-semibold tracking-widest uppercase flex items-center justify-center gap-2 group/btn shadow-md">
+                  class="btn-editorial-mint w-full py-3 px-4 rounded-xl text-xs font-bold tracking-widest uppercase flex items-center justify-center gap-2 group/btn shadow-md">
                   <span>Consultar Disponibilidad</span>
                   <svg class="w-3.5 h-3.5 transform group-hover/btn:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="5" y1="12" x2="19" y2="12"/>

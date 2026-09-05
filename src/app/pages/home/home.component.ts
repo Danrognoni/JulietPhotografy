@@ -32,7 +32,7 @@ import { AuthService } from '../../services/auth.service';
     ScrollRevealDirective
   ],
   template: `
-    <div class="min-h-screen bg-aura-mesh text-slate-100 flex flex-col relative selection:bg-emerald-400 selection:text-slate-950">
+    <div class="min-h-screen bg-aura-mesh text-[#86DEB7] flex flex-col relative selection:bg-[#86DEB7] selection:text-[#142417]">
       
       <!-- Main Content Structure -->
       <div class="relative z-10 flex flex-col flex-grow">
@@ -45,11 +45,11 @@ import { AuthService } from '../../services/auth.service';
           <div 
             class="fixed top-24 right-4 sm:right-6 z-50 max-w-md w-[calc(100%-2rem)] shadow-2xl rounded-2xl p-4 border animate-slideLeft flex items-start gap-3 backdrop-blur-xl transition-all"
             [ngClass]="alert.type === 'error' 
-              ? 'bg-rose-950/90 border-rose-500/40 text-rose-100 shadow-rose-950/50' 
-              : 'bg-emerald-950/90 border-emerald-500/40 text-emerald-100 shadow-emerald-950/50'">
+              ? 'bg-[#142417] border-[#86DEB7] text-[#86DEB7]' 
+              : 'bg-[#63B995] border-[#86DEB7] text-[#142417]'">
             
             <div class="p-2 rounded-xl flex-shrink-0"
-                 [ngClass]="alert.type === 'error' ? 'bg-rose-900/60 text-rose-400' : 'bg-emerald-900/60 text-emerald-400'">
+                 [ngClass]="alert.type === 'error' ? 'bg-[#63B995] text-[#142417]' : 'bg-[#142417] text-[#86DEB7]'">
               @if (alert.type === 'error') {
                 <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="12" r="10"/>
@@ -65,10 +65,11 @@ import { AuthService } from '../../services/auth.service';
 
             <div class="flex-grow min-w-0 pr-2">
               <h5 class="text-xs font-bold uppercase tracking-wider mb-0.5"
-                  [ngClass]="alert.type === 'error' ? 'text-rose-300' : 'text-emerald-300'">
+                  [ngClass]="alert.type === 'error' ? 'text-[#86DEB7]' : 'text-[#142417]'">
                 {{ alert.type === 'error' ? 'Notificación de Error' : 'Operación Exitosa' }}
               </h5>
-              <p class="text-xs leading-relaxed font-medium break-words text-slate-200">
+              <p class="text-xs leading-relaxed font-medium break-words"
+                 [ngClass]="alert.type === 'error' ? 'text-[#86DEB7]' : 'text-[#142417]'">
                 {{ alert.message }}
               </p>
             </div>
@@ -76,7 +77,8 @@ import { AuthService } from '../../services/auth.service';
             <button 
               (click)="shop.clearAlert()" 
               aria-label="Cerrar notificación"
-              class="text-slate-400 hover:text-white p-1 rounded-lg transition-colors">
+              class="p-1 rounded-lg transition-colors hover:opacity-80"
+              [ngClass]="alert.type === 'error' ? 'text-[#86DEB7]' : 'text-[#142417]'">
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"/>
                 <line x1="6" y1="6" x2="18" y2="18"/>
@@ -102,23 +104,23 @@ import { AuthService } from '../../services/auth.service';
           <section 
             appScrollReveal
             class="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <div class="rounded-2xl p-6 sm:p-8 bg-[#120826]/85 backdrop-blur-xl border border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl">
+            <div class="rounded-2xl p-6 sm:p-8 bg-[#63B995] border border-[#86DEB7] flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl text-[#142417]">
               <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-slate-950 flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-500/20">
+                <div class="w-12 h-12 rounded-xl bg-[#142417] text-[#86DEB7] border border-[#86DEB7] flex items-center justify-center flex-shrink-0 shadow-md">
                   <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <rect width="18" height="18" x="3" y="3" rx="2"/>
                     <path d="M7 7h10M7 12h10M7 17h10"/>
                   </svg>
                 </div>
                 <div>
-                  <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold uppercase tracking-wider mb-1">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#142417] border border-[#86DEB7] text-[#86DEB7] text-[11px] font-bold uppercase tracking-wider mb-1">
+                    <span class="w-2 h-2 rounded-full bg-[#86DEB7] animate-pulse"></span>
                     <span>Modo Administradora Activo</span>
                   </div>
-                  <h4 class="font-editorial text-2xl font-light text-white">
+                  <h4 class="font-editorial text-2xl font-bold text-[#142417]">
                     Panel de Control & Edición (CRUD)
                   </h4>
-                  <p class="text-xs sm:text-sm text-slate-300/80 mt-0.5 font-sans font-light">
+                  <p class="text-xs sm:text-sm text-[#142417]/90 mt-0.5 font-sans font-medium">
                     Tienes permisos habilitados para crear o editar fotos, fijar foto de portada hero, álbumes, servicios y tu perfil.
                   </p>
                 </div>

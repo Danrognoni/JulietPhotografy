@@ -16,26 +16,26 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
       <!-- Backdrop con cierre por clic exterior para evitar pantallas trabadas -->
       <div 
         (click)="onBackdropClick($event)"
-        class="modal-overlay-viewport fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-6 backdrop-blur-md bg-black/75 animate-fadeIn">
+        class="modal-overlay-viewport fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-6 backdrop-blur-md bg-[#142417]/80 animate-fadeIn">
         
         <!-- Modal Card Dashboard (detiene propagación de clic) -->
         <div 
           #dashboardModalCard
           (click)="$event.stopPropagation()"
-          class="relative w-full max-w-5xl bg-[#13082a] border border-violet-500/30 rounded-3xl shadow-2xl shadow-violet-950/80 overflow-hidden flex flex-col max-h-[92vh] text-slate-100">
+          class="relative w-full max-w-5xl bg-[#142417] border border-[#86DEB7] rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] text-[#86DEB7]">
           
           <!-- Header Bar -->
-          <div #dashboardHeader class="px-6 py-5 border-b border-violet-500/20 bg-[#180b36] flex items-center justify-between">
+          <div #dashboardHeader class="px-6 py-5 border-b border-[#63B995]/40 bg-[#142417] flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-violet-600 to-fuchsia-600 text-white flex items-center justify-center shadow-lg shadow-violet-600/30">
+              <div class="w-10 h-10 rounded-xl bg-[#63B995] text-[#142417] border border-[#86DEB7] flex items-center justify-center shadow-md">
                 <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect width="18" height="18" x="3" y="3" rx="2"/>
                   <path d="M7 7h10M7 12h10M7 17h10"/>
                 </svg>
               </div>
               <div>
-                <h3 class="font-display font-bold text-xl text-white">Panel de Control Administradora</h3>
-                <p class="text-xs text-violet-300/80">Sesión activa como: <strong class="text-fuchsia-300">{{ auth.currentUser()?.email }}</strong></p>
+                <h3 class="font-display font-bold text-xl text-[#86DEB7]">Panel de Control Administradora</h3>
+                <p class="text-xs text-[#86DEB7]/90 font-medium">Sesión activa como: <strong class="text-[#86DEB7] font-bold">{{ auth.currentUser()?.email }}</strong></p>
               </div>
             </div>
 
@@ -44,8 +44,8 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
               type="button"
               (click)="shop.closeAdminDashboard()"
               aria-label="Cerrar panel de administración"
-              class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-violet-900/40 transition-colors">
-              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              class="p-2 rounded-xl text-[#86DEB7] hover:bg-[#63B995] hover:text-[#142417] transition-colors">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <line x1="18" y1="6" x2="6" y2="18"/>
                 <line x1="6" y1="6" x2="18" y2="18"/>
               </svg>
@@ -53,12 +53,12 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
           </div>
 
           <!-- Tab Bar Navigation: Fotos vs Álbumes vs Servicios vs Editar Perfil (Sincronizado con URL) -->
-          <div class="px-6 pt-4 border-b border-violet-500/20 bg-[#13082b] flex items-center gap-4 overflow-x-auto">
+          <div class="px-6 pt-4 border-b border-[#63B995]/40 bg-[#142417] flex items-center gap-4 overflow-x-auto">
             <button
               type="button"
               (click)="switchTab('photos')"
-              class="pb-3 text-xs sm:text-sm font-semibold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap"
-              [ngClass]="activeTab() === 'photos' ? 'border-[#86DEB7] text-[#86DEB7]' : 'border-transparent text-slate-400 hover:text-white'">
+              class="pb-3 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap"
+              [ngClass]="activeTab() === 'photos' ? 'border-[#86DEB7] text-[#86DEB7]' : 'border-transparent text-[#63B995] hover:text-[#86DEB7]'">
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect width="18" height="18" x="3" y="3" rx="2"/>
                 <circle cx="9" cy="9" r="2"/>
@@ -70,8 +70,8 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
             <button
               type="button"
               (click)="switchTab('albums')"
-              class="pb-3 text-xs sm:text-sm font-semibold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap"
-              [ngClass]="activeTab() === 'albums' ? 'border-[#86DEB7] text-[#86DEB7]' : 'border-transparent text-slate-400 hover:text-white'">
+              class="pb-3 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap"
+              [ngClass]="activeTab() === 'albums' ? 'border-[#86DEB7] text-[#86DEB7]' : 'border-transparent text-[#63B995] hover:text-[#86DEB7]'">
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/>
               </svg>
@@ -81,8 +81,8 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
             <button
               type="button"
               (click)="switchTab('services')"
-              class="pb-3 text-xs sm:text-sm font-semibold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap"
-              [ngClass]="activeTab() === 'services' ? 'border-[#86DEB7] text-[#86DEB7]' : 'border-transparent text-slate-400 hover:text-white'">
+              class="pb-3 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap"
+              [ngClass]="activeTab() === 'services' ? 'border-[#86DEB7] text-[#86DEB7]' : 'border-transparent text-[#63B995] hover:text-[#86DEB7]'">
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
                 <circle cx="9" cy="7" r="4"/>
@@ -95,8 +95,8 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
             <button
               type="button"
               (click)="switchTab('profile')"
-              class="pb-3 text-xs sm:text-sm font-semibold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap"
-              [ngClass]="activeTab() === 'profile' ? 'border-violet-400 text-violet-300' : 'border-transparent text-slate-400 hover:text-white'">
+              class="pb-3 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap"
+              [ngClass]="activeTab() === 'profile' ? 'border-[#86DEB7] text-[#86DEB7]' : 'border-transparent text-[#63B995] hover:text-[#86DEB7]'">
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                 <circle cx="12" cy="7" r="4"/>
@@ -106,23 +106,23 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
           </div>
 
           <!-- Body Content Area -->
-          <div #scrollContainer class="p-6 overflow-y-auto flex-grow space-y-8 bg-[#0c051a]">
+          <div #scrollContainer class="p-6 overflow-y-auto flex-grow space-y-8 bg-[#142417]">
 
             <!-- TAB 1: GESTIÓN DE FOTOS -->
             @if (activeTab() === 'photos') {
               
               <!-- Photo Form (Create / Edit) -->
-              <div class="p-6 rounded-2xl bg-[#160b33]/80 border border-violet-500/25 shadow-xl space-y-4">
+              <div class="p-6 rounded-2xl bg-[#63B995]/20 border border-[#86DEB7] shadow-xl space-y-4">
                 <div class="flex items-center justify-between">
-                  <h4 class="font-display font-bold text-base text-white flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-fuchsia-400"></span>
+                  <h4 class="font-display font-bold text-base text-[#86DEB7] flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#86DEB7]"></span>
                     <span>{{ editingPhotoId() ? 'Editar Fotografía' : 'Subir Nueva Fotografía' }}</span>
                   </h4>
                   @if (editingPhotoId()) {
                     <button
                       type="button"
                       (click)="cancelPhotoEdit()"
-                      class="text-xs text-violet-300 hover:text-white underline">
+                      class="text-xs text-[#86DEB7] hover:underline font-bold">
                       Cancelar edición
                     </button>
                   }
@@ -132,7 +132,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                   
                   <!-- Drag & Drop / Image URL input -->
                   <div class="space-y-2">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-violet-300">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7]">
                       Imagen de la Fotografía *
                     </label>
 
@@ -151,15 +151,15 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
 
                       @if (photoImageUrl) {
                         <div class="flex items-center justify-center gap-3">
-                          <img [src]="photoImageUrl" alt="Vista previa" loading="lazy" decoding="async" class="h-20 w-28 object-cover rounded-lg border border-violet-500/40 shadow-xs"/>
+                          <img [src]="photoImageUrl" alt="Vista previa" loading="lazy" decoding="async" class="h-20 w-28 object-cover rounded-lg border border-[#86DEB7] shadow-sm"/>
                           <div class="text-left text-xs">
-                            <span class="font-semibold text-white block">Imagen lista</span>
-                            <span class="text-fuchsia-400 hover:underline">Haz clic o arrastra para cambiar</span>
+                            <span class="font-bold text-[#86DEB7] block">Imagen lista</span>
+                            <span class="text-[#86DEB7] underline font-medium">Haz clic o arrastra para cambiar</span>
                           </div>
                         </div>
                       } @else {
-                        <div class="flex items-center justify-center gap-2 text-xs text-violet-300">
-                          <svg class="w-5 h-5 text-fuchsia-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <div class="flex items-center justify-center gap-2 text-xs text-[#86DEB7] font-medium">
+                          <svg class="w-5 h-5 text-[#86DEB7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
                             <path d="M12 12v9"/>
                             <path d="m16 16-4-4-4 4"/>
@@ -174,13 +174,13 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                       [(ngModel)]="photoImageUrl"
                       name="photoImageUrl"
                       placeholder="O pega una URL: https://images.unsplash.com/..."
-                      class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white placeholder-violet-300/40 focus:outline-none focus:border-fuchsia-400"/>
+                      class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] placeholder-[#86DEB7]/50 focus:outline-none focus:border-[#86DEB7] font-medium"/>
                   </div>
 
                   <!-- Title, Category, Price -->
                   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7] mb-1">
                         Título de la Obra *
                       </label>
                       <input
@@ -189,11 +189,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                         [(ngModel)]="photoTitle"
                         name="photoTitle"
                         placeholder="Ej: Calma en Acantilados"
-                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white placeholder-violet-300/40 focus:outline-none focus:border-fuchsia-400"/>
+                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] placeholder-[#86DEB7]/50 focus:outline-none focus:border-[#86DEB7] font-medium"/>
                     </div>
 
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-emerald-300 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7] mb-1">
                         Carpeta / Categoría del Álbum *
                       </label>
                       <div class="space-y-2">
@@ -201,11 +201,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                           [(ngModel)]="photoCategory"
                           name="photoCategory"
                           (ngModelChange)="onCategorySelectChange($event)"
-                          class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white focus:outline-none focus:border-[#86DEB7]">
+                          class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] focus:outline-none focus:border-[#86DEB7] font-bold">
                           @for (cat of shop.albumCategories(); track cat) {
-                            <option [value]="cat">{{ cat }}</option>
+                            <option [value]="cat" class="bg-[#142417] text-[#86DEB7]">{{ cat }}</option>
                           }
-                          <option value="__NEW_CATEGORY__">+ Crear o ingresar nuevo álbum...</option>
+                          <option value="__NEW_CATEGORY__" class="bg-[#142417] text-[#86DEB7]">+ Crear o ingresar nuevo álbum...</option>
                         </select>
 
                         @if (isCreatingNewCategory()) {
@@ -215,11 +215,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                               [(ngModel)]="newCategoryName"
                               name="newCategoryName"
                               placeholder="Nombre de la nueva carpeta / álbum..."
-                              class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0b0518] border border-emerald-400/50 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-300"/>
+                              class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#142417] border border-[#86DEB7] text-[#86DEB7] placeholder-[#86DEB7]/60 focus:outline-none focus:border-[#86DEB7] font-medium"/>
                             <button
                               type="button"
                               (click)="applyNewCategory()"
-                              class="px-3 py-2 rounded-xl bg-emerald-500 text-slate-950 font-bold text-xs whitespace-nowrap">
+                              class="btn-editorial-mint px-3 py-2 rounded-xl font-bold text-xs whitespace-nowrap">
                               Asignar
                             </button>
                           </div>
@@ -228,7 +228,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                     </div>
 
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7] mb-1">
                         Precio (USD) *
                       </label>
                       <input
@@ -237,13 +237,13 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                         required
                         [(ngModel)]="photoPrice"
                         name="photoPrice"
-                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white focus:outline-none focus:border-fuchsia-400"/>
+                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] focus:outline-none focus:border-[#86DEB7] font-bold"/>
                     </div>
                   </div>
 
                   <!-- Mandatory Technical Sheet -->
                   <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7] mb-1">
                       Ficha Técnica Completa (Obligatoria) *
                     </label>
                     <input
@@ -252,13 +252,13 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                       [(ngModel)]="photoTechnicalSheet"
                       name="photoTechnicalSheet"
                       placeholder="Ej: Sony Alpha 7 IV · 85mm f/1.4 GM · 1/800s · f/1.8 · ISO 100"
-                      class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white placeholder-violet-300/40 focus:outline-none focus:border-fuchsia-400 font-mono"/>
+                      class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] placeholder-[#86DEB7]/50 focus:outline-none focus:border-[#86DEB7] font-mono"/>
                   </div>
 
                   <!-- Description & Dimensions -->
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7] mb-1">
                         Dimensiones / Soporte
                       </label>
                       <input
@@ -266,11 +266,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                         [(ngModel)]="photoDimensions"
                         name="photoDimensions"
                         placeholder="60 x 40 cm · Fine Art"
-                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white placeholder-violet-300/40 focus:outline-none focus:border-fuchsia-400"/>
+                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] placeholder-[#86DEB7]/50 focus:outline-none focus:border-[#86DEB7] font-medium"/>
                     </div>
 
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7] mb-1">
                         Breve Descripción Artística
                       </label>
                       <input
@@ -278,7 +278,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                         [(ngModel)]="photoDescription"
                         name="photoDescription"
                         placeholder="Descripción conceptual de la toma..."
-                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white placeholder-violet-300/40 focus:outline-none focus:border-fuchsia-400"/>
+                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] placeholder-[#86DEB7]/50 focus:outline-none focus:border-[#86DEB7] font-medium"/>
                     </div>
                   </div>
 
@@ -287,7 +287,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                     <button
                       type="submit"
                       [disabled]="!isPhotoFormValid() || isSubmitting()"
-                      class="btn-fresh-gradient px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                      class="btn-editorial-mint px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                       @if (isSubmitting()) {
                         <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25"></circle>
@@ -310,14 +310,14 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
 
               <!-- List of Photos (CRUD List) -->
               <div class="space-y-3">
-                <h4 class="font-display font-bold text-base text-white">
+                <h4 class="font-display font-bold text-base text-[#86DEB7]">
                   Catálogo de Obras ({{ shop.photos().length }})
                 </h4>
 
-                <div class="rounded-2xl border border-violet-500/25 overflow-hidden bg-[#160b33]/80 shadow-xl">
+                <div class="rounded-2xl border border-[#86DEB7] overflow-hidden bg-[#142417] shadow-xl">
                   <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs">
-                      <thead class="bg-[#1c0e3e] text-violet-300 font-bold uppercase tracking-wider border-b border-violet-500/20">
+                      <thead class="bg-[#63B995] text-[#142417] font-bold uppercase tracking-wider border-b border-[#86DEB7]">
                         <tr>
                           <th class="p-3.5">Foto</th>
                           <th class="p-3.5">Título</th>
@@ -327,24 +327,24 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                           <th class="p-3.5 text-right">Acciones</th>
                         </tr>
                       </thead>
-                      <tbody class="divide-y divide-violet-900/30">
+                      <tbody class="divide-y divide-[#63B995]/30">
                         @for (photo of shop.photos(); track photo.id) {
-                          <tr class="hover:bg-violet-900/20 transition-colors">
+                          <tr class="hover:bg-[#63B995]/15 transition-colors">
                             <td class="p-3.5">
-                              <img [src]="photo.imageUrl" [alt]="photo.title" loading="lazy" decoding="async" class="w-12 h-12 rounded-lg object-cover border border-violet-500/40"/>
+                              <img [src]="photo.imageUrl" [alt]="photo.title" loading="lazy" decoding="async" class="w-12 h-12 rounded-lg object-cover border border-[#86DEB7]"/>
                             </td>
-                            <td class="p-3.5 font-semibold text-white max-w-[150px] truncate">
+                            <td class="p-3.5 font-bold text-[#86DEB7] max-w-[150px] truncate">
                               {{ photo.title }}
                             </td>
                             <td class="p-3.5">
-                              <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-violet-950 text-violet-300 border border-violet-700/50">
+                              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#142417] text-[#86DEB7] border border-[#86DEB7]">
                                 {{ photo.category }}
                               </span>
                             </td>
-                            <td class="p-3.5 font-mono text-[10.5px] text-violet-300 max-w-[200px] truncate" [title]="photo.technicalSheet">
+                            <td class="p-3.5 font-mono text-[10.5px] text-[#63B995] max-w-[200px] truncate font-semibold" [title]="photo.technicalSheet">
                               {{ photo.technicalSheet }}
                             </td>
-                            <td class="p-3.5 font-bold text-white">
+                            <td class="p-3.5 font-bold text-[#86DEB7]">
                               \${{ photo.price }} USD
                             </td>
                             <td class="p-3.5 text-right space-x-1.5 whitespace-nowrap">
@@ -352,24 +352,24 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                                 type="button"
                                 (click)="shop.setHeroCover(photo.id)"
                                 [title]="shop.heroPhoto().id === photo.id ? 'Esta fotografía es la Portada Hero actual' : 'Establecer como Portada Hero'"
-                                class="px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors border"
+                                class="px-2.5 py-1 rounded-lg text-xs font-bold transition-colors border"
                                 [ngClass]="shop.heroPhoto().id === photo.id 
-                                  ? 'bg-emerald-500/25 text-emerald-300 border-emerald-500/50 shadow-sm shadow-emerald-500/20' 
-                                  : 'bg-slate-800/60 text-slate-300 border-slate-700/60 hover:text-emerald-300 hover:border-emerald-500/40'">
+                                  ? 'bg-[#86DEB7] text-[#142417] border-[#142417] shadow-sm' 
+                                  : 'bg-[#142417] text-[#86DEB7] border-[#63B995] hover:bg-[#63B995] hover:text-[#142417]'">
                                 {{ shop.heroPhoto().id === photo.id ? '★ Portada Hero' : 'Fijar Portada' }}
                               </button>
                               <button
                                 type="button"
                                 (click)="startPhotoEdit(photo)"
                                 title="Editar foto"
-                                class="px-2.5 py-1 rounded-lg text-violet-300 bg-violet-900/60 hover:bg-violet-800 border border-violet-600/40 transition-colors">
+                                class="px-2.5 py-1 rounded-lg text-[#142417] bg-[#86DEB7] hover:bg-[#63B995] font-bold transition-colors">
                                 Editar
                               </button>
                               <button
                                 type="button"
                                 (click)="deletePhoto(photo.id)"
                                 title="Eliminar foto"
-                                class="px-2.5 py-1 rounded-lg text-rose-400 bg-rose-950/60 hover:bg-rose-900 border border-rose-800/40 transition-colors">
+                                class="px-2.5 py-1 rounded-lg text-[#86DEB7] bg-[#142417] hover:bg-[#86DEB7] hover:text-[#142417] border border-[#86DEB7] font-bold transition-colors">
                                 Eliminar
                               </button>
                             </td>
@@ -388,16 +388,16 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                 
                 <!-- Album Form (Create / Edit) if active -->
                 @if (isCreatingAlbum()) {
-                  <div class="p-6 rounded-2xl bg-[#160b33]/80 border border-[#86DEB7]/40 shadow-xl space-y-4 animate-fadeIn">
+                  <div class="p-6 rounded-2xl bg-[#63B995]/20 border border-[#86DEB7] shadow-xl space-y-4 animate-fadeIn">
                     <div class="flex items-center justify-between">
-                      <h4 class="font-display font-bold text-base text-white flex items-center gap-2">
+                      <h4 class="font-display font-bold text-base text-[#86DEB7] flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-[#86DEB7]"></span>
                         <span>{{ editingAlbumId() ? 'Editar Álbum Temático' : 'Crear Nuevo Álbum Temático' }}</span>
                       </h4>
                       <button
                         type="button"
                         (click)="cancelAlbumEdit()"
-                        class="text-xs text-violet-300 hover:text-white underline">
+                        class="text-xs text-[#86DEB7] hover:underline font-bold">
                         Cancelar
                       </button>
                     </div>
@@ -407,7 +407,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                       <!-- Album Name & Description -->
                       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="space-y-1">
-                          <label class="block text-xs font-bold uppercase tracking-wider text-violet-300">
+                          <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7]">
                             Nombre del Álbum / Colección *
                           </label>
                           <input
@@ -416,11 +416,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                             name="albumName"
                             [(ngModel)]="albumName"
                             placeholder="Ej. Sesiones en Estudio, Retratos de Pareja..."
-                            class="w-full px-3.5 py-2 rounded-xl bg-[#0c051a] border border-violet-500/30 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#86DEB7] focus:ring-1 focus:ring-[#86DEB7]/30"/>
+                            class="w-full px-3.5 py-2 rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] placeholder-[#86DEB7]/50 text-sm focus:outline-none focus:border-[#86DEB7] font-medium"/>
                         </div>
 
                         <div class="space-y-1">
-                          <label class="block text-xs font-bold uppercase tracking-wider text-violet-300">
+                          <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7]">
                             Descripción Breve
                           </label>
                           <input
@@ -428,13 +428,13 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                             name="albumDescription"
                             [(ngModel)]="albumDescription"
                             placeholder="Breve reseña sobre el estilo o locación de la serie..."
-                            class="w-full px-3.5 py-2 rounded-xl bg-[#0c051a] border border-violet-500/30 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#86DEB7] focus:ring-1 focus:ring-[#86DEB7]/30"/>
+                            class="w-full px-3.5 py-2 rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] placeholder-[#86DEB7]/50 text-sm focus:outline-none focus:border-[#86DEB7] font-medium"/>
                         </div>
                       </div>
 
                       <!-- Cover Image (Upload or URL or pick from Catalog) -->
                       <div class="space-y-2">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-violet-300">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7]">
                           Foto de Portada del Álbum
                         </label>
 
@@ -445,10 +445,10 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                               name="albumCoverUrl"
                               [(ngModel)]="albumCoverUrl"
                               placeholder="https://... o sube una imagen local desde tu PC"
-                              class="w-full px-3.5 py-2 rounded-xl bg-[#0c051a] border border-violet-500/30 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-[#86DEB7]"/>
+                              class="w-full px-3.5 py-2 rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] placeholder-[#86DEB7]/50 text-xs focus:outline-none focus:border-[#86DEB7] font-medium"/>
 
                             <div class="flex items-center gap-3">
-                              <label class="cursor-pointer px-3 py-1.5 rounded-xl bg-[#50723C]/30 border border-[#86DEB7]/30 text-[#86DEB7] text-xs font-semibold hover:bg-[#63B995]/40 transition-colors flex items-center gap-2">
+                              <label class="cursor-pointer px-3.5 py-2 rounded-xl bg-[#63B995] border border-[#86DEB7] text-[#142417] text-xs font-bold hover:bg-[#86DEB7] transition-colors flex items-center gap-2">
                                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                                   <polyline points="17 8 12 3 7 8"/>
@@ -459,7 +459,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                               </label>
 
                               @if (selectedAlbumFile) {
-                                <span class="text-xs text-[#86DEB7] truncate max-w-[200px]">
+                                <span class="text-xs text-[#86DEB7] font-bold truncate max-w-[200px]">
                                   {{ selectedAlbumFile.name }}
                                 </span>
                               }
@@ -468,11 +468,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
 
                           <!-- Preview Thumbnail -->
                           <div class="sm:col-span-4 flex justify-center sm:justify-end">
-                            <div class="w-24 h-24 rounded-xl border border-violet-500/30 overflow-hidden bg-[#0c051a] flex items-center justify-center">
+                            <div class="w-24 h-24 rounded-xl border border-[#86DEB7] overflow-hidden bg-[#142417] flex items-center justify-center">
                               @if (albumCoverUrl) {
                                 <img [src]="albumCoverUrl" alt="Portada Álbum" class="w-full h-full object-cover"/>
                               } @else {
-                                <span class="text-[10px] text-slate-500 text-center p-2">Sin portada asignada</span>
+                                <span class="text-[10px] text-[#86DEB7]/70 text-center p-2 font-medium">Sin portada asignada</span>
                               }
                             </div>
                           </div>
@@ -483,14 +483,14 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                         <button
                           type="button"
                           (click)="cancelAlbumEdit()"
-                          class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white transition-colors">
+                          class="px-4 py-2 rounded-xl text-xs font-bold border border-[#86DEB7] text-[#86DEB7] hover:bg-[#63B995] hover:text-[#142417] transition-colors">
                           Cancelar
                         </button>
 
                         <button
                           type="submit"
                           [disabled]="!albumName.trim() || isSubmitting()"
-                          class="btn-editorial-mint px-6 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                          class="btn-editorial-mint px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                           @if (isSubmitting()) {
                             <span>Guardando...</span>
                           } @else {
@@ -506,10 +506,10 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                 <!-- List of Albums Header & "+ Nuevo Álbum" button -->
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <h4 class="font-display font-bold text-base text-white">
+                    <h4 class="font-display font-bold text-base text-[#86DEB7]">
                       Álbumes Temáticos en Catálogo ({{ shop.albumFolders().length }})
                     </h4>
-                    <p class="text-xs text-slate-400 mt-0.5">
+                    <p class="text-xs text-[#86DEB7]/90 mt-0.5 font-medium">
                       Gestiona, renombra, agrega portadas y crea colecciones temáticas para la portada y filtros.
                     </p>
                   </div>
@@ -518,7 +518,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                     <button
                       type="button"
                       (click)="startAlbumCreate()"
-                      class="btn-editorial-mint px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-md self-start sm:self-auto">
+                      class="btn-editorial-mint px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-md self-start sm:self-auto">
                       <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="5" x2="12" y2="19"/>
                         <line x1="5" y1="12" x2="19" y2="12"/>
@@ -531,39 +531,39 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                 <!-- Albums Grid Cards -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   @for (folder of shop.albumFolders(); track folder.id) {
-                    <div class="p-4 rounded-2xl bg-[#160b33]/80 border border-violet-500/25 flex flex-col justify-between space-y-3 shadow-md">
+                    <div class="p-4 rounded-2xl bg-[#63B995]/20 border border-[#86DEB7] flex flex-col justify-between space-y-3 shadow-md">
                       <div class="flex items-center gap-3">
-                        <div class="w-16 h-16 rounded-xl overflow-hidden bg-[#0c051a] flex-shrink-0 border border-violet-500/30">
+                        <div class="w-16 h-16 rounded-xl overflow-hidden bg-[#142417] flex-shrink-0 border border-[#86DEB7]">
                           @if (folder.coverImage) {
                             <img [src]="folder.coverImage" [alt]="folder.name" class="w-full h-full object-cover"/>
                           } @else {
-                            <div class="w-full h-full flex items-center justify-center text-slate-500 text-[9px] text-center p-1">
+                            <div class="w-full h-full flex items-center justify-center text-[#86DEB7]/60 text-[9px] text-center p-1 font-bold">
                               Sin portada
                             </div>
                           }
                         </div>
                         <div class="min-w-0 flex-grow">
                           <div class="flex items-center justify-between gap-1">
-                            <h5 class="font-bold text-white text-sm truncate">{{ folder.name }}</h5>
-                            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#50723C]/30 text-[#86DEB7] border border-[#86DEB7]/20 flex-shrink-0">
+                            <h5 class="font-bold text-[#86DEB7] text-sm truncate">{{ folder.name }}</h5>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#142417] text-[#86DEB7] border border-[#86DEB7] flex-shrink-0 font-bold">
                               {{ folder.count }} {{ folder.count === 1 ? 'foto' : 'fotos' }}
                             </span>
                           </div>
-                          <p class="text-xs text-slate-300/80 line-clamp-2 mt-1">{{ folder.description }}</p>
+                          <p class="text-xs text-[#86DEB7]/90 line-clamp-2 mt-1 font-medium">{{ folder.description }}</p>
                         </div>
                       </div>
 
-                      <div class="flex items-center justify-end gap-2 pt-2 border-t border-violet-900/30">
+                      <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#63B995]/30">
                         <button
                           type="button"
                           (click)="startAlbumEdit(folder)"
-                          class="px-3 py-1 rounded-lg text-xs font-semibold text-[#86DEB7] bg-[#50723C]/30 hover:bg-[#63B995]/40 border border-[#86DEB7]/30 transition-colors">
+                          class="px-3 py-1 rounded-lg text-xs font-bold text-[#142417] bg-[#86DEB7] hover:bg-[#63B995] transition-colors">
                           Editar
                         </button>
                         <button
                           type="button"
                           (click)="deleteAlbum(folder)"
-                          class="px-3 py-1 rounded-lg text-xs font-semibold text-rose-400 bg-rose-950/60 hover:bg-rose-900 border border-rose-800/40 transition-colors">
+                          class="px-3 py-1 rounded-lg text-xs font-bold text-[#86DEB7] border border-[#86DEB7] hover:bg-[#86DEB7] hover:text-[#142417] transition-colors">
                           Eliminar
                         </button>
                       </div>
@@ -575,18 +575,18 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
 
             } @else if (activeTab() === 'services') {
               
-              <!-- TAB 2: GESTIÓN DE SERVICIOS -->
-              <div class="p-6 rounded-2xl bg-[#160b33]/80 border border-violet-500/25 shadow-xl space-y-4">
+              <!-- TAB 3: GESTIÓN DE SERVICIOS -->
+              <div class="p-6 rounded-2xl bg-[#63B995]/20 border border-[#86DEB7] shadow-xl space-y-4">
                 <div class="flex items-center justify-between">
-                  <h4 class="font-display font-bold text-base text-white flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-fuchsia-400"></span>
+                  <h4 class="font-display font-bold text-base text-[#86DEB7] flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#86DEB7]"></span>
                     <span>{{ editingServiceId() ? 'Editar Servicio' : 'Crear Nuevo Servicio de Cobertura' }}</span>
                   </h4>
                   @if (editingServiceId()) {
                     <button
                       type="button"
                       (click)="cancelServiceEdit()"
-                      class="text-xs text-violet-300 hover:text-white underline">
+                      class="text-xs text-[#86DEB7] hover:underline font-bold">
                       Cancelar edición
                     </button>
                   }
@@ -596,7 +596,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                   
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7] mb-1">
                         Título del Servicio *
                       </label>
                       <input
@@ -605,11 +605,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                         [(ngModel)]="serviceTitle"
                         name="serviceTitle"
                         placeholder="Ej: Bautismos & Festejos Familiares"
-                        class="w-full px-3.5 py-2.5 rounded-xl bg-[#0e0620] border border-violet-600/40 text-white text-sm focus:outline-none focus:border-fuchsia-400"/>
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] text-sm focus:outline-none focus:border-[#86DEB7] font-medium"/>
                     </div>
 
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7] mb-1">
                         URL de Imagen del Servicio *
                       </label>
                       <input
@@ -618,12 +618,12 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                         [(ngModel)]="serviceImageUrl"
                         name="serviceImageUrl"
                         placeholder="https://images.unsplash.com/..."
-                        class="w-full px-3.5 py-2.5 rounded-xl bg-[#0e0620] border border-violet-600/40 text-white text-sm focus:outline-none focus:border-fuchsia-400"/>
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] text-sm focus:outline-none focus:border-[#86DEB7] font-medium"/>
                     </div>
                   </div>
 
                   <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7] mb-1">
                       Descripción del Servicio *
                     </label>
                     <textarea
@@ -632,11 +632,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                       [(ngModel)]="serviceDescription"
                       name="serviceDescription"
                       placeholder="Explica qué incluye la cobertura fotográfica..."
-                      class="w-full px-3.5 py-2 rounded-xl bg-[#0e0620] border border-violet-600/40 text-white text-sm focus:outline-none focus:border-fuchsia-400"></textarea>
+                      class="w-full px-3.5 py-2 rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] text-sm focus:outline-none focus:border-[#86DEB7] font-medium"></textarea>
                   </div>
 
                   <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7] mb-1">
                       Características Principales (separadas por coma)
                     </label>
                     <input
@@ -644,14 +644,14 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                       [(ngModel)]="serviceFeaturesString"
                       name="serviceFeaturesString"
                       placeholder="Tomas espontáneas, Galería web privada, Fotos en alta resolución..."
-                      class="w-full px-3.5 py-2.5 rounded-xl bg-[#0e0620] border border-violet-600/40 text-white text-sm focus:outline-none focus:border-fuchsia-400"/>
+                      class="w-full px-3.5 py-2.5 rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] text-sm focus:outline-none focus:border-[#86DEB7] font-medium"/>
                   </div>
 
                   <div class="flex items-center justify-end gap-3 pt-2">
                     <button
                       type="submit"
                       [disabled]="!isServiceFormValid() || isSubmitting()"
-                      class="btn-fresh-gradient px-6 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                      class="btn-editorial-mint px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                       @if (isSubmitting()) {
                         <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25"></circle>
@@ -674,32 +674,32 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
 
               <!-- List of Services (CRUD List) -->
               <div class="space-y-3">
-                <h4 class="font-display font-bold text-base text-white">
+                <h4 class="font-display font-bold text-base text-[#86DEB7]">
                   Servicios Publicados ({{ shop.services().length }})
                 </h4>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   @for (service of shop.services(); track service.id) {
-                    <div class="p-4 rounded-2xl bg-[#160b33]/80 border border-violet-500/25 flex flex-col justify-between space-y-3 shadow-md">
+                    <div class="p-4 rounded-2xl bg-[#63B995]/20 border border-[#86DEB7] flex flex-col justify-between space-y-3 shadow-md">
                       <div class="flex items-center gap-3">
-                        <img [src]="service.imageUrl" [alt]="service.title" loading="lazy" decoding="async" class="w-14 h-14 rounded-xl object-cover border border-violet-500/30"/>
+                        <img [src]="service.imageUrl" [alt]="service.title" loading="lazy" decoding="async" class="w-14 h-14 rounded-xl object-cover border border-[#86DEB7]"/>
                         <div class="min-w-0">
-                          <h5 class="font-bold text-white text-sm truncate">{{ service.title }}</h5>
-                          <p class="text-xs text-slate-300 line-clamp-2 mt-0.5">{{ service.description }}</p>
+                          <h5 class="font-bold text-[#86DEB7] text-sm truncate">{{ service.title }}</h5>
+                          <p class="text-xs text-[#86DEB7]/90 line-clamp-2 mt-0.5 font-medium">{{ service.description }}</p>
                         </div>
                       </div>
 
-                      <div class="flex items-center justify-end gap-2 pt-2 border-t border-violet-900/30">
+                      <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#63B995]/30">
                         <button
                           type="button"
                           (click)="startServiceEdit(service)"
-                          class="px-3 py-1 rounded-lg text-xs font-semibold text-violet-300 bg-violet-900/60 hover:bg-violet-800 border border-violet-600/40 transition-colors">
+                          class="px-3 py-1 rounded-lg text-xs font-bold text-[#142417] bg-[#86DEB7] hover:bg-[#63B995] transition-colors">
                           Editar
                         </button>
                         <button
                           type="button"
                           (click)="deleteService(service.id)"
-                          class="px-3 py-1 rounded-lg text-xs font-semibold text-rose-400 bg-rose-950/60 hover:bg-rose-900 border border-rose-800/40 transition-colors">
+                          class="px-3 py-1 rounded-lg text-xs font-bold text-[#86DEB7] border border-[#86DEB7] hover:bg-[#86DEB7] hover:text-[#142417] transition-colors">
                           Eliminar
                         </button>
                       </div>
@@ -710,15 +710,15 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
 
             } @else if (activeTab() === 'profile') {
               
-              <!-- TAB 3: GESTIÓN DE PERFIL & SOBRE MÍ & ETIQUETAS DINÁMICAS -->
-              <div class="p-6 rounded-2xl bg-[#160b33]/80 border border-violet-500/25 shadow-xl space-y-6">
+              <!-- TAB 4: GESTIÓN DE PERFIL & SOBRE MÍ & ETIQUETAS DINÁMICAS -->
+              <div class="p-6 rounded-2xl bg-[#63B995]/20 border border-[#86DEB7] shadow-xl space-y-6">
                 <div class="flex items-center justify-between">
-                  <h4 class="font-display font-bold text-base text-white flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-fuchsia-400"></span>
+                  <h4 class="font-display font-bold text-base text-[#86DEB7] flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#86DEB7]"></span>
                     <span>Actualizar Información del Perfil & Presentación</span>
                   </h4>
                   @if (profileSavedMessage()) {
-                    <span class="text-xs text-emerald-400 font-bold flex items-center gap-1 animate-fadeIn">
+                    <span class="text-xs text-[#86DEB7] font-bold flex items-center gap-1 animate-fadeIn">
                       <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                         <polyline points="20 6 9 17 4 12"/>
                       </svg>
@@ -731,13 +731,13 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                   
                   <!-- Profile Image Preview & URL / Drag Drop -->
                   <div class="space-y-3">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-violet-300">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7]">
                       Foto de Perfil Profesional
                     </label>
 
                     <div class="flex flex-col sm:flex-row items-center gap-5">
                       <!-- Image Preview Avatar -->
-                      <div class="w-28 h-28 rounded-2xl overflow-hidden border-2 border-violet-400/50 shadow-lg shadow-violet-950/50 flex-shrink-0 bg-[#0e0620]">
+                      <div class="w-28 h-28 rounded-2xl overflow-hidden border-2 border-[#86DEB7] shadow-lg flex-shrink-0 bg-[#142417]">
                         <img [src]="profileImageUrl" alt="Vista previa de perfil" loading="lazy" decoding="async" class="w-full h-full object-cover"/>
                       </div>
 
@@ -753,8 +753,8 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                           <button
                             type="button"
                             (click)="profileFileInput.click()"
-                            class="px-4 py-2 text-xs font-semibold rounded-xl bg-violet-900/60 border border-violet-500/40 text-violet-200 hover:bg-violet-800 hover:text-white transition-colors flex items-center gap-2">
-                            <svg class="w-4 h-4 text-fuchsia-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            class="px-4 py-2 text-xs font-bold rounded-xl bg-[#63B995] border border-[#86DEB7] text-[#142417] hover:bg-[#86DEB7] transition-colors flex items-center gap-2">
+                            <svg class="w-4 h-4 text-[#142417]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                               <polyline points="17 8 12 3 7 8"/>
                               <line x1="12" y1="3" x2="12" y2="15"/>
@@ -762,8 +762,8 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                             <span>{{ selectedProfileFile ? 'Cambiar archivo seleccionado' : 'Subir imagen desde equipo' }}</span>
                           </button>
                           @if (selectedProfileFile) {
-                            <span class="text-xs text-emerald-300 font-medium truncate max-w-[200px] inline-flex items-center gap-1">
-                              <svg class="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <span class="text-xs text-[#86DEB7] font-bold truncate max-w-[200px] inline-flex items-center gap-1">
+                              <svg class="w-3.5 h-3.5 text-[#86DEB7] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                 <polyline points="20 6 9 17 4 12"/>
                               </svg>
                               <span class="truncate">{{ selectedProfileFile.name }}</span>
@@ -776,8 +776,8 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                           [(ngModel)]="profileImageUrl"
                           name="profileImageUrl"
                           placeholder="O ingresa una URL: https://images.unsplash.com/..."
-                          class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white placeholder-violet-300/40 focus:outline-none focus:border-fuchsia-400"/>
-                        <p class="text-[11px] text-slate-400">
+                          class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] placeholder-[#86DEB7]/50 focus:outline-none focus:border-[#86DEB7] font-medium"/>
+                        <p class="text-[11px] text-[#86DEB7]/80 font-medium">
                           Sube un archivo de imagen o ingresa una URL directa para actualizar tu retrato profesional.
                         </p>
                       </div>
@@ -787,7 +787,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                   <!-- Name, Title, Location -->
                   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7] mb-1">
                         Nombre Completo
                       </label>
                       <input
@@ -795,11 +795,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                         required
                         [(ngModel)]="profileName"
                         name="profileName"
-                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white focus:outline-none focus:border-fuchsia-400"/>
+                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] focus:outline-none focus:border-[#86DEB7] font-bold"/>
                     </div>
 
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7] mb-1">
                         Título Profesional
                       </label>
                       <input
@@ -807,11 +807,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                         required
                         [(ngModel)]="profileTitle"
                         name="profileTitle"
-                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white focus:outline-none focus:border-fuchsia-400"/>
+                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] focus:outline-none focus:border-[#86DEB7] font-medium"/>
                     </div>
 
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7] mb-1">
                         Ubicación
                       </label>
                       <input
@@ -819,13 +819,13 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                         required
                         [(ngModel)]="profileLocation"
                         name="profileLocation"
-                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white focus:outline-none focus:border-fuchsia-400"/>
+                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] focus:outline-none focus:border-[#86DEB7] font-medium"/>
                     </div>
                   </div>
 
                   <!-- Bio / Introduction text -->
                   <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7] mb-1">
                       Texto de Presentación (Sección "Sobre Mí") *
                     </label>
                     <textarea
@@ -834,21 +834,21 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                       [(ngModel)]="profileBio"
                       name="profileBio"
                       placeholder="Escribe tu presentación profesional..."
-                      class="w-full px-3.5 py-2.5 text-sm rounded-xl bg-[#0e0620] border border-violet-600/40 text-white focus:outline-none focus:border-fuchsia-400 leading-relaxed"></textarea>
+                      class="w-full px-3.5 py-2.5 text-sm rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] focus:outline-none focus:border-[#86DEB7] leading-relaxed font-medium"></textarea>
                   </div>
 
-                  <!-- REQUERIMIENTO 2: GESTIÓN DINÁMICA DE ETIQUETAS EN EDITAR PERFIL -->
-                  <div class="space-y-3 p-4 rounded-2xl bg-[#0e0620]/80 border border-violet-500/30">
+                  <!-- GESTIÓN DINÁMICA DE ETIQUETAS EN EDITAR PERFIL -->
+                  <div class="space-y-3 p-4 rounded-2xl bg-[#142417] border border-[#86DEB7]">
                     <div class="flex items-center justify-between">
                       <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-violet-200">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7]">
                           Etiquetas de Especialidades & Servicios (Dinámicas)
                         </label>
-                        <p class="text-[11px] text-violet-300/70 mt-0.5">
+                        <p class="text-[11px] text-[#86DEB7]/80 mt-0.5 font-medium">
                           Administra las etiquetas que se mostrarán en la portada ("Sobre Mí"). Puedes agregar, editar o eliminar las que desees.
                         </p>
                       </div>
-                      <span class="text-xs text-fuchsia-300 font-semibold px-2 py-0.5 rounded-full bg-fuchsia-950/80 border border-fuchsia-700/40">
+                      <span class="text-xs text-[#142417] font-bold px-2 py-0.5 rounded-full bg-[#86DEB7]">
                         {{ profileTags().length }} etiquetas
                       </span>
                     </div>
@@ -861,12 +861,12 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                         (keydown.enter)="$event.preventDefault(); addTag()"
                         name="newTagInput"
                         placeholder="Escribe una etiqueta (ej: 'Sesiones Boudoir') y presiona Enter o Agregar..."
-                        class="flex-grow px-3.5 py-2 text-xs rounded-xl bg-[#140b2e] border border-violet-600/40 text-white placeholder-violet-400/40 focus:outline-none focus:border-fuchsia-400 focus:ring-1 focus:ring-fuchsia-400/30"/>
+                        class="flex-grow px-3.5 py-2 text-xs rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] placeholder-[#86DEB7]/50 focus:outline-none focus:border-[#86DEB7] font-medium"/>
                       
                       <button
                         type="button"
                         (click)="addTag()"
-                        class="btn-fresh-gradient px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 shadow-sm">
+                        class="btn-editorial-mint px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 shadow-sm">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <line x1="12" y1="5" x2="12" y2="19"/>
                           <line x1="5" y1="12" x2="19" y2="12"/>
@@ -878,7 +878,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                     <!-- Lista de Chips Dinámicos con Edición y Eliminación -->
                     <div class="flex flex-wrap items-center gap-2 pt-2">
                       @for (tag of profileTags(); track $index) {
-                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#1d0d40] border border-violet-500/40 text-violet-100 text-xs shadow-md group">
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#63B995] border border-[#86DEB7] text-[#142417] text-xs shadow-md group font-bold">
                           @if (editingTagIndex() === $index) {
                             <input
                               type="text"
@@ -886,13 +886,13 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                               (keydown.enter)="$event.preventDefault(); saveEditedTag($index)"
                               (keydown.escape)="cancelEditTag()"
                               name="editingTag_{{ $index }}"
-                              class="px-2 py-0.5 text-xs rounded bg-[#0e0620] border border-fuchsia-400 text-white focus:outline-none w-36"/>
+                              class="px-2 py-0.5 text-xs rounded bg-[#142417] border border-[#86DEB7] text-[#86DEB7] focus:outline-none w-36"/>
                             <button
                               type="button"
                               (click)="saveEditedTag($index)"
                               title="Guardar cambio"
-                              class="text-emerald-400 hover:text-emerald-300 p-0.5">
-                              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                              class="text-[#142417] hover:text-[#86DEB7] p-0.5">
+                              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                                 <polyline points="20 6 9 17 4 12"/>
                               </svg>
                             </button>
@@ -900,14 +900,14 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                               type="button"
                               (click)="cancelEditTag()"
                               title="Cancelar edición"
-                              class="text-slate-400 hover:text-white p-0.5">
+                              class="text-[#142417] hover:text-[#86DEB7] p-0.5">
                               <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="18" y1="6" x2="6" y2="18"/>
                                 <line x1="6" y1="6" x2="18" y2="18"/>
                               </svg>
                             </button>
                           } @else {
-                            <span class="font-medium text-white">
+                            <span>
                               {{ tag }}
                             </span>
                             
@@ -915,7 +915,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                               type="button"
                               (click)="startEditTag($index, tag)"
                               title="Editar texto de etiqueta"
-                              class="text-violet-400 hover:text-white transition-colors p-0.5 rounded">
+                              class="text-[#142417] hover:text-[#86DEB7] transition-colors p-0.5 rounded">
                               <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
                               </svg>
@@ -925,7 +925,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                               type="button"
                               (click)="removeTag($index)"
                               title="Eliminar etiqueta"
-                              class="text-rose-400 hover:text-rose-300 transition-colors p-0.5 rounded">
+                              class="text-[#142417] hover:text-[#86DEB7] transition-colors p-0.5 rounded">
                               <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="18" y1="6" x2="6" y2="18"/>
                                 <line x1="6" y1="6" x2="18" y2="18"/>
@@ -936,7 +936,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                       }
 
                       @if (profileTags().length === 0) {
-                        <p class="text-xs text-slate-400 italic py-1">
+                        <p class="text-xs text-[#86DEB7]/80 italic py-1">
                           No tienes etiquetas registradas. Añade una arriba para mostrarla en tu presentación.
                         </p>
                       }
@@ -946,7 +946,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                   <!-- Social Handles -->
                   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7] mb-1">
                         Instagram
                       </label>
                       <input
@@ -954,11 +954,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                         [(ngModel)]="profileInstagram"
                         name="profileInstagram"
                         placeholder="@julietamph_"
-                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white focus:outline-none focus:border-fuchsia-400"/>
+                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] focus:outline-none focus:border-[#86DEB7] font-medium"/>
                     </div>
 
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7] mb-1">
                         WhatsApp
                       </label>
                       <input
@@ -966,11 +966,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                         [(ngModel)]="profileWhatsapp"
                         name="profileWhatsapp"
                         placeholder="2281311917"
-                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white focus:outline-none focus:border-fuchsia-400"/>
+                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] focus:outline-none focus:border-[#86DEB7] font-medium"/>
                     </div>
 
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-[#86DEB7] mb-1">
                         Correo Electrónico
                       </label>
                       <input
@@ -978,7 +978,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                         [(ngModel)]="profileEmail"
                         name="profileEmail"
                         placeholder="julietamarateo4@gmail.com"
-                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white focus:outline-none focus:border-fuchsia-400"/>
+                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#142417] border border-[#63B995] text-[#86DEB7] focus:outline-none focus:border-[#86DEB7] font-medium"/>
                     </div>
                   </div>
 
@@ -987,7 +987,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
                     <button
                       type="submit"
                       [disabled]="isSubmitting()"
-                      class="btn-fresh-gradient px-7 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 shadow-md shadow-violet-600/30 disabled:opacity-50">
+                      class="btn-editorial-mint px-7 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-md disabled:opacity-50">
                       @if (isSubmitting()) {
                         <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25"></circle>
@@ -1013,12 +1013,12 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData, AlbumFolder } from '../
           </div>
 
           <!-- Footer Bar -->
-          <div class="px-6 py-4 border-t border-violet-500/20 bg-[#180b36] flex items-center justify-between text-xs text-violet-300/80">
+          <div class="px-6 py-4 border-t border-[#63B995]/40 bg-[#142417] flex items-center justify-between text-xs text-[#86DEB7]/90 font-medium">
             <span>Los cambios se guardan localmente y se reflejan en tiempo real.</span>
             <button
               type="button"
               (click)="shop.closeAdminDashboard()"
-              class="px-4 py-2 rounded-xl bg-violet-900/60 hover:bg-violet-800 text-white font-semibold transition-colors border border-violet-500/30">
+              class="px-4 py-2 rounded-xl bg-[#63B995] hover:bg-[#86DEB7] text-[#142417] font-bold transition-colors border border-[#86DEB7]">
               Cerrar Panel
             </button>
           </div>

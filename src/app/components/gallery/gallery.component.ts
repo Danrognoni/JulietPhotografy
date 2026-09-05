@@ -13,7 +13,7 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
   imports: [CommonModule, FormsModule, ScrollRevealDirective],
   template: `
     <!-- SECTION 1: ÁLBUMES & COLECCIONES (MOSAICO EDITORIAL ASIMÉTRICO FULL-WIDTH) -->
-    <section id="albumes" class="py-16 md:py-24 w-full px-3 sm:px-4 md:px-6 relative">
+    <section id="albumes" class="py-16 md:py-24 w-full px-3 sm:px-4 md:px-6 relative bg-[#142417]">
       
       <!-- Section Header -->
       <div 
@@ -21,14 +21,14 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
         [revealDelay]="0"
         class="max-w-7xl mx-auto px-2 sm:px-4 flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
         <div>
-          <div class="inline-flex items-center gap-2 text-[#86DEB7] text-xs font-semibold uppercase tracking-[0.25em] mb-2.5">
-            <span class="w-6 h-[1px] bg-[#86DEB7]"></span>
+          <div class="inline-flex items-center gap-2 text-[#86DEB7] text-xs font-bold uppercase tracking-[0.25em] mb-2.5">
+            <span class="w-6 h-[1.5px] bg-[#86DEB7]"></span>
             <span>Series & Colecciones</span>
           </div>
-          <h2 class="font-editorial text-4xl sm:text-5xl lg:text-6xl text-white font-light tracking-tight">
+          <h2 class="font-editorial text-4xl sm:text-5xl lg:text-6xl text-[#86DEB7] font-bold tracking-tight">
             Álbumes Temáticos
           </h2>
-          <p class="text-slate-300/90 text-sm sm:text-base mt-2.5 max-w-xl font-sans font-light leading-relaxed">
+          <p class="text-[#86DEB7]/90 text-sm sm:text-base mt-2.5 max-w-xl font-sans font-medium leading-relaxed">
             Explora los diferentes cuerpos de trabajo en una composición editorial continua. Haz clic en cualquier serie para explorar sus obras.
           </p>
         </div>
@@ -38,9 +38,9 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
           <button
             type="button"
             (click)="selectAlbum('Todos')"
-            class="px-4 py-2 rounded-full bg-[#50723C]/40 border border-[#86DEB7]/40 text-[#86DEB7] text-xs font-medium hover:bg-[#63B995]/60 hover:text-white transition-all flex items-center gap-2 self-start md:self-auto backdrop-blur-md">
+            class="px-4 py-2 rounded-full bg-[#142417] border border-[#86DEB7] text-[#86DEB7] text-xs font-bold hover:bg-[#63B995] hover:text-[#142417] transition-all flex items-center gap-2 self-start md:self-auto shadow-md">
             <span>Ver Todas las Carpetas</span>
-            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <line x1="18" y1="6" x2="6" y2="18"/>
               <line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
@@ -55,10 +55,10 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
             appScrollReveal
             [revealDelay]="(idx % 5) * 80"
             (click)="selectAlbum(folder.category)"
-            class="relative w-full h-full overflow-hidden rounded-2xl bg-[#0f0920] group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500 border border-white/5"
+            class="relative w-full h-full overflow-hidden rounded-2xl bg-[#63B995] group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500 border border-[#86DEB7]/40"
             [ngClass]="[
               getAlbumSpanClass(idx),
-              shop.selectedCategory() === folder.category ? 'ring-2 ring-[#86DEB7] ring-offset-2 ring-offset-[#0c0817]' : ''
+              shop.selectedCategory() === folder.category ? 'ring-2 ring-[#86DEB7] ring-offset-2 ring-offset-[#142417]' : ''
             ]">
             
             @if (folder.count > 0 && folder.coverImage) {
@@ -71,50 +71,50 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
                 class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"/>
             } @else {
               <!-- Elegant Sober Empty State -->
-              <div class="w-full h-full bg-gradient-to-br from-[#120826] via-[#100720] to-[#0c051a] flex flex-col items-center justify-center p-6 text-center">
-                <div class="w-12 h-12 rounded-xl border border-[#86DEB7]/20 bg-[#190e32]/60 flex items-center justify-center text-[#86DEB7]/60 mb-2">
-                  <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <div class="w-full h-full bg-[#142417] flex flex-col items-center justify-center p-6 text-center border border-[#63B995]">
+                <div class="w-12 h-12 rounded-xl border border-[#86DEB7] bg-[#63B995] flex items-center justify-center text-[#142417] mb-2">
+                  <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
                     <circle cx="9" cy="9" r="2"/>
                     <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
                   </svg>
                 </div>
-                <span class="text-[10px] font-mono tracking-widest text-slate-400 uppercase">Serie en Preparación</span>
+                <span class="text-[10px] font-mono tracking-widest text-[#86DEB7] uppercase font-bold">Serie en Preparación</span>
               </div>
             }
 
             <!-- Static Bottom Caption (Always visible gently before hover) -->
-            <div class="absolute inset-0 bg-gradient-to-t from-[#090514]/90 via-[#090514]/25 to-transparent pointer-events-none transition-opacity duration-300 group-hover:opacity-0"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#142417]/95 via-[#142417]/35 to-transparent pointer-events-none transition-opacity duration-300 group-hover:opacity-0"></div>
             <div class="absolute bottom-4 left-4 right-4 z-10 text-left transition-opacity duration-300 group-hover:opacity-0">
-              <span class="text-[9px] font-mono tracking-[0.2em] uppercase text-[#86DEB7] block mb-0.5">
+              <span class="text-[9px] font-mono tracking-[0.2em] uppercase text-[#86DEB7] block mb-0.5 font-bold">
                 Colección
               </span>
-              <h3 class="font-editorial text-xl sm:text-2xl font-light text-white leading-tight">
+              <h3 class="font-editorial text-xl sm:text-2xl font-bold text-[#86DEB7] leading-tight drop-shadow-sm">
                 {{ folder.name }}
               </h3>
-              <span class="text-[11px] font-mono text-slate-300/80">
+              <span class="text-[11px] font-mono text-[#86DEB7]/90 font-semibold">
                 {{ folder.count }} {{ folder.count === 1 ? 'fotografía' : 'fotografías' }}
               </span>
             </div>
 
-            <!-- Hover Overlay with #50723C and Subtle Central (+) Icon -->
-            <div class="absolute inset-0 bg-[#50723C]/35 backdrop-blur-[3px] opacity-0 group-hover:opacity-100 transition-all duration-400 flex flex-col items-center justify-center p-6 text-center z-20">
-              <div class="w-12 h-12 rounded-full border border-[#86DEB7] bg-[#0c0817]/70 text-[#86DEB7] flex items-center justify-center shadow-xl transform scale-90 group-hover:scale-100 transition-transform duration-300 mb-2.5">
-                <svg class="w-6 h-6 stroke-[1.75]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <!-- Hover Overlay with #142417 and Subtle Central (+) Icon -->
+            <div class="absolute inset-0 bg-[#142417]/35 backdrop-blur-[3px] opacity-0 group-hover:opacity-100 transition-all duration-400 flex flex-col items-center justify-center p-6 text-center z-20">
+              <div class="w-12 h-12 rounded-full border border-[#86DEB7] bg-[#142417] text-[#86DEB7] flex items-center justify-center shadow-xl transform scale-90 group-hover:scale-100 transition-transform duration-300 mb-2.5">
+                <svg class="w-6 h-6 stroke-[2]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <line x1="12" y1="5" x2="12" y2="19"/>
                   <line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
               </div>
-              <h3 class="font-editorial text-2xl sm:text-3xl font-light text-white drop-shadow-md">
+              <h3 class="font-editorial text-2xl sm:text-3xl font-bold text-[#86DEB7] drop-shadow-md">
                 {{ folder.name }}
               </h3>
-              <span class="text-xs font-mono text-[#86DEB7] tracking-widest uppercase my-1 font-semibold">
+              <span class="text-xs font-mono text-[#86DEB7] tracking-widest uppercase my-1 font-bold">
                 {{ folder.count }} {{ folder.count === 1 ? 'fotografía' : 'fotografías' }}
               </span>
-              <p class="text-xs text-slate-200 font-sans font-light line-clamp-2 max-w-xs mt-1">
+              <p class="text-xs text-[#86DEB7]/95 font-sans font-medium line-clamp-2 max-w-xs mt-1">
                 {{ folder.description }}
               </p>
-              <span class="mt-2.5 inline-flex items-center gap-1.5 text-[11px] font-medium text-white/90 bg-[#0c0817]/60 px-3 py-1 rounded-full border border-[#86DEB7]/30">
+              <span class="mt-2.5 inline-flex items-center gap-1.5 text-[11px] font-bold text-[#142417] bg-[#86DEB7] px-3 py-1 rounded-full border border-[#142417]">
                 <span>Explorar serie</span>
                 <span>→</span>
               </span>
@@ -123,7 +123,7 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
             <!-- Top Indicator Pill if Active -->
             @if (shop.selectedCategory() === folder.category) {
               <div class="absolute top-3 left-3 z-30">
-                <span class="px-2.5 py-0.5 rounded-full bg-[#86DEB7] text-[#0c0817] text-[10px] font-bold uppercase tracking-widest shadow-md">
+                <span class="px-2.5 py-0.5 rounded-full bg-[#86DEB7] text-[#142417] text-[10px] font-extrabold uppercase tracking-widest shadow-md border border-[#142417]">
                   Activo
                 </span>
               </div>
@@ -137,24 +137,24 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
 
     <!-- Seamless Subtle Divider -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="h-[1px] bg-gradient-to-r from-transparent via-[#86DEB7]/20 to-transparent"></div>
+      <div class="h-[1.5px] bg-gradient-to-r from-transparent via-[#86DEB7]/40 to-transparent"></div>
     </div>
 
     <!-- SECTION 2: PORTAFOLIO DETALLADO (FILTROS MINIMALISTAS & OBRAS) -->
-    <section id="galeria" class="py-20 md:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+    <section id="galeria" class="py-20 md:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative bg-[#142417]">
       
       <!-- Filter Bar & Search Header -->
       <div 
         appScrollReveal
         [revealDelay]="50"
-        class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-14 pb-6 border-b border-violet-500/15">
+        class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-14 pb-6 border-b border-[#63B995]/30">
         <div>
-          <span class="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#86DEB7] block mb-2">
+          <span class="text-[11px] font-bold uppercase tracking-[0.25em] text-[#86DEB7] block mb-2">
             Catálogo de Fotografías
           </span>
-          <h3 class="font-editorial text-3xl sm:text-4xl lg:text-5xl text-white font-light">
-            {{ shop.selectedCategory() === 'Todos' ? 'Todas las Fotografías' : 'Colección: ' + shop.selectedCategory() }}
-            <span class="text-xs sm:text-sm font-sans text-violet-300/70 ml-2 font-normal">
+          <h3 class="font-editorial text-3xl sm:text-4xl lg:text-5xl text-[#86DEB7] font-bold">
+            {{ shop.selectedCategory() === 'Todos' ? 'Venta De Fotografías' : 'Colección: ' + shop.selectedCategory() }}
+            <span class="text-xs sm:text-sm font-sans text-[#63B995] ml-2 font-bold">
               ({{ shop.filteredPhotos().length }} obras)
             </span>
           </h3>
@@ -163,15 +163,15 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           
           <!-- Category Filter Tabs (Minimalist Pixpa Text Tabs with Active Underline #86DEB7) -->
-          <nav aria-label="Filtro de categorías" class="flex flex-wrap items-center gap-4 sm:gap-6 border-b border-white/5 pb-2 sm:pb-0 sm:border-b-0">
+          <nav aria-label="Filtro de categorías" class="flex flex-wrap items-center gap-4 sm:gap-6 border-b border-[#63B995]/20 pb-2 sm:pb-0 sm:border-b-0">
             @for (cat of categories(); track cat) {
               <button
                 type="button"
                 (click)="setFilter(cat)"
-                class="text-xs tracking-[0.2em] uppercase font-medium py-1.5 relative transition-colors"
+                class="text-xs tracking-[0.2em] uppercase font-bold py-1.5 relative transition-colors"
                 [ngClass]="shop.selectedCategory() === cat 
-                  ? 'text-[#86DEB7] font-semibold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-[#86DEB7]' 
-                  : 'text-slate-400 hover:text-white'">
+                  ? 'text-[#86DEB7] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-[#86DEB7]' 
+                  : 'text-[#63B995] hover:text-[#86DEB7]'">
                 {{ cat }}
               </button>
             }
@@ -179,7 +179,7 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
 
           <!-- Search Input -->
           <div class="relative min-w-[200px] w-full sm:w-auto">
-            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#86DEB7]/70">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#86DEB7]">
               <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="8"/>
                 <path d="m21 21-4.3-4.3"/>
@@ -190,7 +190,7 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
               placeholder="Buscar obra, cámara..."
               [ngModel]="shop.searchQuery()"
               (ngModelChange)="onSearchChange($event)"
-              class="w-full pl-8 pr-3 py-1.5 text-xs rounded-full bg-[#120826]/80 border border-violet-500/25 text-white placeholder-slate-400/50 focus:outline-none focus:border-[#86DEB7] focus:ring-1 focus:ring-[#86DEB7]/30 transition-all"/>
+              class="w-full pl-8 pr-3 py-1.5 text-xs rounded-full bg-[#142417] border border-[#63B995] text-[#86DEB7] placeholder-[#86DEB7]/60 focus:outline-none focus:border-[#86DEB7] focus:ring-1 focus:ring-[#86DEB7] transition-all font-medium"/>
           </div>
 
         </div>
@@ -207,12 +207,12 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
               
               <!-- ADMIN ON-CARD ACTION BADGES (RENDERED ONLY IF LOGGED IN) -->
               @if (auth.isAdmin()) {
-                <div class="absolute top-3 right-3 z-30 flex items-center gap-1.5 bg-[#0c0817]/90 backdrop-blur-md p-1 rounded-xl shadow-lg border border-[#86DEB7]/40">
+                <div class="absolute top-3 right-3 z-30 flex items-center gap-1.5 bg-[#142417] p-1 rounded-xl shadow-lg border border-[#86DEB7]">
                   <button
                     type="button"
                     (click)="editPhotoAdmin(photo)"
                     title="Editar fotografía"
-                    class="p-1.5 rounded-lg text-[#86DEB7] hover:bg-[#50723C]/60 hover:text-white transition-colors">
+                    class="p-1.5 rounded-lg text-[#86DEB7] hover:bg-[#63B995] hover:text-[#142417] transition-colors">
                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                       <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -223,7 +223,7 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
                     type="button"
                     (click)="deletePhotoAdmin(photo.id)"
                     title="Eliminar fotografía"
-                    class="p-1.5 rounded-lg text-rose-400 hover:bg-rose-950/60 transition-colors">
+                    class="p-1.5 rounded-lg text-[#86DEB7] hover:bg-[#63B995] hover:text-[#142417] transition-colors">
                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <polyline points="3 6 5 6 21 6"/>
                       <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -235,7 +235,7 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
               <!-- Image Frame with Lightbox Click -->
               <div 
                 (click)="shop.openPreview(photo)"
-                class="relative aspect-[3/4] sm:aspect-[4/5] overflow-hidden rounded-2xl bg-[#0f0920] cursor-pointer shadow-xl group-hover:shadow-2xl transition-all duration-500">
+                class="relative aspect-[3/4] sm:aspect-[4/5] overflow-hidden rounded-2xl bg-[#63B995] cursor-pointer shadow-xl group-hover:shadow-2xl transition-all duration-500 border border-[#86DEB7]/40">
                 
                 <img
                   [src]="photo.imageUrl"
@@ -245,19 +245,19 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
                   class="w-full h-full object-cover object-center transform transition-transform duration-700 ease-out group-hover:scale-105"/>
                 
                 <!-- Category Badge -->
-                <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-mono tracking-widest uppercase border shadow-md backdrop-blur-md bg-[#0c0817]/75 border-white/10 text-[#86DEB7]">
+                <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-mono tracking-widest uppercase border shadow-md backdrop-blur-md bg-[#142417] border-[#86DEB7] text-[#86DEB7] font-bold">
                   {{ photo.category }}
                 </span>
 
                 @if (photo.badge) {
-                  <span class="absolute bottom-3 left-3 px-2.5 py-0.5 rounded-md text-[10px] font-mono uppercase tracking-wider bg-[#0c0817]/85 border border-violet-500/30 text-violet-200">
+                  <span class="absolute bottom-3 left-3 px-2.5 py-0.5 rounded-md text-[10px] font-mono uppercase tracking-wider bg-[#63B995] border border-[#86DEB7] text-[#142417] font-extrabold">
                     {{ photo.badge }}
                   </span>
                 }
 
                 <!-- Hover Overlay with Lens Icon -->
-                <div class="absolute inset-0 bg-[#090514]/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <span class="px-4 py-2 rounded-full bg-[#0c0817]/90 text-white text-xs font-medium flex items-center gap-2 border border-[#86DEB7]/40 shadow-xl">
+                <div class="absolute inset-0 bg-[#142417]/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <span class="px-4 py-2 rounded-full bg-[#142417] text-[#86DEB7] text-xs font-bold flex items-center gap-2 border border-[#86DEB7] shadow-xl">
                     <svg class="w-4 h-4 text-[#86DEB7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <circle cx="11" cy="11" r="8"/>
                       <line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -270,20 +270,20 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
               <!-- Information Beneath Image -->
               <div class="pt-4 space-y-2">
                 <div class="flex items-baseline justify-between gap-2">
-                  <h4 class="font-editorial text-2xl font-light text-white group-hover:text-[#86DEB7] transition-colors leading-snug">
+                  <h4 class="font-editorial text-2xl font-bold text-[#86DEB7] transition-colors leading-snug">
                     {{ photo.title }}
                   </h4>
-                  <span class="font-mono text-base font-medium text-[#86DEB7] flex-shrink-0">
+                  <span class="font-mono text-base font-bold text-[#86DEB7] flex-shrink-0">
                     \${{ photo.price }}
                   </span>
                 </div>
 
-                <p class="text-xs text-slate-300/80 line-clamp-2 leading-relaxed font-sans font-light">
+                <p class="text-xs text-[#86DEB7]/90 line-clamp-2 leading-relaxed font-sans font-medium">
                   {{ photo.description }}
                 </p>
 
                 <!-- Technical Camera Sheet Badge -->
-                <div class="pt-1 flex items-center gap-2 text-[11px] font-mono text-slate-400 truncate">
+                <div class="pt-1 flex items-center gap-2 text-[11px] font-mono text-[#63B995] truncate font-semibold">
                   <svg class="w-3.5 h-3.5 text-[#86DEB7] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"/>
                     <circle cx="12" cy="12" r="3"/>
@@ -292,17 +292,17 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
                 </div>
 
                 <!-- Footer: Dimensions & Cart CTA -->
-                <div class="pt-3 border-t border-violet-500/15 flex items-center justify-between gap-3">
-                  <span class="text-[11px] font-mono text-slate-400/80 truncate">
+                <div class="pt-3 border-t border-[#63B995]/30 flex items-center justify-between gap-3">
+                  <span class="text-[11px] font-mono text-[#63B995] truncate font-semibold">
                     {{ photo.dimensions }}
                   </span>
 
                   <button
                     type="button"
                     (click)="handleAddToCart(photo)"
-                    class="px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md"
+                    class="px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-md"
                     [ngClass]="addedPhotoId() === photo.id 
-                      ? 'bg-[#86DEB7] text-[#0c0817] font-bold' 
+                      ? 'bg-[#86DEB7] text-[#142417]' 
                       : 'btn-editorial-mint'">
                     @if (addedPhotoId() === photo.id) {
                       <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
@@ -330,20 +330,20 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal.directive'
         <div 
           appScrollReveal
           class="py-16 text-center max-w-lg mx-auto space-y-4">
-          <div class="w-12 h-12 rounded-full bg-violet-950/60 text-violet-400 flex items-center justify-center mx-auto border border-violet-500/30">
+          <div class="w-12 h-12 rounded-full bg-[#63B995] text-[#142417] flex items-center justify-center mx-auto border border-[#86DEB7]">
             <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="11" cy="11" r="8"/>
               <line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
           </div>
-          <h4 class="font-editorial text-2xl text-white font-normal">No se encontraron fotografías</h4>
-          <p class="text-slate-300 text-sm max-w-md mx-auto font-light">
+          <h4 class="font-editorial text-2xl text-[#86DEB7] font-bold">No se encontraron fotografías</h4>
+          <p class="text-[#86DEB7]/90 text-sm max-w-md mx-auto font-medium">
             No hay obras que coincidan con "{{ shop.searchQuery() }}" en la serie seleccionada.
           </p>
           <button
             type="button"
             (click)="shop.setCategory('Todos'); shop.setSearchQuery('')"
-            class="px-5 py-2.5 rounded-full bg-[#50723C]/80 border border-[#86DEB7]/40 text-[#86DEB7] text-xs font-semibold hover:bg-[#63B995] hover:text-white transition-colors">
+            class="px-5 py-2.5 rounded-full bg-[#142417] border border-[#86DEB7] text-[#86DEB7] text-xs font-bold hover:bg-[#63B995] hover:text-[#142417] transition-colors">
             Restablecer Filtros
           </button>
         </div>
