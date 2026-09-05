@@ -1,8 +1,10 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
-import { Photo, PhotoCategory, ServiceItem, ProfileData, CartItem } from '../models/photo.model';
+import { Photo, PhotoCategory, ServiceItem, ProfileData, CartItem, AlbumFolder } from '../models/photo.model';
 import { AuthService } from './auth.service';
+import { ViewportScrollService } from './viewport-scroll.service';
 import { environment } from '../../environments/environment';
 
 export interface AppAlert {
@@ -15,7 +17,9 @@ export interface AppAlert {
 })
 export class ShopService {
   private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
   readonly auth = inject(AuthService);
+  readonly viewportScroll = inject(ViewportScrollService);
 
   readonly defaultWhatsAppUrl = 'https://wa.me/5492281311917?text=Hola%20Julieta,%20vengo%20de%20tu%20sitio%20web%20y%20me%20gustar%C3%ADa%20agendar%20una%20cita.';
   readonly defaultInstagramUrl = 'https://www.instagram.com/julietamph_/';
@@ -244,7 +248,8 @@ export class ShopService {
     bio: 'Hola, mi nombre es Julieta Marateo. Soy Técnica en Fotografía radicada en Mar del Plata. Me apasiona capturar momentos únicos, encargándome con máxima dedicación tanto de la toma fotográfica como de la postproducción y edición profesional. Ofrezco coberturas para casamientos, cumpleaños de XV y eventos en general, garantizando un recuerdo imborrable con la mejor calidad visual.',
     whatsapp: '2281311917',
     email: 'julietamarateo4@gmail.com',
-    instagram: '@julietamph_'
+    instagram: '@julietamph_',
+    tags: ['Casamientos', 'Cumpleaños de XV', 'Eventos Sociales & Corporativos', 'Retoque & Postproducción']
   };
 
   // State Signals
@@ -332,18 +337,69 @@ export class ShopService {
   }
 
   // Computed state
+  // Computed Albums / Folders based on photos
+  readonly albumFolders = computed<AlbumFolder[]>(() => {
+    const all = this.photos();
+    const standardFolders = [
+      { name: 'Casamientos', desc: 'Historias de amor, ceremonias íntimas y momentos espontáneos de bodas.' },
+      { name: 'Cumpleaños XV', desc: 'Sesiones previas llenas de estilo, fiesta y vals de 15 años.' },
+      { name: 'Eventos', desc: 'Celebraciones sociales, aniversarios y registros culturales.' },
+      { name: 'Paisajismo', desc: 'Horizontes, dunas y la inmensidad del océano en Mar del Plata.' },
+      { name: 'Foto Producto', desc: 'Composiciones gastronómicas y comerciales con iluminación de estudio.' }
+    ];
+
+    // Add any unique custom categories uploaded by the user
+    const existingNames = standardFolders.map(f => f.name.toLowerCase());
+    all.forEach(p => {
+      if (p.category && !existingNames.includes(p.category.toLowerCase()) && p.category !== 'Todos') {
+        standardFolders.push({
+          name: p.category,
+          desc: 'Colección fotográfica de autor y galería temática.'
+        });
+        existingNames.push(p.category.toLowerCase());
+      }
+    });
+
+    return standardFolders.map(folder => {
+      const matching = all.filter(p => {
+        const catMatch = p.category?.toLowerCase() === folder.name.toLowerCase();
+        const badgeMatch = (folder.name === 'Casamientos' && p.badge?.toLowerCase().includes('casamiento')) ||
+                           (folder.name === 'Cumpleaños XV' && p.badge?.toLowerCase().includes('quince'));
+        return catMatch || badgeMatch;
+      });
+
+      const cover = matching.length > 0 ? matching[0].imageUrl : (all[0]?.imageUrl || 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80');
+
+      return {
+        id: folder.name.toLowerCase().replace(/\s+/g, '-'),
+        name: folder.name,
+        category: folder.name,
+        coverImage: cover,
+        count: matching.length,
+        description: folder.desc
+      };
+    });
+  });
+
+  // Computed state
   readonly filteredPhotos = computed(() => {
     const category = this.selectedCategory();
     const query = this.searchQuery().toLowerCase().trim();
     const all = this.photos();
 
     return all.filter(photo => {
-      const matchesCategory = category === 'Todos' || photo.category === category;
+      let matchesCategory = category === 'Todos' || photo.category === category;
+      if (!matchesCategory) {
+        if (category === 'Casamientos' && photo.badge?.toLowerCase().includes('casamiento')) matchesCategory = true;
+        if (category === 'Cumpleaños XV' && photo.badge?.toLowerCase().includes('quince')) matchesCategory = true;
+      }
+
       const matchesSearch = query === '' ||
         photo.title.toLowerCase().includes(query) ||
         photo.description.toLowerCase().includes(query) ||
         photo.technicalSheet.toLowerCase().includes(query) ||
-        photo.category.toLowerCase().includes(query);
+        photo.category.toLowerCase().includes(query) ||
+        (photo.badge && photo.badge.toLowerCase().includes(query));
       return matchesCategory && matchesSearch;
     });
   });
@@ -360,7 +416,12 @@ export class ShopService {
     if (typeof window === 'undefined') return fallback;
     try {
       const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : fallback;
+      if (!item) return fallback;
+      const parsed = JSON.parse(item);
+      if (key === 'jm_profile' && parsed && (!parsed.tags || parsed.tags.length === 0)) {
+        parsed.tags = (fallback as any).tags || ['Casamientos', 'Cumpleaños de XV', 'Eventos Sociales & Corporativos', 'Retoque & Postproducción'];
+      }
+      return parsed;
     } catch {
       return fallback;
     }
@@ -403,11 +464,13 @@ export class ShopService {
   startEditingPhoto(photo: Photo): void {
     this.editingPhoto.set(photo);
     this.openAdminDashboard('photos');
+    this.scrollToTop(true);
   }
 
   startEditingService(service: ServiceItem): void {
     this.editingService.set(service);
     this.openAdminDashboard('services');
+    this.scrollToTop(true);
   }
 
   /**
@@ -624,6 +687,16 @@ export class ShopService {
   // --- EDITAR PERFIL (CON PERSISTENCIA BACKEND Y MULTIPART) ---
   updateProfile(changes: Partial<ProfileData>, file?: File): Observable<ProfileData> {
     const headers = this.getAuthHeaders();
+
+    // Actualización local inmediata para respuesta instantánea en UI
+    const updatedLocal: ProfileData = {
+      ...this.profile(),
+      ...changes,
+      tags: changes.tags || this.profile().tags || []
+    };
+    this.profile.set(updatedLocal);
+    this.saveStorage('jm_profile', updatedLocal);
+
     if (file) {
       const formData = new FormData();
       formData.append('file', file);
@@ -635,11 +708,14 @@ export class ShopService {
       if (changes.whatsapp) formData.append('whatsapp', changes.whatsapp.trim());
       if (changes.email) formData.append('email', changes.email.trim());
       if (changes.imageUrl) formData.append('imageUrl', changes.imageUrl.trim());
+      if (changes.tags) formData.append('tags', JSON.stringify(changes.tags));
 
       return this.http.put<ProfileData>(`${environment.apiUrl}/profile`, formData, { headers }).pipe(
         tap((saved) => {
           const updated: ProfileData = {
+            ...updatedLocal,
             ...saved,
+            tags: changes.tags || saved.tags || updatedLocal.tags,
             imageUrl: this.normalizeImageUrl(saved.imageUrl)
           };
           this.profile.set(updated);
@@ -647,11 +723,13 @@ export class ShopService {
         })
       );
     } else {
-      const payload = { ...this.profile(), ...changes };
+      const payload = { ...updatedLocal };
       return this.http.put<ProfileData>(`${environment.apiUrl}/profile`, payload, { headers }).pipe(
         tap((saved) => {
           const updated: ProfileData = {
+            ...updatedLocal,
             ...saved,
+            tags: changes.tags || saved.tags || updatedLocal.tags,
             imageUrl: this.normalizeImageUrl(saved.imageUrl)
           };
           this.profile.set(updated);
@@ -705,40 +783,78 @@ export class ShopService {
     this.cart.set([]);
   }
 
+  scrollToTop(smooth: boolean = true): void {
+    this.viewportScroll.scrollToTop(smooth);
+  }
+
+  updateBodyScrollLock(): void {
+    const isAnyOpen = this.isAdminDashboardOpen() || this.isCartOpen() || !!this.selectedPhoto();
+    this.viewportScroll.setBodyScrollLocked(isAnyOpen);
+  }
+
   toggleCart(): void {
-    this.isCartOpen.update(v => !v);
+    const willOpen = !this.isCartOpen();
+    this.isCartOpen.set(willOpen);
+    if (willOpen) {
+      this.scrollToTop(true);
+    }
+    this.updateBodyScrollLock();
   }
 
   openCart(): void {
     this.isCartOpen.set(true);
+    this.scrollToTop(true);
+    this.updateBodyScrollLock();
   }
 
   closeCart(): void {
     this.isCartOpen.set(false);
+    this.updateBodyScrollLock();
   }
 
   openPreview(photo: Photo): void {
     this.selectedPhoto.set(photo);
+    this.scrollToTop(true);
+    this.updateBodyScrollLock();
   }
 
   closePreview(): void {
     this.selectedPhoto.set(null);
+    this.updateBodyScrollLock();
   }
 
   // --- ADMIN DASHBOARD ACTIONS ---
   toggleAdminDashboard(tab: 'photos' | 'services' | 'profile' = 'photos'): void {
-    this.adminInitialTab.set(tab);
-    this.isAdminDashboardOpen.update(v => !v);
+    if (!this.isAdminDashboardOpen()) {
+      this.openAdminDashboard(tab);
+      return;
+    }
+    // Si ya está abierto pero en OTRA pestaña (ej: estaba editando servicio y hace clic en Admin), cambia a la pestaña deseada sin cerrar
+    if (this.adminInitialTab() !== tab) {
+      this.openAdminDashboard(tab);
+      return;
+    }
+    this.closeAdminDashboard();
   }
 
   openAdminDashboard(tab: 'photos' | 'services' | 'profile' = 'photos'): void {
     this.adminInitialTab.set(tab);
     this.isAdminDashboardOpen.set(true);
+    this.scrollToTop(true);
+    this.updateBodyScrollLock();
+    const targetRoute = tab === 'photos' ? 'crud' : tab;
+    if (typeof window !== 'undefined' && this.router.url !== `/admin/${targetRoute}`) {
+      this.router.navigate(['/admin', targetRoute]);
+    }
   }
 
   closeAdminDashboard(): void {
     this.isAdminDashboardOpen.set(false);
     this.editingPhoto.set(null);
     this.editingService.set(null);
+    this.updateBodyScrollLock();
+    if (typeof window !== 'undefined' && this.router.url.startsWith('/admin')) {
+      this.router.navigate(['/']);
+    }
   }
 }

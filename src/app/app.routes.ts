@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -10,6 +11,35 @@ export const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent
+  },
+  {
+    path: 'admin',
+    redirectTo: 'admin/crud',
+    pathMatch: 'full'
+  },
+  {
+    path: 'admin/crud',
+    component: HomeComponent,
+    canActivate: [authGuard],
+    data: { tab: 'photos' }
+  },
+  {
+    path: 'admin/photos',
+    component: HomeComponent,
+    canActivate: [authGuard],
+    data: { tab: 'photos' }
+  },
+  {
+    path: 'admin/services',
+    component: HomeComponent,
+    canActivate: [authGuard],
+    data: { tab: 'services' }
+  },
+  {
+    path: 'admin/profile',
+    component: HomeComponent,
+    canActivate: [authGuard],
+    data: { tab: 'profile' }
   },
   {
     path: '**',

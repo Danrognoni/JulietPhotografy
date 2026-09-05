@@ -1,140 +1,175 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { ShopService } from '../../services/shop.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-hero',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   template: `
-    <section id="inicio" class="relative pt-32 pb-16 md:pt-40 md:pb-24 overflow-hidden">
+    <section id="inicio" class="relative pt-28 pb-16 md:pt-36 md:pb-24 overflow-hidden">
       
-      <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <!-- Main Presentation Container: Profile Photo + Bio Card -->
-        <div id="sobre-mi" class="card-fresh rounded-3xl p-6 sm:p-10 lg:p-12 border border-slate-200/90 flex flex-col lg:flex-row items-center gap-8 lg:gap-12 bg-white/90 backdrop-blur-md relative group">
-          
-          <!-- Admin Quick Edit Profile Badge (VISIBLE ONLY IF LOGGED IN) -->
-          @if (auth.isAdmin()) {
-            <button
-              (click)="shop.openAdminDashboard('profile')"
-              title="Editar foto y biografía de perfil"
-              class="absolute top-4 right-4 z-20 px-3 py-1.5 rounded-full bg-teal-50 border border-teal-300 text-teal-800 text-xs font-bold hover:bg-teal-100 flex items-center gap-1.5 shadow-xs transition-colors">
-              <svg class="w-3.5 h-3.5 text-teal-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-              </svg>
-              <span>Editar Perfil</span>
-            </button>
-          }
+      <!-- Subtle Ambient Soft Aura Glows -->
+      <div class="absolute top-20 left-10 w-96 h-96 rounded-full bg-emerald-500/10 blur-[120px] pointer-events-none"></div>
+      <div class="absolute top-40 right-10 w-[450px] h-[450px] rounded-full bg-sky-500/10 blur-[130px] pointer-events-none"></div>
+      <div class="absolute bottom-10 left-1/3 w-[500px] h-[500px] rounded-full bg-violet-600/15 blur-[140px] pointer-events-none"></div>
 
-          <!-- Profile Picture with persistent imageUrl from shop.profile() -->
-          <div class="relative flex-shrink-0 group/img">
-            <div class="w-56 h-56 sm:w-64 sm:h-64 rounded-3xl p-2 bg-gradient-to-tr from-teal-400 via-sky-300 to-yellow-200 shadow-md">
-              <div class="w-full h-full rounded-[20px] overflow-hidden bg-slate-100 relative">
-                <img
-                  [src]="shop.profile().imageUrl"
-                  [alt]="shop.profile().name + ' - ' + shop.profile().title"
-                  class="w-full h-full object-cover object-center group-hover/img:scale-105 transition-transform duration-500"/>
+      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Revel Editorial Masthead & Headline -->
+        <div class="text-center max-w-4xl mx-auto mb-12 lg:mb-16 space-y-4">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 text-xs font-semibold uppercase tracking-[0.25em]">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>Portafolio Editorial & Servicios de Autor</span>
+          </div>
+
+          <h1 class="font-editorial text-4xl sm:text-6xl lg:text-7xl font-light text-white leading-[1.08] tracking-tight">
+            Historias contadas a través de la <span class="italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-sky-200 to-violet-300">luz & la emoción</span>
+          </h1>
+
+          <p class="text-slate-300 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto font-sans font-normal leading-relaxed">
+            Fotografía sensible y postproducción profesional en Mar del Plata. Coberturas integrales para casamientos, cumpleaños de XV, paisajes y sesiones de autor.
+          </p>
+
+          <!-- Primary Actions -->
+          <div class="pt-3 flex flex-wrap items-center justify-center gap-3.5">
+            <a href="/#albumes"
+               class="btn-editorial-mint px-7 py-3 rounded-full text-xs sm:text-sm font-semibold tracking-wider uppercase flex items-center gap-2 shadow-lg">
+              <span>Explorar Álbumes</span>
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </a>
+
+            <a href="/#servicios"
+               class="btn-aura-outline px-6 py-3 rounded-full text-xs sm:text-sm font-semibold tracking-wider uppercase transition-all">
+              Ver Servicios
+            </a>
+
+            @if (auth.isAdmin()) {
+              <button
+                type="button"
+                (click)="shop.openAdminDashboard('photos')"
+                class="px-4 py-3 rounded-full bg-[#180a32]/80 border border-emerald-500/40 text-emerald-300 text-xs font-bold hover:bg-emerald-950/60 transition-colors flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                <span>Gestionar Fotos</span>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Revel Signature: Asymmetrical Editorial Photo Grid (Dynamic from catalog) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-5 sm:gap-6 items-center">
+          
+          <!-- Column 1: Vertical Masterpiece (Featured Casamiento / Retrato) -->
+          <div class="lg:col-span-4 relative group">
+            <div class="album-card-editorial overflow-hidden shadow-2xl h-[420px] sm:h-[480px]">
+              <img
+                [src]="featuredPhoto1()?.imageUrl || defaultCover1"
+                [alt]="featuredPhoto1()?.title || 'Fotografía de Autor'"
+                class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"/>
+              <div class="absolute inset-0 bg-gradient-to-t from-[#090514]/90 via-[#090514]/20 to-transparent"></div>
+              
+              <div class="absolute bottom-5 left-5 right-5 space-y-1 text-left">
+                <span class="inline-block px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-400/40 text-emerald-300 text-[10px] font-bold uppercase tracking-widest">
+                  {{ featuredPhoto1()?.category || 'Casamientos' }}
+                </span>
+                <h3 class="font-editorial text-2xl text-white font-normal leading-snug drop-shadow-md">
+                  {{ featuredPhoto1()?.title || 'Promesa al Atardecer' }}
+                </h3>
+                <p class="text-xs text-slate-300/80 line-clamp-1 font-sans">
+                  {{ featuredPhoto1()?.dimensions || 'Fine Art 310g' }}
+                </p>
               </div>
-            </div>
-            
-            <!-- Location Badge -->
-            <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-4 py-1.5 rounded-full bg-white text-teal-800 border border-teal-200 text-xs font-semibold shadow-xs flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
-              <span>{{ shop.profile().location }}</span>
             </div>
           </div>
 
-          <!-- Bio & Introduction Text from persistent shop.profile() -->
-          <div class="flex-grow text-center lg:text-left space-y-5">
-            
-            <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2">
-              <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-700 text-xs font-bold uppercase tracking-wider">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <circle cx="12" cy="12" r="3"/>
-                </svg>
-                <span>{{ shop.profile().title }}</span>
-              </span>
-
-              <!-- Instagram Badge -->
-              <a
-                [href]="shop.defaultInstagramUrl"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-50 border border-pink-200 text-pink-700 text-xs font-semibold hover:bg-pink-100 transition-colors">
-                <svg class="w-3.5 h-3.5 text-pink-600 fill-current" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                </svg>
-                <span>{{ shop.profile().instagram }}</span>
-              </a>
+          <!-- Column 2: Centerpiece Landscape + Floating Editorial Quote Card -->
+          <div class="lg:col-span-5 space-y-5">
+            <!-- Centerpiece Landscape -->
+            <div class="album-card-editorial overflow-hidden shadow-2xl h-[280px] sm:h-[300px] relative group">
+              <img
+                [src]="featuredPhoto2()?.imageUrl || defaultCover2"
+                [alt]="featuredPhoto2()?.title || 'Paisajes de Mar del Plata'"
+                class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"/>
+              <div class="absolute inset-0 bg-gradient-to-t from-[#090514]/90 via-[#090514]/15 to-transparent"></div>
+              
+              <div class="absolute bottom-5 left-5 right-5 space-y-1 text-left">
+                <span class="inline-block px-2.5 py-0.5 rounded-full bg-sky-950/80 border border-sky-400/40 text-sky-300 text-[10px] font-bold uppercase tracking-widest">
+                  {{ featuredPhoto2()?.category || 'Paisajismo' }}
+                </span>
+                <h3 class="font-editorial text-2xl text-white font-normal leading-snug drop-shadow-md">
+                  {{ featuredPhoto2()?.title || 'Amanecer en los Acantilados' }}
+                </h3>
+              </div>
             </div>
 
-            <!-- Introductory Presentation text -->
-            <p class="text-base sm:text-lg lg:text-xl text-slate-700 font-normal leading-relaxed">
-              {{ shop.profile().bio }}
-            </p>
-
-            <!-- Key Specialties Pills -->
-            <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2 pt-1">
-              <span class="px-3 py-1 rounded-lg bg-sky-50 text-sky-800 border border-sky-100 text-xs font-medium">
-                💍 Casamientos
-              </span>
-              <span class="px-3 py-1 rounded-lg bg-teal-50 text-teal-800 border border-teal-100 text-xs font-medium">
-                👑 Cumpleaños de XV
-              </span>
-              <span class="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 text-xs font-medium">
-                🎉 Eventos Sociales & Corporativos
-              </span>
-              <span class="px-3 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-100 text-xs font-medium">
-                ✨ Retoque & Postproducción
-              </span>
+            <!-- Floating Editorial Inspiration Pill / Quote -->
+            <div class="card-editorial rounded-2xl p-5 border border-violet-500/20 bg-[#140b2e]/70 backdrop-blur-xl flex items-center justify-between gap-4">
+              <div class="space-y-1">
+                <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">Filosofía de Trabajo</span>
+                <p class="font-editorial text-lg italic text-slate-100">
+                  "Capturar la autenticidad sin poses forzadas, con el respeto que merece cada historia."
+                </p>
+              </div>
+              <div class="w-10 h-10 rounded-full bg-violet-950/70 border border-violet-500/30 flex items-center justify-center flex-shrink-0 text-violet-300 font-editorial text-xl italic">
+                ✦
+              </div>
             </div>
+          </div>
 
-            <!-- Quick Action Buttons -->
-            <div class="pt-3 flex flex-wrap items-center justify-center lg:justify-start gap-3.5">
-              <a href="#servicios"
-                 class="btn-fresh-gradient px-6 py-3 rounded-xl text-sm font-semibold flex items-center gap-2">
-                <span>Ver Servicios</span>
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </a>
-
-              <a [href]="shop.defaultWhatsAppUrl"
-                 target="_blank"
-                 rel="noopener noreferrer"
-                 class="btn-whatsapp px-6 py-3 rounded-xl text-sm font-semibold flex items-center gap-2">
-                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86.174.086.275.072.376-.044.101-.116.433-.506.549-.68.116-.173.231-.145.39-.086s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824z"/>
-                </svg>
-                <span>Agendar Cita</span>
-              </a>
-
-              <a [href]="shop.defaultInstagramUrl"
-                 target="_blank"
-                 rel="noopener noreferrer"
-                 class="btn-instagram px-5 py-3 rounded-xl text-sm font-semibold flex items-center gap-2">
-                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                </svg>
-                <span>Instagram</span>
-              </a>
+          <!-- Column 3: Offset Companion Image (XV / Foto Producto) -->
+          <div class="lg:col-span-3 space-y-5">
+            <div class="album-card-editorial overflow-hidden shadow-2xl h-[360px] sm:h-[420px] relative group">
+              <img
+                [src]="featuredPhoto3()?.imageUrl || defaultCover3"
+                [alt]="featuredPhoto3()?.title || 'Quinceañeras & Eventos'"
+                class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"/>
+              <div class="absolute inset-0 bg-gradient-to-t from-[#090514]/90 via-[#090514]/15 to-transparent"></div>
+              
+              <div class="absolute bottom-5 left-5 right-5 space-y-1 text-left">
+                <span class="inline-block px-2.5 py-0.5 rounded-full bg-fuchsia-950/80 border border-fuchsia-400/40 text-fuchsia-300 text-[10px] font-bold uppercase tracking-widest">
+                  {{ featuredPhoto3()?.category || 'Eventos' }}
+                </span>
+                <h3 class="font-editorial text-xl text-white font-normal leading-snug drop-shadow-md">
+                  {{ featuredPhoto3()?.title || 'Brillo de Quinceañera' }}
+                </h3>
+              </div>
             </div>
-
           </div>
 
         </div>
 
       </div>
-
     </section>
   `
 })
 export class HeroComponent {
   readonly shop = inject(ShopService);
   readonly auth = inject(AuthService);
+
+  readonly defaultCover1 = 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85';
+  readonly defaultCover2 = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=85';
+  readonly defaultCover3 = 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85';
+
+  readonly featuredPhoto1 = computed(() => {
+    const photos = this.shop.photos();
+    return photos.find(p => p.badge?.toLowerCase().includes('casamiento') || p.category === 'Eventos') || photos[2] || photos[0];
+  });
+
+  readonly featuredPhoto2 = computed(() => {
+    const photos = this.shop.photos();
+    return photos.find(p => p.category === 'Paisajismo') || photos[0];
+  });
+
+  readonly featuredPhoto3 = computed(() => {
+    const photos = this.shop.photos();
+    return photos.find(p => p.badge?.toLowerCase().includes('quince') || p.category === 'Foto Producto') || photos[4] || photos[1];
+  });
 }

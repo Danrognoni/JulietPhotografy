@@ -2,68 +2,83 @@
 
 @layer base {
   :root {
-    --bg-aura-base: #f2f9f5;
-    --color-teal-mint: #0d9488;
-    --color-sky-soft: #0284c7;
-    --color-warm-accent: #f59e0b;
-    --text-slate-main: #0f172a;
-    --text-slate-muted: #64748b;
+    --bg-aura-base: #0b0618;
+    --bg-aura-surface: #120926;
+    --bg-aura-card: rgba(22, 12, 42, 0.72);
+    --color-violet-primary: #8b5cf6;
+    --color-violet-vivid: #a855f7;
+    --color-lavender-glow: #e9d5ff;
+    --color-lilac-soft: #d8b4fe;
+    --color-mint-accent: #34d399;
+    --color-mint-soft: #a7f3d0;
+    --color-sky-accent: #38bdf8;
+    --color-sky-soft: #bae6fd;
+    --text-slate-light: #f8fafc;
+    --text-slate-muted: #94a3b8;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
   }
 
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    background-color: #f2f9f5;
-    color: #1e293b;
+    background-color: #0b0618;
+    color: #f1f5f9;
     overflow-x: hidden;
+    min-height: 100vh;
   }
 
-  h1, h2, h3, h4, .font-display {
+  h1, h2, h3, .font-editorial, .font-serif-editorial {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    letter-spacing: -0.01em;
+  }
+
+  h4, h5, .font-display {
     font-family: 'Syne', sans-serif;
   }
 }
 
-/* Aura Mesh Gradient Background with Slow Breathing Animation */
+/* Aura Mesh Gradient Background with Slow Mystical Breathing Animation */
 .bg-aura-mesh {
-  background-color: #f2f9f5;
+  background-color: #090514;
   background-image: 
-    radial-gradient(at 15% 15%, rgba(94, 234, 212, 0.38) 0px, transparent 55%),
-    radial-gradient(at 85% 18%, rgba(254, 240, 138, 0.32) 0px, transparent 48%),
-    radial-gradient(at 50% 50%, rgba(186, 230, 253, 0.35) 0px, transparent 55%),
-    radial-gradient(at 82% 82%, rgba(45, 212, 191, 0.35) 0px, transparent 52%),
-    radial-gradient(at 18% 85%, rgba(253, 224, 71, 0.25) 0px, transparent 48%);
-  background-size: 150% 150%;
-  animation: aura-breathe 18s ease-in-out infinite alternate;
+    radial-gradient(at 15% 15%, rgba(139, 92, 246, 0.22) 0px, transparent 55%),
+    radial-gradient(at 85% 18%, rgba(217, 70, 239, 0.18) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(99, 102, 241, 0.16) 0px, transparent 55%),
+    radial-gradient(at 82% 82%, rgba(168, 85, 247, 0.2) 0px, transparent 52%),
+    radial-gradient(at 18% 85%, rgba(244, 114, 182, 0.14) 0px, transparent 48%);
+  background-size: 140% 140%;
+  animation: aura-breathe 20s ease-in-out infinite alternate;
 }
 
 @keyframes aura-breathe {
   0% {
     background-position: 0% 0%;
-    filter: saturate(100%) brightness(100%);
   }
   50% {
     background-position: 100% 50%;
-    filter: saturate(115%) brightness(102%);
   }
   100% {
     background-position: 50% 100%;
-    filter: saturate(108%) brightness(101%);
   }
 }
 
-/* Floating Aura Ambient Orbs */
-.aura-orb-teal {
-  background: radial-gradient(circle, rgba(94, 234, 212, 0.45) 0%, rgba(45, 212, 191, 0.15) 60%, transparent 70%);
-  animation: aura-drift-1 16s ease-in-out infinite alternate;
+/* Floating Aura Ambient Orbs (Violet, Magenta & Amethyst glow) */
+.aura-orb-violet, .aura-orb-teal {
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.35) 0%, rgba(124, 58, 237, 0.12) 60%, transparent 70%);
+  animation: aura-drift-1 18s ease-in-out infinite alternate;
 }
 
-.aura-orb-warm {
-  background: radial-gradient(circle, rgba(254, 240, 138, 0.4) 0%, rgba(253, 224, 71, 0.15) 55%, transparent 70%);
-  animation: aura-drift-2 20s ease-in-out infinite alternate;
+.aura-orb-magenta, .aura-orb-warm {
+  background: radial-gradient(circle, rgba(217, 70, 239, 0.28) 0%, rgba(192, 38, 211, 0.1) 55%, transparent 70%);
+  animation: aura-drift-2 22s ease-in-out infinite alternate;
 }
 
-.aura-orb-sky {
-  background: radial-gradient(circle, rgba(186, 230, 253, 0.45) 0%, rgba(125, 211, 252, 0.15) 55%, transparent 70%);
-  animation: aura-drift-3 14s ease-in-out infinite alternate;
+.aura-orb-indigo, .aura-orb-sky {
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, rgba(79, 70, 229, 0.1) 55%, transparent 70%);
+  animation: aura-drift-3 16s ease-in-out infinite alternate;
 }
 
 @keyframes aura-drift-1 {
@@ -79,35 +94,54 @@
   100% { transform: translate(35px, 50px) scale(1.12); }
 }
 
-/* Luminous Pastel Sky Blue & Soft Seafoam Green CTA */
-.btn-fresh-gradient {
-  background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
+/* Primary Aura Luminous Violet Button */
+.btn-fresh-gradient, .btn-aura-primary {
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 50%, #4f46e5 100%);
   color: #ffffff;
-  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
+  box-shadow: 0 4px 18px rgba(168, 85, 247, 0.35), 0 0 10px rgba(124, 58, 237, 0.2);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(216, 180, 254, 0.25);
 }
 
-.btn-fresh-gradient:hover {
-  background: linear-gradient(135deg, #0f766e 0%, #0369a1 100%);
-  box-shadow: 0 8px 22px rgba(13, 148, 136, 0.35);
+.btn-fresh-gradient:hover, .btn-aura-primary:hover {
+  background: linear-gradient(135deg, #c084fc 0%, #8b5cf6 50%, #6366f1 100%);
+  box-shadow: 0 6px 28px rgba(168, 85, 247, 0.55), 0 0 20px rgba(217, 70, 239, 0.3);
   transform: translateY(-2px);
+  border-color: rgba(233, 213, 255, 0.45);
 }
 
-.btn-fresh-gradient:active {
+.btn-fresh-gradient:active, .btn-aura-primary:active {
   transform: scale(0.97);
+}
+
+/* Secondary Aura Outline Button */
+.btn-aura-outline {
+  background: rgba(26, 14, 51, 0.6);
+  backdrop-filter: blur(12px);
+  color: #e9d5ff;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  transition: all 0.25s ease;
+}
+
+.btn-aura-outline:hover {
+  background: rgba(147, 51, 234, 0.2);
+  border-color: rgba(216, 180, 254, 0.6);
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.25);
 }
 
 /* WhatsApp Brand Button */
 .btn-whatsapp {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: #ffffff;
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
   transition: all 0.25s ease;
+  border: 1px solid rgba(110, 231, 183, 0.25);
 }
 
 .btn-whatsapp:hover {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  box-shadow: 0 8px 22px rgba(16, 185, 129, 0.35);
+  background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45);
   transform: translateY(-2px);
 }
 
@@ -115,78 +149,158 @@
   transform: scale(0.97);
 }
 
-/* Instagram Brand Button */
-.btn-instagram {
-  background: linear-gradient(135deg, #e1306c 0%, #fd1d1d 50%, #f77737 100%);
-  color: #ffffff;
-  box-shadow: 0 4px 14px rgba(225, 48, 108, 0.25);
-  transition: all 0.25s ease;
+/* Frosted Dark Aura Glass Header */
+.glass-header-light, .glass-header-aura {
+  background: rgba(12, 6, 26, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(168, 85, 247, 0.16);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
-.btn-instagram:hover {
-  box-shadow: 0 8px 22px rgba(225, 48, 108, 0.35);
-  transform: translateY(-2px);
-}
-
-.btn-instagram:active {
-  transform: scale(0.97);
-}
-
-/* Fresh Luminous Glass & Header */
-.glass-header-light {
-  background: rgba(255, 255, 255, 0.88);
+/* Card Styling with Resplendor & Ethereal Glow */
+.card-fresh, .card-aura, .card-editorial {
+  background: rgba(18, 10, 36, 0.72);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.85);
-}
-
-/* Card Styling with Subtle Resplendor & Elevation */
-.card-fresh {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(192, 132, 252, 0.18);
+  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.5), 0 0 20px -3px rgba(139, 92, 246, 0.08);
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.card-fresh:hover {
-  border-color: #99f6e4;
-  box-shadow: 0 14px 30px -6px rgba(45, 212, 191, 0.2), 0 8px 16px -4px rgba(254, 240, 138, 0.15);
+.card-fresh:hover, .card-aura:hover, .card-editorial:hover {
+  border-color: rgba(216, 180, 254, 0.45);
+  box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.7), 0 0 35px -5px rgba(168, 85, 247, 0.22), 0 0 15px rgba(52, 211, 153, 0.1);
   transform: translateY(-4px);
+}
+
+/* Revel Album / Folder Card with Aspect Ratio & Editorial Caption */
+.album-card-editorial {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(192, 132, 252, 0.2);
+  background: #110826;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.album-card-editorial:hover {
+  border-color: rgba(52, 211, 153, 0.5);
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.8), 0 0 30px rgba(52, 211, 153, 0.2);
+  transform: translateY(-5px);
+}
+
+/* Mint & Sky Editorial Action Buttons */
+.btn-editorial-mint {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3), 0 0 12px rgba(52, 211, 153, 0.2);
+  transition: all 0.25s ease;
+  border: 1px solid rgba(110, 231, 183, 0.3);
+}
+.btn-editorial-mint:hover {
+  background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+  box-shadow: 0 6px 24px rgba(16, 185, 129, 0.5), 0 0 20px rgba(110, 231, 183, 0.35);
+  transform: translateY(-2px);
+}
+
+.btn-editorial-sky {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(2, 132, 199, 0.3), 0 0 12px rgba(56, 189, 248, 0.2);
+  transition: all 0.25s ease;
+  border: 1px solid rgba(125, 211, 252, 0.3);
+}
+.btn-editorial-sky:hover {
+  background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+  box-shadow: 0 6px 24px rgba(2, 132, 199, 0.5), 0 0 20px rgba(56, 189, 248, 0.35);
+  transform: translateY(-2px);
 }
 
 /* Technical Sheet Badge & Container */
 .badge-tech-sheet {
-  background-color: #f0fdfa;
-  color: #0f766e;
-  border: 1px solid #ccfbf1;
+  background-color: rgba(26, 13, 50, 0.85);
+  color: #d8b4fe;
+  border: 1px solid rgba(192, 132, 252, 0.25);
 }
 
-/* Drag and Drop Zone in Pastel Mint & Sky */
+/* Drag and Drop Zone in Dark Aura Violet */
 .drag-drop-zone-fresh {
-  background: linear-gradient(180deg, rgba(204, 251, 241, 0.35) 0%, rgba(224, 242, 254, 0.35) 100%);
-  border: 2px dashed #99f6e4;
+  background: linear-gradient(180deg, rgba(46, 16, 101, 0.35) 0%, rgba(30, 10, 60, 0.5) 100%);
+  border: 2px dashed rgba(192, 132, 252, 0.35);
   transition: all 0.25s ease;
 }
 
 .drag-drop-zone-fresh.active,
 .drag-drop-zone-fresh:hover {
-  border-color: #0d9488;
-  background: linear-gradient(180deg, rgba(204, 251, 241, 0.55) 0%, rgba(224, 242, 254, 0.55) 100%);
+  border-color: #34d399;
+  background: linear-gradient(180deg, rgba(88, 28, 135, 0.45) 0%, rgba(46, 16, 101, 0.6) 100%);
+  box-shadow: 0 0 20px rgba(52, 211, 153, 0.25);
 }
 
-/* Smooth Light Scrollbar */
+/* Dynamic Aura Tag Pills (Soft Pastel Tones) */
+.aura-pill-tag, .pill-editorial {
+  background: rgba(30, 14, 60, 0.65);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(192, 132, 252, 0.25);
+  color: #e9d5ff;
+  transition: all 0.2s ease;
+}
+
+.aura-pill-tag:hover, .pill-editorial:hover {
+  border-color: rgba(52, 211, 153, 0.6);
+  box-shadow: 0 0 14px rgba(52, 211, 153, 0.25);
+  color: #ffffff;
+}
+
+/* Mint, Sky & Lavender Accent Pills */
+.pill-mint {
+  background: rgba(6, 78, 59, 0.55);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  color: #a7f3d0;
+}
+.pill-sky {
+  background: rgba(12, 74, 110, 0.55);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #bae6fd;
+}
+.pill-lavender {
+  background: rgba(59, 7, 100, 0.55);
+  border: 1px solid rgba(192, 132, 252, 0.35);
+  color: #e9d5ff;
+}
+
+/* Smooth Violet Glass Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #090514;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: rgba(168, 85, 247, 0.3);
   border-radius: 9999px;
-  border: 2px solid #f1f5f9;
+  border: 2px solid #090514;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: rgba(192, 132, 252, 0.55);
+}
+
+/* Global Viewport & Modal Scroll Locks */
+body.overflow-hidden {
+  overflow: hidden !important;
+  touch-action: none;
+}
+
+/* Fixed viewport overlay with guaranteed full-screen anchoring */
+.modal-overlay-viewport {
+  position: fixed !important;
+  inset: 0 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
 }

@@ -1,9 +1,10 @@
-import { Component, inject, signal, effect, HostListener } from '@angular/core';
+import { Component, inject, signal, effect, HostListener, ViewChild, ElementRef, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { catchError, throwError } from 'rxjs';
 import { ShopService } from '../../services/shop.service';
 import { AuthService } from '../../services/auth.service';
+import { ViewportScrollService } from '../../services/viewport-scroll.service';
 import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/photo.model';
 
 @Component({
@@ -15,33 +16,35 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
       <!-- Backdrop con cierre por clic exterior para evitar pantallas trabadas -->
       <div 
         (click)="onBackdropClick($event)"
-        class="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-6 backdrop-blur-md bg-slate-900/60 animate-fadeIn">
+        class="modal-overlay-viewport fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-6 backdrop-blur-md bg-black/75 animate-fadeIn">
         
         <!-- Modal Card Dashboard (detiene propagación de clic) -->
         <div 
+          #dashboardModalCard
           (click)="$event.stopPropagation()"
-          class="relative w-full max-w-5xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+          class="relative w-full max-w-5xl bg-[#13082a] border border-violet-500/30 rounded-3xl shadow-2xl shadow-violet-950/80 overflow-hidden flex flex-col max-h-[92vh] text-slate-100">
           
           <!-- Header Bar -->
-          <div class="px-6 py-5 border-b border-slate-200 bg-slate-50/90 flex items-center justify-between">
+          <div #dashboardHeader class="px-6 py-5 border-b border-violet-500/20 bg-[#180b36] flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-xs">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-violet-600 to-fuchsia-600 text-white flex items-center justify-center shadow-lg shadow-violet-600/30">
                 <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect width="18" height="18" x="3" y="3" rx="2"/>
                   <path d="M7 7h10M7 12h10M7 17h10"/>
                 </svg>
               </div>
               <div>
-                <h3 class="font-display font-bold text-xl text-slate-900">Panel de Control Administradora</h3>
-                <p class="text-xs text-slate-500">Sesión activa como: <strong class="text-teal-800">{{ auth.currentUser()?.email }}</strong></p>
+                <h3 class="font-display font-bold text-xl text-white">Panel de Control Administradora</h3>
+                <p class="text-xs text-violet-300/80">Sesión activa como: <strong class="text-fuchsia-300">{{ auth.currentUser()?.email }}</strong></p>
               </div>
             </div>
 
             <!-- Close Button -->
             <button
+              type="button"
               (click)="shop.closeAdminDashboard()"
               aria-label="Cerrar panel de administración"
-              class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/70 transition-colors">
+              class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-violet-900/40 transition-colors">
               <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"/>
                 <line x1="6" y1="6" x2="18" y2="18"/>
@@ -49,24 +52,26 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
             </button>
           </div>
 
-          <!-- Tab Bar Navigation: Fotos vs Servicios vs Editar Perfil -->
-          <div class="px-6 pt-4 border-b border-slate-200 bg-white flex items-center gap-4 overflow-x-auto">
+          <!-- Tab Bar Navigation: Fotos vs Servicios vs Editar Perfil (Sincronizado con URL) -->
+          <div class="px-6 pt-4 border-b border-violet-500/20 bg-[#13082b] flex items-center gap-4 overflow-x-auto">
             <button
-              (click)="activeTab.set('photos')"
+              type="button"
+              (click)="switchTab('photos')"
               class="pb-3 text-xs sm:text-sm font-semibold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap"
-              [ngClass]="activeTab() === 'photos' ? 'border-teal-600 text-teal-700' : 'border-transparent text-slate-500 hover:text-slate-800'">
+              [ngClass]="activeTab() === 'photos' ? 'border-emerald-400 text-emerald-300' : 'border-transparent text-slate-400 hover:text-white'">
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect width="18" height="18" x="3" y="3" rx="2"/>
                 <circle cx="9" cy="9" r="2"/>
                 <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
               </svg>
-              <span>Fotos ({{ shop.photos().length }})</span>
+              <span>Fotos & Álbumes ({{ shop.photos().length }})</span>
             </button>
 
             <button
-              (click)="activeTab.set('services')"
+              type="button"
+              (click)="switchTab('services')"
               class="pb-3 text-xs sm:text-sm font-semibold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap"
-              [ngClass]="activeTab() === 'services' ? 'border-teal-600 text-teal-700' : 'border-transparent text-slate-500 hover:text-slate-800'">
+              [ngClass]="activeTab() === 'services' ? 'border-sky-400 text-sky-300' : 'border-transparent text-slate-400 hover:text-white'">
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
                 <circle cx="9" cy="7" r="4"/>
@@ -77,9 +82,10 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
             </button>
 
             <button
-              (click)="activeTab.set('profile')"
+              type="button"
+              (click)="switchTab('profile')"
               class="pb-3 text-xs sm:text-sm font-semibold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap"
-              [ngClass]="activeTab() === 'profile' ? 'border-teal-600 text-teal-700' : 'border-transparent text-slate-500 hover:text-slate-800'">
+              [ngClass]="activeTab() === 'profile' ? 'border-violet-400 text-violet-300' : 'border-transparent text-slate-400 hover:text-white'">
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                 <circle cx="12" cy="7" r="4"/>
@@ -89,22 +95,23 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
           </div>
 
           <!-- Body Content Area -->
-          <div class="p-6 overflow-y-auto flex-grow space-y-8 bg-slate-50/50">
+          <div #scrollContainer class="p-6 overflow-y-auto flex-grow space-y-8 bg-[#0c051a]">
 
             <!-- TAB 1: GESTIÓN DE FOTOS -->
             @if (activeTab() === 'photos') {
               
               <!-- Photo Form (Create / Edit) -->
-              <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
+              <div class="p-6 rounded-2xl bg-[#160b33]/80 border border-violet-500/25 shadow-xl space-y-4">
                 <div class="flex items-center justify-between">
-                  <h4 class="font-display font-bold text-base text-slate-800 flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-teal-500"></span>
+                  <h4 class="font-display font-bold text-base text-white flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-fuchsia-400"></span>
                     <span>{{ editingPhotoId() ? 'Editar Fotografía' : 'Subir Nueva Fotografía' }}</span>
                   </h4>
                   @if (editingPhotoId()) {
                     <button
+                      type="button"
                       (click)="cancelPhotoEdit()"
-                      class="text-xs text-slate-500 hover:text-slate-700 underline">
+                      class="text-xs text-violet-300 hover:text-white underline">
                       Cancelar edición
                     </button>
                   }
@@ -114,7 +121,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                   
                   <!-- Drag & Drop / Image URL input -->
                   <div class="space-y-2">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-violet-300">
                       Imagen de la Fotografía *
                     </label>
 
@@ -133,15 +140,15 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
 
                       @if (photoImageUrl) {
                         <div class="flex items-center justify-center gap-3">
-                          <img [src]="photoImageUrl" alt="Vista previa" class="h-20 w-28 object-cover rounded-lg border border-slate-200 shadow-xs"/>
+                          <img [src]="photoImageUrl" alt="Vista previa" class="h-20 w-28 object-cover rounded-lg border border-violet-500/40 shadow-xs"/>
                           <div class="text-left text-xs">
-                            <span class="font-semibold text-slate-800 block">Imagen lista</span>
-                            <span class="text-teal-600 hover:underline">Haz clic o arrastra para cambiar</span>
+                            <span class="font-semibold text-white block">Imagen lista</span>
+                            <span class="text-fuchsia-400 hover:underline">Haz clic o arrastra para cambiar</span>
                           </div>
                         </div>
                       } @else {
-                        <div class="flex items-center justify-center gap-2 text-xs text-slate-600">
-                          <svg class="w-5 h-5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <div class="flex items-center justify-center gap-2 text-xs text-violet-300">
+                          <svg class="w-5 h-5 text-fuchsia-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
                             <path d="M12 12v9"/>
                             <path d="m16 16-4-4-4 4"/>
@@ -155,14 +162,14 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                       type="url"
                       [(ngModel)]="photoImageUrl"
                       name="photoImageUrl"
-                      placeholder="O pega una URL directa de imagen..."
-                      class="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-teal-500"/>
+                      placeholder="O pega una URL: https://images.unsplash.com/..."
+                      class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white placeholder-violet-300/40 focus:outline-none focus:border-fuchsia-400"/>
                   </div>
 
-                  <!-- Title & Category -->
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <!-- Title, Category, Price -->
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
                         Título de la Obra *
                       </label>
                       <input
@@ -170,97 +177,111 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                         required
                         [(ngModel)]="photoTitle"
                         name="photoTitle"
-                        placeholder="Ej: Olas al Atardecer"
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-teal-500"/>
+                        placeholder="Ej: Calma en Acantilados"
+                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white placeholder-violet-300/40 focus:outline-none focus:border-fuchsia-400"/>
                     </div>
 
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
-                        Categoría *
+                      <label class="block text-xs font-bold uppercase tracking-wider text-emerald-300 mb-1">
+                        Carpeta / Categoría del Álbum *
                       </label>
-                      <select
-                        [(ngModel)]="photoCategory"
-                        name="photoCategory"
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-teal-500">
-                        <option value="Foto Producto">Foto Producto</option>
-                        <option value="Paisajismo">Paisajismo</option>
-                        <option value="Eventos">Eventos</option>
-                      </select>
+                      <div class="space-y-2">
+                        <select
+                          [(ngModel)]="photoCategory"
+                          name="photoCategory"
+                          (ngModelChange)="onCategorySelectChange($event)"
+                          class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white focus:outline-none focus:border-emerald-400">
+                          <option value="Casamientos">Casamientos</option>
+                          <option value="Cumpleaños XV">Cumpleaños XV</option>
+                          <option value="Eventos">Eventos</option>
+                          <option value="Paisajismo">Paisajismo</option>
+                          <option value="Foto Producto">Foto Producto</option>
+                          @for (cat of customCategoryOptions(); track cat) {
+                            <option [value]="cat">{{ cat }}</option>
+                          }
+                          <option value="__NEW_CATEGORY__">+ Crear o ingresar nueva carpeta...</option>
+                        </select>
+
+                        @if (isCreatingNewCategory()) {
+                          <div class="flex items-center gap-2 animate-fadeIn">
+                            <input
+                              type="text"
+                              [(ngModel)]="newCategoryName"
+                              name="newCategoryName"
+                              placeholder="Nombre de la nueva carpeta / álbum..."
+                              class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0b0518] border border-emerald-400/50 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-300"/>
+                            <button
+                              type="button"
+                              (click)="applyNewCategory()"
+                              class="px-3 py-2 rounded-xl bg-emerald-500 text-slate-950 font-bold text-xs whitespace-nowrap">
+                              Asignar
+                            </button>
+                          </div>
+                        }
+                      </div>
+                    </div>
+
+                    <div>
+                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+                        Precio (USD) *
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        required
+                        [(ngModel)]="photoPrice"
+                        name="photoPrice"
+                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white focus:outline-none focus:border-fuchsia-400"/>
                     </div>
                   </div>
 
-                  <!-- MANDATORY FICHA TÉCNICA FIELD -->
-                  <div class="p-4 rounded-xl bg-teal-50/70 border border-teal-200/90 space-y-1.5">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-teal-900 flex items-center gap-1.5">
-                      <svg class="w-4 h-4 text-teal-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <circle cx="12" cy="12" r="3"/>
-                      </svg>
-                      <span>Ficha Técnica (Campo Obligatorio) *</span>
+                  <!-- Mandatory Technical Sheet -->
+                  <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+                      Ficha Técnica Completa (Obligatoria) *
                     </label>
-                    <p class="text-[11.5px] text-teal-800 font-normal">
-                      Indica la cámara, lente y ajustes de toma (apertura, velocidad, ISO).
-                    </p>
                     <input
                       type="text"
                       required
                       [(ngModel)]="photoTechnicalSheet"
                       name="photoTechnicalSheet"
-                      placeholder="Ej: Sony Alpha 7 IV · FE 24-70mm f/2.8 · f/2.8 · 1/500s · ISO 100"
-                      class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-teal-300 text-slate-900 text-sm font-mono focus:outline-none focus:border-teal-600"/>
+                      placeholder="Ej: Sony Alpha 7 IV · 85mm f/1.4 GM · 1/800s · f/1.8 · ISO 100"
+                      class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white placeholder-violet-300/40 focus:outline-none focus:border-fuchsia-400 font-mono"/>
                   </div>
 
-                  <!-- Price & Dimensions -->
+                  <!-- Description & Dimensions -->
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
-                        Precio (USD) *
-                      </label>
-                      <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 font-bold">$</span>
-                        <input
-                          type="number"
-                          min="1"
-                          required
-                          [(ngModel)]="photoPrice"
-                          name="photoPrice"
-                          placeholder="120"
-                          class="w-full pl-8 pr-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-teal-500"/>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
-                        Formato / Dimensiones
+                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+                        Dimensiones / Soporte
                       </label>
                       <input
                         type="text"
                         [(ngModel)]="photoDimensions"
                         name="photoDimensions"
-                        placeholder="Ej: 60 x 40 cm · Fine Art"
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-teal-500"/>
+                        placeholder="60 x 40 cm · Fine Art"
+                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white placeholder-violet-300/40 focus:outline-none focus:border-fuchsia-400"/>
+                    </div>
+
+                    <div>
+                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+                        Breve Descripción Artística
+                      </label>
+                      <input
+                        type="text"
+                        [(ngModel)]="photoDescription"
+                        name="photoDescription"
+                        placeholder="Descripción conceptual de la toma..."
+                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white placeholder-violet-300/40 focus:outline-none focus:border-fuchsia-400"/>
                     </div>
                   </div>
 
-                  <!-- Description -->
-                  <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
-                      Descripción
-                    </label>
-                    <textarea
-                      rows="2"
-                      [(ngModel)]="photoDescription"
-                      name="photoDescription"
-                      placeholder="Concepto de la toma, iluminación o detalles de locación..."
-                      class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-teal-500"></textarea>
-                  </div>
-
-                  <!-- Action Buttons -->
+                  <!-- Submit Action -->
                   <div class="flex items-center justify-end gap-3 pt-2">
                     <button
                       type="submit"
                       [disabled]="!isPhotoFormValid() || isSubmitting()"
-                      class="btn-fresh-gradient px-6 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                      class="btn-fresh-gradient px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                       @if (isSubmitting()) {
                         <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25"></circle>
@@ -281,16 +302,16 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                 </form>
               </div>
 
-              <!-- Table of Photos (CRUD List) -->
+              <!-- List of Photos (CRUD List) -->
               <div class="space-y-3">
-                <h4 class="font-display font-bold text-base text-slate-800">
-                  Fotografías en Catálogo Activo ({{ shop.photos().length }})
+                <h4 class="font-display font-bold text-base text-white">
+                  Catálogo de Obras ({{ shop.photos().length }})
                 </h4>
 
-                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+                <div class="rounded-2xl border border-violet-500/25 overflow-hidden bg-[#160b33]/80 shadow-xl">
                   <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs text-slate-700">
-                      <thead class="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-500 border-b border-slate-200">
+                    <table class="w-full text-left text-xs">
+                      <thead class="bg-[#1c0e3e] text-violet-300 font-bold uppercase tracking-wider border-b border-violet-500/20">
                         <tr>
                           <th class="p-3.5">Foto</th>
                           <th class="p-3.5">Título</th>
@@ -300,37 +321,39 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                           <th class="p-3.5 text-right">Acciones</th>
                         </tr>
                       </thead>
-                      <tbody class="divide-y divide-slate-100">
+                      <tbody class="divide-y divide-violet-900/30">
                         @for (photo of shop.photos(); track photo.id) {
-                          <tr class="hover:bg-slate-50/80 transition-colors">
+                          <tr class="hover:bg-violet-900/20 transition-colors">
                             <td class="p-3.5">
-                              <img [src]="photo.imageUrl" [alt]="photo.title" class="w-12 h-12 rounded-lg object-cover border border-slate-200"/>
+                              <img [src]="photo.imageUrl" [alt]="photo.title" class="w-12 h-12 rounded-lg object-cover border border-violet-500/40"/>
                             </td>
-                            <td class="p-3.5 font-semibold text-slate-900 max-w-[150px] truncate">
+                            <td class="p-3.5 font-semibold text-white max-w-[150px] truncate">
                               {{ photo.title }}
                             </td>
                             <td class="p-3.5">
-                              <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-teal-50 text-teal-700 border border-teal-100">
+                              <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-violet-950 text-violet-300 border border-violet-700/50">
                                 {{ photo.category }}
                               </span>
                             </td>
-                            <td class="p-3.5 font-mono text-[10.5px] text-slate-600 max-w-[200px] truncate" [title]="photo.technicalSheet">
+                            <td class="p-3.5 font-mono text-[10.5px] text-violet-300 max-w-[200px] truncate" [title]="photo.technicalSheet">
                               {{ photo.technicalSheet }}
                             </td>
-                            <td class="p-3.5 font-bold text-slate-900">
+                            <td class="p-3.5 font-bold text-white">
                               \${{ photo.price }} USD
                             </td>
                             <td class="p-3.5 text-right space-x-1.5 whitespace-nowrap">
                               <button
+                                type="button"
                                 (click)="startPhotoEdit(photo)"
                                 title="Editar foto"
-                                class="px-2.5 py-1 rounded-lg text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 transition-colors">
+                                class="px-2.5 py-1 rounded-lg text-violet-300 bg-violet-900/60 hover:bg-violet-800 border border-violet-600/40 transition-colors">
                                 Editar
                               </button>
                               <button
+                                type="button"
                                 (click)="deletePhoto(photo.id)"
                                 title="Eliminar foto"
-                                class="px-2.5 py-1 rounded-lg text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 transition-colors">
+                                class="px-2.5 py-1 rounded-lg text-rose-400 bg-rose-950/60 hover:bg-rose-900 border border-rose-800/40 transition-colors">
                                 Eliminar
                               </button>
                             </td>
@@ -345,16 +368,17 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
             } @else if (activeTab() === 'services') {
               
               <!-- TAB 2: GESTIÓN DE SERVICIOS -->
-              <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
+              <div class="p-6 rounded-2xl bg-[#160b33]/80 border border-violet-500/25 shadow-xl space-y-4">
                 <div class="flex items-center justify-between">
-                  <h4 class="font-display font-bold text-base text-slate-800 flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span>
+                  <h4 class="font-display font-bold text-base text-white flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-fuchsia-400"></span>
                     <span>{{ editingServiceId() ? 'Editar Servicio' : 'Crear Nuevo Servicio de Cobertura' }}</span>
                   </h4>
                   @if (editingServiceId()) {
                     <button
+                      type="button"
                       (click)="cancelServiceEdit()"
-                      class="text-xs text-slate-500 hover:text-slate-700 underline">
+                      class="text-xs text-violet-300 hover:text-white underline">
                       Cancelar edición
                     </button>
                   }
@@ -364,7 +388,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                   
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
                         Título del Servicio *
                       </label>
                       <input
@@ -373,11 +397,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                         [(ngModel)]="serviceTitle"
                         name="serviceTitle"
                         placeholder="Ej: Bautismos & Festejos Familiares"
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-teal-500"/>
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-[#0e0620] border border-violet-600/40 text-white text-sm focus:outline-none focus:border-fuchsia-400"/>
                     </div>
 
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
                         URL de Imagen del Servicio *
                       </label>
                       <input
@@ -386,12 +410,12 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                         [(ngModel)]="serviceImageUrl"
                         name="serviceImageUrl"
                         placeholder="https://images.unsplash.com/..."
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-teal-500"/>
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-[#0e0620] border border-violet-600/40 text-white text-sm focus:outline-none focus:border-fuchsia-400"/>
                     </div>
                   </div>
 
                   <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
                       Descripción del Servicio *
                     </label>
                     <textarea
@@ -400,11 +424,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                       [(ngModel)]="serviceDescription"
                       name="serviceDescription"
                       placeholder="Explica qué incluye la cobertura fotográfica..."
-                      class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-teal-500"></textarea>
+                      class="w-full px-3.5 py-2 rounded-xl bg-[#0e0620] border border-violet-600/40 text-white text-sm focus:outline-none focus:border-fuchsia-400"></textarea>
                   </div>
 
                   <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
                       Características Principales (separadas por coma)
                     </label>
                     <input
@@ -412,7 +436,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                       [(ngModel)]="serviceFeaturesString"
                       name="serviceFeaturesString"
                       placeholder="Tomas espontáneas, Galería web privada, Fotos en alta resolución..."
-                      class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-teal-500"/>
+                      class="w-full px-3.5 py-2.5 rounded-xl bg-[#0e0620] border border-violet-600/40 text-white text-sm focus:outline-none focus:border-fuchsia-400"/>
                   </div>
 
                   <div class="flex items-center justify-end gap-3 pt-2">
@@ -442,30 +466,32 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
 
               <!-- List of Services (CRUD List) -->
               <div class="space-y-3">
-                <h4 class="font-display font-bold text-base text-slate-800">
+                <h4 class="font-display font-bold text-base text-white">
                   Servicios Publicados ({{ shop.services().length }})
                 </h4>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   @for (service of shop.services(); track service.id) {
-                    <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between space-y-3">
-                      <div class="flex items-start gap-3">
-                        <img [src]="service.imageUrl" [alt]="service.title" class="w-16 h-16 rounded-xl object-cover border border-slate-200 flex-shrink-0"/>
+                    <div class="p-4 rounded-2xl bg-[#160b33]/80 border border-violet-500/25 flex flex-col justify-between space-y-3 shadow-md">
+                      <div class="flex items-center gap-3">
+                        <img [src]="service.imageUrl" [alt]="service.title" class="w-14 h-14 rounded-xl object-cover border border-violet-500/30"/>
                         <div class="min-w-0">
-                          <h5 class="font-display font-bold text-sm text-slate-900 truncate">{{ service.title }}</h5>
-                          <p class="text-xs text-slate-500 line-clamp-2 mt-0.5">{{ service.description }}</p>
+                          <h5 class="font-bold text-white text-sm truncate">{{ service.title }}</h5>
+                          <p class="text-xs text-slate-300 line-clamp-2 mt-0.5">{{ service.description }}</p>
                         </div>
                       </div>
 
-                      <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                      <div class="flex items-center justify-end gap-2 pt-2 border-t border-violet-900/30">
                         <button
+                          type="button"
                           (click)="startServiceEdit(service)"
-                          class="px-2.5 py-1 text-xs rounded-lg text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 font-medium">
+                          class="px-3 py-1 rounded-lg text-xs font-semibold text-violet-300 bg-violet-900/60 hover:bg-violet-800 border border-violet-600/40 transition-colors">
                           Editar
                         </button>
                         <button
+                          type="button"
                           (click)="deleteService(service.id)"
-                          class="px-2.5 py-1 text-xs rounded-lg text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 font-medium">
+                          class="px-3 py-1 rounded-lg text-xs font-semibold text-rose-400 bg-rose-950/60 hover:bg-rose-900 border border-rose-800/40 transition-colors">
                           Eliminar
                         </button>
                       </div>
@@ -474,39 +500,36 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                 </div>
               </div>
 
-            } @else {
+            } @else if (activeTab() === 'profile') {
               
-              <!-- TAB 3: EDITAR PERFIL & SOBRE MÍ (NEW FEATURE) -->
-              <div class="p-6 sm:p-8 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-6">
-                <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-                  <div>
-                    <h4 class="font-display font-bold text-lg text-slate-900 flex items-center gap-2">
-                      <span class="w-3 h-3 rounded-full bg-teal-500"></span>
-                      <span>Editar Perfil & Sección Sobre Mí</span>
-                    </h4>
-                    <p class="text-xs text-slate-500 mt-0.5">
-                      Personaliza tu foto de perfil y texto de presentación. Se guardará de forma persistente en tu navegador.
-                    </p>
-                  </div>
-
+              <!-- TAB 3: GESTIÓN DE PERFIL & SOBRE MÍ & ETIQUETAS DINÁMICAS -->
+              <div class="p-6 rounded-2xl bg-[#160b33]/80 border border-violet-500/25 shadow-xl space-y-6">
+                <div class="flex items-center justify-between">
+                  <h4 class="font-display font-bold text-base text-white flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-fuchsia-400"></span>
+                    <span>Actualizar Información del Perfil & Presentación</span>
+                  </h4>
                   @if (profileSavedMessage()) {
-                    <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold animate-fadeIn">
-                      ✓ ¡Perfil Guardado con Éxito!
+                    <span class="text-xs text-emerald-400 font-bold flex items-center gap-1 animate-fadeIn">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                      ¡Guardado con éxito!
                     </span>
                   }
                 </div>
 
-                <form (ngSubmit)="saveProfile()" class="space-y-5">
+                <form (ngSubmit)="saveProfile()" class="space-y-6">
                   
                   <!-- Profile Image Preview & URL / Drag Drop -->
                   <div class="space-y-3">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-violet-300">
                       Foto de Perfil Profesional
                     </label>
 
                     <div class="flex flex-col sm:flex-row items-center gap-5">
                       <!-- Image Preview Avatar -->
-                      <div class="w-28 h-28 rounded-2xl overflow-hidden border-2 border-teal-300 shadow-sm flex-shrink-0 bg-slate-100">
+                      <div class="w-28 h-28 rounded-2xl overflow-hidden border-2 border-violet-400/50 shadow-lg shadow-violet-950/50 flex-shrink-0 bg-[#0e0620]">
                         <img [src]="profileImageUrl" alt="Vista previa de perfil" class="w-full h-full object-cover"/>
                       </div>
 
@@ -522,8 +545,8 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                           <button
                             type="button"
                             (click)="profileFileInput.click()"
-                            class="px-4 py-2 text-xs font-semibold rounded-xl bg-teal-50 border border-teal-200 text-teal-800 hover:bg-teal-100 transition-colors flex items-center gap-2">
-                            <svg class="w-4 h-4 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            class="px-4 py-2 text-xs font-semibold rounded-xl bg-violet-900/60 border border-violet-500/40 text-violet-200 hover:bg-violet-800 hover:text-white transition-colors flex items-center gap-2">
+                            <svg class="w-4 h-4 text-fuchsia-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                               <polyline points="17 8 12 3 7 8"/>
                               <line x1="12" y1="3" x2="12" y2="15"/>
@@ -531,7 +554,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                             <span>{{ selectedProfileFile ? 'Cambiar archivo seleccionado' : 'Subir imagen desde equipo' }}</span>
                           </button>
                           @if (selectedProfileFile) {
-                            <span class="text-xs text-teal-700 font-medium truncate max-w-[200px]">
+                            <span class="text-xs text-fuchsia-300 font-medium truncate max-w-[200px]">
                               ✓ {{ selectedProfileFile.name }}
                             </span>
                           }
@@ -542,8 +565,8 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                           [(ngModel)]="profileImageUrl"
                           name="profileImageUrl"
                           placeholder="O ingresa una URL: https://images.unsplash.com/..."
-                          class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 text-slate-800 focus:outline-none focus:border-teal-500"/>
-                        <p class="text-[11px] text-slate-500">
+                          class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white placeholder-violet-300/40 focus:outline-none focus:border-fuchsia-400"/>
+                        <p class="text-[11px] text-slate-400">
                           Sube un archivo de imagen o ingresa una URL directa para actualizar tu retrato profesional.
                         </p>
                       </div>
@@ -553,7 +576,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                   <!-- Name, Title, Location -->
                   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
                         Nombre Completo
                       </label>
                       <input
@@ -561,11 +584,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                         required
                         [(ngModel)]="profileName"
                         name="profileName"
-                        class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 text-slate-800 focus:outline-none focus:border-teal-500"/>
+                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white focus:outline-none focus:border-fuchsia-400"/>
                     </div>
 
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
                         Título Profesional
                       </label>
                       <input
@@ -573,11 +596,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                         required
                         [(ngModel)]="profileTitle"
                         name="profileTitle"
-                        class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 text-slate-800 focus:outline-none focus:border-teal-500"/>
+                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white focus:outline-none focus:border-fuchsia-400"/>
                     </div>
 
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
                         Ubicación
                       </label>
                       <input
@@ -585,13 +608,13 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                         required
                         [(ngModel)]="profileLocation"
                         name="profileLocation"
-                        class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 text-slate-800 focus:outline-none focus:border-teal-500"/>
+                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white focus:outline-none focus:border-fuchsia-400"/>
                     </div>
                   </div>
 
                   <!-- Bio / Introduction text -->
                   <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
                       Texto de Presentación (Sección "Sobre Mí") *
                     </label>
                     <textarea
@@ -600,13 +623,115 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                       [(ngModel)]="profileBio"
                       name="profileBio"
                       placeholder="Escribe tu presentación profesional..."
-                      class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 text-slate-800 focus:outline-none focus:border-teal-500 leading-relaxed"></textarea>
+                      class="w-full px-3.5 py-2.5 text-sm rounded-xl bg-[#0e0620] border border-violet-600/40 text-white focus:outline-none focus:border-fuchsia-400 leading-relaxed"></textarea>
+                  </div>
+
+                  <!-- REQUERIMIENTO 2: GESTIÓN DINÁMICA DE ETIQUETAS EN EDITAR PERFIL -->
+                  <div class="space-y-3 p-4 rounded-2xl bg-[#0e0620]/80 border border-violet-500/30">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-violet-200">
+                          Etiquetas de Especialidades & Servicios (Dinámicas)
+                        </label>
+                        <p class="text-[11px] text-violet-300/70 mt-0.5">
+                          Administra las etiquetas que se mostrarán en la portada ("Sobre Mí"). Puedes agregar, editar o eliminar las que desees.
+                        </p>
+                      </div>
+                      <span class="text-xs text-fuchsia-300 font-semibold px-2 py-0.5 rounded-full bg-fuchsia-950/80 border border-fuchsia-700/40">
+                        {{ profileTags().length }} etiquetas
+                      </span>
+                    </div>
+
+                    <!-- Input para agregar nueva etiqueta -->
+                    <div class="flex items-center gap-2">
+                      <input
+                        type="text"
+                        [(ngModel)]="newTagInput"
+                        (keydown.enter)="$event.preventDefault(); addTag()"
+                        name="newTagInput"
+                        placeholder="Escribe una etiqueta (ej: 'Sesiones Boudoir') y presiona Enter o Agregar..."
+                        class="flex-grow px-3.5 py-2 text-xs rounded-xl bg-[#140b2e] border border-violet-600/40 text-white placeholder-violet-400/40 focus:outline-none focus:border-fuchsia-400 focus:ring-1 focus:ring-fuchsia-400/30"/>
+                      
+                      <button
+                        type="button"
+                        (click)="addTag()"
+                        class="btn-fresh-gradient px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 shadow-sm">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <line x1="12" y1="5" x2="12" y2="19"/>
+                          <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        <span>Agregar</span>
+                      </button>
+                    </div>
+
+                    <!-- Lista de Chips Dinámicos con Edición y Eliminación -->
+                    <div class="flex flex-wrap items-center gap-2 pt-2">
+                      @for (tag of profileTags(); track $index) {
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#1d0d40] border border-violet-500/40 text-violet-100 text-xs shadow-md group">
+                          @if (editingTagIndex() === $index) {
+                            <input
+                              type="text"
+                              [(ngModel)]="editingTagValue"
+                              (keydown.enter)="$event.preventDefault(); saveEditedTag($index)"
+                              (keydown.escape)="cancelEditTag()"
+                              name="editingTag_{{ $index }}"
+                              class="px-2 py-0.5 text-xs rounded bg-[#0e0620] border border-fuchsia-400 text-white focus:outline-none w-36"/>
+                            <button
+                              type="button"
+                              (click)="saveEditedTag($index)"
+                              title="Guardar cambio"
+                              class="text-emerald-400 hover:text-emerald-300 font-bold">
+                              ✓
+                            </button>
+                            <button
+                              type="button"
+                              (click)="cancelEditTag()"
+                              title="Cancelar edición"
+                              class="text-slate-400 hover:text-white">
+                              ✕
+                            </button>
+                          } @else {
+                            <span class="font-medium text-white flex items-center gap-1">
+                              <span class="text-fuchsia-400">✦</span>
+                              <span>{{ tag }}</span>
+                            </span>
+                            
+                            <button
+                              type="button"
+                              (click)="startEditTag($index, tag)"
+                              title="Editar texto de etiqueta"
+                              class="text-violet-400 hover:text-white transition-colors p-0.5 rounded">
+                              <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+                              </svg>
+                            </button>
+
+                            <button
+                              type="button"
+                              (click)="removeTag($index)"
+                              title="Eliminar etiqueta"
+                              class="text-rose-400 hover:text-rose-300 transition-colors p-0.5 rounded">
+                              <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"/>
+                                <line x1="6" y1="6" x2="18" y2="18"/>
+                              </svg>
+                            </button>
+                          }
+                        </div>
+                      }
+
+                      @if (profileTags().length === 0) {
+                        <p class="text-xs text-slate-400 italic py-1">
+                          No tienes etiquetas registradas. Añade una arriba para mostrarla en tu presentación.
+                        </p>
+                      }
+                    </div>
                   </div>
 
                   <!-- Social Handles -->
                   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
                         Instagram
                       </label>
                       <input
@@ -614,11 +739,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                         [(ngModel)]="profileInstagram"
                         name="profileInstagram"
                         placeholder="@julietamph_"
-                        class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 text-slate-800 focus:outline-none focus:border-teal-500"/>
+                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white focus:outline-none focus:border-fuchsia-400"/>
                     </div>
 
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
                         WhatsApp
                       </label>
                       <input
@@ -626,11 +751,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                         [(ngModel)]="profileWhatsapp"
                         name="profileWhatsapp"
                         placeholder="2281311917"
-                        class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 text-slate-800 focus:outline-none focus:border-teal-500"/>
+                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white focus:outline-none focus:border-fuchsia-400"/>
                     </div>
 
                     <div>
-                      <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                      <label class="block text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
                         Correo Electrónico
                       </label>
                       <input
@@ -638,7 +763,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                         [(ngModel)]="profileEmail"
                         name="profileEmail"
                         placeholder="julietamarateo4@gmail.com"
-                        class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 text-slate-800 focus:outline-none focus:border-teal-500"/>
+                        class="w-full px-3.5 py-2 text-xs rounded-xl bg-[#0e0620] border border-violet-600/40 text-white focus:outline-none focus:border-fuchsia-400"/>
                     </div>
                   </div>
 
@@ -647,7 +772,7 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
                     <button
                       type="submit"
                       [disabled]="isSubmitting()"
-                      class="btn-fresh-gradient px-7 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 shadow-sm disabled:opacity-50">
+                      class="btn-fresh-gradient px-7 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 shadow-md shadow-violet-600/30 disabled:opacity-50">
                       @if (isSubmitting()) {
                         <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25"></circle>
@@ -673,11 +798,12 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
           </div>
 
           <!-- Footer Bar -->
-          <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs text-slate-500">
-            <span>Los cambios se guardan localmente en tu navegador y se reflejan al instante.</span>
+          <div class="px-6 py-4 border-t border-violet-500/20 bg-[#180b36] flex items-center justify-between text-xs text-violet-300/80">
+            <span>Los cambios se guardan localmente y se reflejan en tiempo real.</span>
             <button
+              type="button"
               (click)="shop.closeAdminDashboard()"
-              class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold transition-colors">
+              class="px-4 py-2 rounded-xl bg-violet-900/60 hover:bg-violet-800 text-white font-semibold transition-colors border border-violet-500/30">
               Cerrar Panel
             </button>
           </div>
@@ -690,6 +816,11 @@ import { Photo, PhotoCategory, ServiceItem, ProfileData } from '../../models/pho
 export class AdminDashboardComponent {
   readonly shop = inject(ShopService);
   readonly auth = inject(AuthService);
+  readonly viewport = inject(ViewportScrollService);
+
+  @ViewChild('scrollContainer') scrollContainer?: ElementRef<HTMLDivElement>;
+  @ViewChild('dashboardModalCard') dashboardModalCard?: ElementRef<HTMLDivElement>;
+  @ViewChild('dashboardHeader') dashboardHeader?: ElementRef<HTMLDivElement>;
 
   readonly activeTab = signal<'photos' | 'services' | 'profile'>('photos');
   readonly isSubmitting = signal<boolean>(false);
@@ -704,6 +835,31 @@ export class AdminDashboardComponent {
   photoTechnicalSheet = '';
   photoDescription = '';
   selectedPhotoFile: File | null = null;
+  isCreatingNewCategory = signal<boolean>(false);
+  newCategoryName = '';
+
+  readonly customCategoryOptions = computed(() => {
+    const standard = ['Casamientos', 'Cumpleaños XV', 'Eventos', 'Paisajismo', 'Foto Producto'];
+    const all = this.shop.photos().map(p => p.category).filter(Boolean);
+    return Array.from(new Set(all.filter(c => !standard.includes(c) && c !== 'Todos')));
+  });
+
+  onCategorySelectChange(val: string): void {
+    if (val === '__NEW_CATEGORY__') {
+      this.isCreatingNewCategory.set(true);
+    } else {
+      this.isCreatingNewCategory.set(false);
+    }
+  }
+
+  applyNewCategory(): void {
+    const trimmed = this.newCategoryName.trim();
+    if (trimmed) {
+      this.photoCategory = trimmed;
+      this.isCreatingNewCategory.set(false);
+      this.shop.showAlert('info', `Carpeta "${trimmed}" asignada a la fotografía.`);
+    }
+  }
 
   // Service form
   editingServiceId = signal<string | null>(null);
@@ -724,13 +880,27 @@ export class AdminDashboardComponent {
   selectedProfileFile: File | null = null;
   profileSavedMessage = signal<boolean>(false);
 
+  // Dynamic tags state
+  profileTags = signal<string[]>([]);
+  newTagInput = '';
+  editingTagIndex = signal<number | null>(null);
+  editingTagValue = '';
+
   constructor() {
+    // Sincronizar apertura del dashboard y resetear la posición del scroll
+    effect(() => {
+      if (this.shop.isAdminDashboardOpen()) {
+        this.resetScroll();
+        setTimeout(() => this.resetScroll(), 50);
+      }
+    });
+
     // Sync initial tab when triggered
     effect(() => {
       this.activeTab.set(this.shop.adminInitialTab());
-    }, { allowSignalWrites: true });
+    });
 
-    // Populate profile form fields from shop.profile()
+    // Populate profile form fields and dynamic tags from shop.profile()
     effect(() => {
       const p = this.shop.profile();
       this.profileName = p.name;
@@ -741,6 +911,7 @@ export class AdminDashboardComponent {
       this.profileInstagram = p.instagram;
       this.profileWhatsapp = p.whatsapp;
       this.profileEmail = p.email;
+      this.profileTags.set(p.tags ? [...p.tags] : ['Casamientos', 'Cumpleaños de XV', 'Eventos Sociales & Corporativos', 'Retoque & Postproducción']);
     });
 
     // Escuchar si se seleccionó una foto para editar desde la galería
@@ -749,7 +920,7 @@ export class AdminDashboardComponent {
       if (ep) {
         this.startPhotoEdit(ep);
       }
-    }, { allowSignalWrites: true });
+    });
 
     // Escuchar si se seleccionó un servicio para editar desde la sección de servicios
     effect(() => {
@@ -757,7 +928,27 @@ export class AdminDashboardComponent {
       if (es) {
         this.startServiceEdit(es);
       }
-    }, { allowSignalWrites: true });
+    });
+  }
+
+  /**
+   * Resetea el scroll de la ventana y del contenedor interno del modal
+   */
+  resetScroll(): void {
+    this.viewport.scrollToTop(true);
+    if (this.scrollContainer?.nativeElement) {
+      this.viewport.resetContainerScroll(this.scrollContainer.nativeElement);
+    }
+    if (this.dashboardHeader?.nativeElement) {
+      this.viewport.scrollIntoView(this.dashboardHeader.nativeElement, true);
+    }
+  }
+
+  // --- NAVEGACIÓN ENTRE PESTAÑAS Y SINCRONIZACIÓN CON ROUTER ---
+  switchTab(tab: 'photos' | 'services' | 'profile'): void {
+    this.activeTab.set(tab);
+    this.shop.openAdminDashboard(tab);
+    this.resetScroll();
   }
 
   // --- CERRAR MODAL CON TECLA ESCAPE O CLIC EN BACKDROP ---
@@ -774,25 +965,55 @@ export class AdminDashboardComponent {
     }
   }
 
+  // --- DYNAMIC TAGS MANAGEMENT ---
+  addTag(): void {
+    const trimmed = this.newTagInput.trim();
+    if (!trimmed) return;
+    if (this.profileTags().includes(trimmed)) {
+      this.shop.showAlert('warning', `La etiqueta "${trimmed}" ya existe.`);
+      return;
+    }
+    this.profileTags.update(tags => [...tags, trimmed]);
+    this.newTagInput = '';
+  }
+
+  startEditTag(index: number, current: string): void {
+    this.editingTagIndex.set(index);
+    this.editingTagValue = current;
+  }
+
+  saveEditedTag(index: number): void {
+    const trimmed = this.editingTagValue.trim();
+    if (!trimmed) {
+      this.cancelEditTag();
+      return;
+    }
+    this.profileTags.update(tags => {
+      const copy = [...tags];
+      copy[index] = trimmed;
+      return copy;
+    });
+    this.editingTagIndex.set(null);
+    this.editingTagValue = '';
+  }
+
+  cancelEditTag(): void {
+    this.editingTagIndex.set(null);
+    this.editingTagValue = '';
+  }
+
+  removeTag(index: number): void {
+    this.profileTags.update(tags => tags.filter((_, i) => i !== index));
+  }
+
   /**
    * Manejador centralizado de errores:
-   * 1. Quita el estado borroso y cierra el modal inmediatamente.
-   * 2. Registra el error limpio en consola.
-   * 3. Muestra una alerta limpia tanto en la UI como en el navegador.
    */
   private handleRequestError(cleanMsg: string, rawError?: any): void {
     this.isSubmitting.set(false);
-    
-    // Quitar estado borroso y cerrar modal para evitar pantalla trabada
     this.shop.closeAdminDashboard();
-
-    // Notificación limpia en consola
     console.error('[AdminDashboard] Petición fallida:', cleanMsg, rawError);
-
-    // Alerta visual reactiva en la interfaz
     this.shop.showAlert('error', cleanMsg, 8000);
-
-    // Alerta nativa en navegador
     if (typeof window !== 'undefined') {
       alert(cleanMsg);
     }
@@ -868,11 +1089,15 @@ export class AdminDashboardComponent {
 
     this.isSubmitting.set(true);
 
+    const categoryToSave = this.isCreatingNewCategory() && this.newCategoryName.trim()
+      ? this.newCategoryName.trim()
+      : this.photoCategory;
+
     if (this.editingPhotoId()) {
       const photoId = this.editingPhotoId()!;
       this.shop.updatePhoto(photoId, {
         title: this.photoTitle.trim(),
-        category: this.photoCategory,
+        category: categoryToSave,
         price: Number(this.photoPrice),
         imageUrl: this.photoImageUrl.trim(),
         dimensions: this.photoDimensions.trim() || '60 x 40 cm · Fine Art',
@@ -900,7 +1125,7 @@ export class AdminDashboardComponent {
     } else {
       this.shop.addPhoto({
         title: this.photoTitle.trim(),
-        category: this.photoCategory,
+        category: categoryToSave,
         price: Number(this.photoPrice),
         imageUrl: this.photoImageUrl.trim(),
         dimensions: this.photoDimensions.trim() || '60 x 40 cm · Fine Art',
@@ -941,6 +1166,8 @@ export class AdminDashboardComponent {
     this.photoTechnicalSheet = photo.technicalSheet;
     this.photoDescription = photo.description;
     this.selectedPhotoFile = null;
+    this.switchTab('photos');
+    this.resetScroll();
   }
 
   cancelPhotoEdit(): void {
@@ -979,6 +1206,8 @@ export class AdminDashboardComponent {
   private resetPhotoForm(): void {
     this.photoTitle = '';
     this.photoCategory = 'Foto Producto';
+    this.isCreatingNewCategory.set(false);
+    this.newCategoryName = '';
     this.photoPrice = 120;
     this.photoImageUrl = '';
     this.photoDimensions = '60 x 40 cm · Fine Art';
@@ -1064,6 +1293,8 @@ export class AdminDashboardComponent {
     this.serviceImageUrl = service.imageUrl;
     this.serviceDescription = service.description;
     this.serviceFeaturesString = (service.features || []).join(', ');
+    this.switchTab('services');
+    this.resetScroll();
   }
 
   cancelServiceEdit(): void {
@@ -1106,7 +1337,7 @@ export class AdminDashboardComponent {
     this.serviceFeaturesString = '';
   }
 
-  // --- PROFILE EDIT ---
+  // --- PROFILE EDIT CON ETIQUETAS DINÁMICAS ---
   saveProfile(): void {
     if (this.isSubmitting()) return;
     this.isSubmitting.set(true);
@@ -1119,7 +1350,8 @@ export class AdminDashboardComponent {
       bio: this.profileBio.trim(),
       instagram: this.profileInstagram.trim(),
       whatsapp: this.profileWhatsapp.trim(),
-      email: this.profileEmail.trim()
+      email: this.profileEmail.trim(),
+      tags: this.profileTags()
     }, this.selectedProfileFile || undefined)
     .pipe(
       catchError((err) => {
@@ -1133,7 +1365,7 @@ export class AdminDashboardComponent {
         this.isSubmitting.set(false);
         this.selectedProfileFile = null;
         this.profileSavedMessage.set(true);
-        this.shop.showAlert('success', '¡Perfil actualizado permanentemente!');
+        this.shop.showAlert('success', '¡Perfil y etiquetas actualizados permanentemente!');
         setTimeout(() => {
           this.profileSavedMessage.set(false);
         }, 2500);

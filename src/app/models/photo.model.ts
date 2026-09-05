@@ -1,4 +1,4 @@
-export type PhotoCategory = 'Foto Producto' | 'Paisajismo' | 'Eventos';
+export type PhotoCategory = 'Foto Producto' | 'Paisajismo' | 'Eventos' | 'Casamientos' | 'Cumpleaños XV' | (string & {});
 
 export interface CameraSpecs {
   camera: string;
@@ -41,9 +41,19 @@ export interface ProfileData {
   whatsapp: string;
   email: string;
   instagram: string;
+  tags?: string[];
 }
 
 export interface CartItem {
   photo: Photo;
   quantity: number;
+}
+
+export interface AlbumFolder {
+  id: string;
+  name: string;
+  category: string;
+  coverImage: string;
+  count: number;
+  description: string;
 }
